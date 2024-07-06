@@ -1,0 +1,20 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "setup_python_env",
+            "type": "shell",
+            "linux": {
+                "command": "export CARB_APP_PATH=${input:isaacsim_path}/kit && export ISAAC_PATH=${input:isaacsim_path} && export EXP_PATH=${input:isaacsim_path}/apps && source ${input:isaacsim_path}/setup_python_env.sh && printenv >${workspaceFolder}/.vscode/.python.env && ${input:isaacsim_path}/python.sh ${workspaceFolder}/.vscode/tools/setup_vscode.py --isaacsim_path ${input:isaacsim_path}"
+            }
+        }
+    ],
+    "inputs": [
+        {
+            "id": "isaacsim_path",
+            "description": "Absolute path to Isaac Sim:",
+            "default": "",
+            "type": "promptString"
+        },
+    ]
+}

@@ -1,0 +1,84 @@
+{
+    // Configure glob patterns of file associations to languages (for example `"*.extension": "html"`).
+    // These have precedence over the default associations of the languages installed.
+    "files.associations": {
+        "*.tpp": "cpp",
+        "*.kit": "toml",
+        "*.rst": "restructuredtext"
+    },
+    "editor.rulers": [120],
+
+    // Configure paths or glob patterns to exclude from file watching. E.g. ignored by linter.
+    "files.watcherExclude": {
+        "**/.git/objects/**": true,
+        "**/.git/subtree-cache/**": true,
+        "**/node_modules/**": true,
+        "**/_isaac_sim/**": true,
+        "**/_compiler/**": true
+    },
+    // Configuration for spelling checker
+    "spellright.language": [
+        "en-US-10-1."
+    ],
+    "spellright.documentTypes": [
+        "markdown",
+        "latex",
+        "plaintext",
+        "cpp",
+        "asciidoc",
+        "python",
+        "restructuredtext"
+    ],
+    "cSpell.words": [
+        "literalinclude",
+        "linenos",
+        "instanceable",
+        "isaacSim",
+        "jacobians",
+        "pointcloud",
+        "ridgeback",
+        "rllib",
+        "robomimic",
+        "teleoperation",
+        "xform",
+        "numpy",
+        "tensordict",
+        "flatcache",
+        "physx",
+        "dpad",
+        "gamepad",
+        "linspace",
+        "upsampled",
+        "downsampled",
+        "arange",
+        "discretization",
+        "trimesh",
+        "uninstanceable"
+    ],
+    // This enables python language server. Seems to work slightly better than jedi:
+    "python.languageServer": "Pylance",
+    // We use "black" as a formatter:
+    "black-formatter.args": ["--line-length", "120",],
+    // Use flake8 for linting
+    "flake8.args": ["--max-line-length", "120"],
+    // Use docstring generator
+    "autoDocstring.docstringFormat": "google",
+    "autoDocstring.guessTypes": true,
+    // Python environment path
+    "python.defaultInterpreterPath": "_isaac_sim/python.sh",
+    "python.envFile": "${workspaceFolder}/.vscode/.python.env",
+    // ROS distribution
+    "ros.distro": "noetic",
+    // Language specific settings
+    "[python]": {
+        "editor.tabSize": 4,
+        "editor.defaultFormatter": "ms-python.black-formatter",
+        "editor.formatOnSave": true,
+    },
+    "[restructuredtext]": {
+        "editor.tabSize": 2
+    },
+    // Python extra paths
+    // Note: this is will be auto-filled
+    "python.analysis.extraPaths": []
+}
