@@ -9,8 +9,7 @@ You need to install `Isaac Lab`.
 Using a python interpreter that has Isaac Lab installed, install the library
 
 ```bash
-cd ext/real_robot
-python -m pip install -e .
+python -m pip install -e real_robot
 ```
 
 ## Try unitree-a1 example
