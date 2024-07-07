@@ -252,12 +252,12 @@ class RewardsCfg:
     base_height_l2 = RewTerm(
         func=mdp.base_height_l2,
         weight=0.0,
-        params={"asset_cfg": SceneEntityCfg("contact_forces", body_names="base"), "target_height": 0.0},
+        params={"asset_cfg": SceneEntityCfg("robot", body_names="base"), "target_height": 0.0},
     )
     body_lin_acc_l2 = RewTerm(
         func=mdp.body_lin_acc_l2,
         weight=0.0,
-        params={"asset_cfg": SceneEntityCfg("contact_forces", body_names="base")},
+        params={"asset_cfg": SceneEntityCfg("robot", body_names="base")},
     )
 
     # Joint penaltie
@@ -313,13 +313,38 @@ class RewardsCfg:
         },
     )
 
+    foot_contact = RewTerm(
+        func=mdp.foot_contact,
+        weight=0.01,
+        params={
+            "sensor_cfg": SceneEntityCfg("contact_forces", body_names=".*FOOT"),
+            "command_name": "base_velocity",
+            "expect_contact_num": 2,
+        },
+    )
+
 
 @configclass
 class TerminationsCfg:
     """Termination terms for the MDP."""
 
+    # MDP terminations
     time_out = DoneTerm(func=mdp.time_out, time_out=True)
-    base_contact = DoneTerm(
+    # command_resample
+
+    # Root terminations
+    # bad_orientation
+    # root_height_below_minimum
+
+    # Joint terminations
+    # joint_pos_out_of_limit
+    # joint_pos_out_of_manual_limit
+    # joint_vel_out_of_limit
+    # joint_vel_out_of_manual_limit
+    # joint_effort_out_of_limit
+
+    # Contact sensor
+    illegal_contact = DoneTerm(
         func=mdp.illegal_contact,
         params={"sensor_cfg": SceneEntityCfg("contact_forces", body_names="base"), "threshold": 1.0},
     )
