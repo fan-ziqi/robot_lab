@@ -21,14 +21,19 @@ class UnitreeA1RoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         self.scene.terrain.terrain_generator.sub_terrains["random_rough"].noise_range = (0.01, 0.06)
         self.scene.terrain.terrain_generator.sub_terrains["random_rough"].noise_step = 0.01
 
+        # observations
+        self.observations.policy.base_lin_vel = None
+        self.observations.policy.height_scan = None
+
         # reduce action scale
         self.actions.joint_pos.scale = 0.25
 
         # event
-        self.events.push_robot = None
+        # self.events.push_robot = None
         self.events.add_base_mass.params["mass_distribution_params"] = (-1.0, 3.0)
         self.events.add_base_mass.params["asset_cfg"].body_names = "trunk"
         self.events.base_external_force_torque.params["asset_cfg"].body_names = "trunk"
+        self.events.base_external_force_torque.params["force_range"] = (-1.0, 3.0)
         self.events.reset_robot_joints.params["position_range"] = (1.0, 1.0)
         self.events.reset_base.params = {
             "pose_range": {"x": (-0.5, 0.5), "y": (-0.5, 0.5), "yaw": (-3.14, 3.14)},
@@ -41,17 +46,55 @@ class UnitreeA1RoughEnvCfg(LocomotionVelocityRoughEnvCfg):
                 "yaw": (0.0, 0.0),
             },
         }
+        # randomize_actuator_gains is currently not supported for explicit actuator models
+        self.events.randomize_actuator_gains = None 
 
-        # rewards
-        self.rewards.feet_air_time.params["sensor_cfg"].body_names = ".*_foot"
-        self.rewards.feet_air_time.weight = 0.01
-        self.rewards.undesired_contacts = None
-        self.rewards.dof_torques_l2.weight = -0.0002
+        # ------------------------------Rewards------------------------------
+        # General
+        # UNUESD self.rewards.is_alive.weight = 0.0
+        # UNUESD self.rewards.is_terminated.weight = 0.0
+
+        # Root penalties
+        self.rewards.lin_vel_z_l2.weight = -2.0
+        self.rewards.ang_vel_xy_l2.weight = -0.05
+        self.rewards.flat_orientation_l2.weight = -0.5
+        self.rewards.base_height_l2 = None
+        # self.rewards.base_height_l2.weight = -5.0
+        # self.rewards.base_height_l2.params["target_height"] = 0.35
+        # self.rewards.base_height_l2.params["asset_cfg"].body_names = "trunk"
+        self.rewards.body_lin_acc_l2.weight = 0.0
+        self.rewards.body_lin_acc_l2.params["asset_cfg"].body_names = "trunk"
+
+        # Joint penaltie
+        self.rewards.joint_torques_l2.weight = -0.0002
+        # UNUESD self.rewards.joint_vel_l1.weight = 0.0
+        self.rewards.joint_vel_l2.weight = 0.0
+        self.rewards.joint_acc_l2.weight = -2.5e-7
+        # UNUESD self.rewards.joint_deviation_l1.weight = 0.0
+        self.rewards.joint_pos_limits.weight = -5.0
+        self.rewards.joint_vel_limits.weight = 0.0
+
+        # Action penalties
+        self.rewards.applied_torque_limits.weight = 0.0
+        self.rewards.applied_torque_limits.params["asset_cfg"].body_names = "trunk"
+        self.rewards.action_rate_l2.weight = -0.01
+        # UNUESD self.rewards.action_l2.weight = 0.0
+
+        # Contact sensor
+        self.rewards.undesired_contacts.weight = 0.0
+        self.rewards.undesired_contacts.params["sensor_cfg"].body_names = ""
+        self.rewards.contact_forces.weight = 0.0
+        self.rewards.contact_forces.params["sensor_cfg"].body_names = ".*_foot"
+
+        # Velocity-tracking rewards
         self.rewards.track_lin_vel_xy_exp.weight = 1.5
         self.rewards.track_ang_vel_z_exp.weight = 0.75
-        self.rewards.dof_acc_l2.weight = -2.5e-7
 
-        # terminations
+        # Others
+        self.rewards.feet_air_time.weight = 0.01
+        self.rewards.feet_air_time.params["sensor_cfg"].body_names = ".*_foot"
+
+        # ------------------------------Terminations------------------------------
         self.terminations.base_contact.params["sensor_cfg"].body_names = "trunk"
 
 
