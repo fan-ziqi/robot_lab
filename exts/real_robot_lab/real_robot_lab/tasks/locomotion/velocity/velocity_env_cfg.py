@@ -202,7 +202,7 @@ class EventCfg:
         },
     )
 
-    randomize_actuator_gains = EventTerm(
+    randomize_actuator_gains = EventTerm( # add
         func=mdp.randomize_actuator_gains,
         mode="reset",
         params={
@@ -214,7 +214,7 @@ class EventCfg:
         },
     )
 
-    randomize_joint_parameters = EventTerm(
+    randomize_joint_parameters = EventTerm( # add
         func=mdp.randomize_joint_parameters,
         mode="reset",
         params={
@@ -319,6 +319,32 @@ class RewardsCfg:
         },
     )
 
+    base_height_rough_l2 = RewTerm(
+        func=mdp.base_height_rough_l2,
+        weight=0.01,
+        params={
+            "asset_cfg": SceneEntityCfg("robot", body_names="base"), 
+            "sensor_cfg": SceneEntityCfg("height_scanner"),
+            "target_height": 0.0,
+        },
+    )
+
+    foot_slip = RewTerm(
+        func=mdp.foot_slip,
+        weight=0.01,
+        params={
+            "asset_cfg": SceneEntityCfg("robot", body_names=".*FOOT"), 
+            "sensor_cfg": SceneEntityCfg("contact_forces", body_names=".*FOOT"),
+        },
+    )
+
+    joint_power = RewTerm(func=mdp.joint_power, weight=0.01)
+
+    stand_still_when_zero_command = RewTerm(
+        func=mdp.stand_still_when_zero_command, 
+        weight=0.01, 
+        params={"command_name": "base_velocity"},
+    )
 
 @configclass
 class TerminationsCfg:

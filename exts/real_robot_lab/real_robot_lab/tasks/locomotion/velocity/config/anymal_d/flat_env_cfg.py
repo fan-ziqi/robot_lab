@@ -1,3 +1,5 @@
+import math
+
 from omni.isaac.lab.utils import configclass
 
 from .rough_env_cfg import AnymalDRoughEnvCfg
@@ -13,6 +15,8 @@ class AnymalDFlatEnvCfg(AnymalDRoughEnvCfg):
         self.rewards.flat_orientation_l2.weight = -5.0
         self.rewards.joint_torques_l2.weight = -2.5e-5
         self.rewards.feet_air_time.weight = 0.5
+        self.rewards.base_height_l2.weight = 0
+        self.rewards.base_height_rough_l2.weight = 0
         # change terrain to flat
         self.scene.terrain.terrain_type = "plane"
         self.scene.terrain.terrain_generator = None
@@ -30,7 +34,6 @@ class AnymalDFlatEnvCfg_PLAY(AnymalDFlatEnvCfg):
 
         # make a smaller scene for play
         self.scene.num_envs = 50
-        self.scene.env_spacing = 2.5
         # disable randomization for play
         self.observations.policy.enable_corruption = False
         # remove random pushing

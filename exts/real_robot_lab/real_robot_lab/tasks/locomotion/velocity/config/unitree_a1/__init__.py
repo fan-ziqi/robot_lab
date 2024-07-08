@@ -7,7 +7,7 @@ from . import agents, flat_env_cfg, rough_env_cfg
 ##
 
 gym.register(
-    id="RealRobot-Velocity-Flat-Unitree-A1-v0",
+    id="RealRobot-Isaac-Velocity-Flat-Unitree-A1-v0",
     entry_point="omni.isaac.lab.envs:ManagerBasedRLEnv",
     disable_env_checker=True,
     kwargs={
