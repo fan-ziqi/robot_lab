@@ -25,12 +25,10 @@ python scripts/rsl_rl/play.py --task RealRobot-Isaac-Velocity-Rough-Unitree-A1-P
 
 To convert urdf, you need to run `convert_urdf.py` of dir `IsaacLab`
 
+For example, to generate A1 usd file:
+
 ```bash
-./isaaclab.sh -p source/standalone/tools/convert_urdf.py \
-  ~/git/anymal_d_simple_description/urdf/anymal.urdf \
-  source/extensions/omni.isaac.lab_assets/data/Robots/<YOUR_ROBOT>/<YOUR_ROBOT>.usd \
-  --merge-joints \
-  --make-instanceable
+./isaaclab.sh -p source/standalone/tools/convert_urdf.py <YOUR_ROBOT>.urdf source/extensions/omni.isaac.lab_assets/data/Robots/<YOUR_ROBOT>/<YOUR_ROBOT>.usd --merge-join
 ```
 
 Check [import_new_asset](https://docs.robotsfan.com/isaaclab/source/how-to/import_new_asset.html) for detail
