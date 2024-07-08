@@ -35,7 +35,7 @@ import torch
 from rsl_rl.runners import OnPolicyRunner
 
 # Import extensions to set up environment tasks
-import real_robot.tasks  # noqa: F401
+import real_robot_lab.tasks  # noqa: F401
 
 from omni.isaac.lab_tasks.utils import get_checkpoint_path, parse_env_cfg
 from omni.isaac.lab_tasks.utils.wrappers.rsl_rl import RslRlOnPolicyRunnerCfg, RslRlVecEnvWrapper, export_policy_as_onnx

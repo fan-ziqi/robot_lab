@@ -38,7 +38,7 @@ from datetime import datetime
 from rsl_rl.runners import OnPolicyRunner
 
 # Import extensions to set up environment tasks
-import real_robot.tasks  # noqa: F401
+import real_robot_lab.tasks  # noqa: F401
 
 from omni.isaac.lab.envs import ManagerBasedRLEnvCfg
 from omni.isaac.lab.utils.dict import print_dict

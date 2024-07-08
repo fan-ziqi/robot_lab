@@ -1,4 +1,4 @@
-# omni.isaaclab.real_robot
+# real_robot_lab
 
 ## Get Ready
 
@@ -9,7 +9,7 @@ You need to install `Isaac Lab`.
 Using a python interpreter that has Isaac Lab installed, install the library
 
 ```bash
-python -m pip install -e real_robot
+python -m pip install -e ./exts/real_robot_lab
 ```
 
 ## Try unitree-a1 example
