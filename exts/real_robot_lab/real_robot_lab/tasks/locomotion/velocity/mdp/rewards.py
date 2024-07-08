@@ -55,11 +55,11 @@ def feet_air_time_positive_biped(
     reward *= torch.norm(env.command_manager.get_command(command_name)[:, :2], dim=1) > 0.1
     return reward
 
+
 def foot_contact(
     env: ManagerBasedRLEnv, command_name: str, expect_contact_num: int, sensor_cfg: SceneEntityCfg
 ) -> torch.Tensor:
-    """Reward foot_contact
-    """
+    """Reward foot_contact"""
     # extract the used quantities (to enable type-hinting)
     contact_sensor: ContactSensor = env.scene.sensors[sensor_cfg.name]
     # compute the reward
