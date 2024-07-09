@@ -1,5 +1,9 @@
 # robot_lab
 
+robot_lab is an extension project based on the IsaacLab framework. It has a clear code framework and you can quickly migrate to your own robot.
+
+[Click to discuss on Discord](https://discord.gg/vmVjkhVugU)
+
 ## Get Ready
 
 You need to install `Isaac Lab`.
@@ -13,6 +17,15 @@ python -m pip install -e ./exts/robot_lab
 ```
 
 ## Try examples
+
+Anymal D
+
+```bash
+# To train
+python scripts/rsl_rl/train.py --task RobotLab-Isaac-Velocity-Flat-Anymal-D-v0 --headless
+# To play
+python scripts/rsl_rl/play.py --task RobotLab-Isaac-Velocity-Flat-Anymal-D-Play-v0
+```
 
 Unitree A1
 
@@ -32,23 +45,16 @@ python scripts/rsl_rl/train.py --task RobotLab-Isaac-Velocity-Flat-Unitree-H1-v0
 python scripts/rsl_rl/play.py --task RobotLab-Isaac-Velocity-Flat-Unitree-H1-Play-v0
 ```
 
-Anymal D
-
-```bash
-# To train
-python scripts/rsl_rl/train.py --task RobotLab-Isaac-Velocity-Flat-Anymal-D-v0 --headless
-# To play
-python scripts/rsl_rl/play.py --task RobotLab-Isaac-Velocity-Flat-Anymal-D-Play-v0
-```
-
 FFTAI GR1T1
 
 ```bash
 # To train
-python scripts/rsl_rl/train.py --task RobotLab-Isaac-Velocity-Rough-FFTAI-GR1T1-v0 --headless
+python scripts/rsl_rl/train.py --task RobotLab-Isaac-Velocity-Flat-FFTAI-GR1T1-v0 --headless
 # To play
-python scripts/rsl_rl/play.py --task RobotLab-Isaac-Velocity-Rough-FFTAI-GR1T1-Play-v0
+python scripts/rsl_rl/play.py --task RobotLab-Isaac-Velocity-Flat-FFTAI-GR1T1-Play-v0
 ```
+
+The above configs are flat, you can change Flat to Rough
 
 ## Add your own robot
 
