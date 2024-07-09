@@ -1,23 +1,30 @@
-from real_robot_lab.tasks.locomotion.velocity.velocity_env_cfg import LocomotionVelocityRoughEnvCfg
+from robot_lab.tasks.locomotion.velocity.velocity_env_cfg import LocomotionVelocityRoughEnvCfg
 
 from omni.isaac.lab.utils import configclass
 
 ##
 # Pre-defined configs
 ##
-from omni.isaac.lab_assets.anymal import ANYMAL_D_CFG  # isort: skip
+# use cloud assets
+# from omni.isaac.lab_assets.unitree import UNITREE_A1_CFG  # isort: skip
+# use local assets
+from robot_lab.assets.unitree import UNITREE_A1_CFG  # isort: skip
 
 
 @configclass
-class AnymalDRoughEnvCfg(LocomotionVelocityRoughEnvCfg):
+class UnitreeA1RoughEnvCfg(LocomotionVelocityRoughEnvCfg):
     def __post_init__(self):
         # post init of parent
         super().__post_init__()
 
         # ------------------------------Sence------------------------------
-        # switch robot to anymal-d
-        self.scene.robot = ANYMAL_D_CFG.replace(prim_path="{ENV_REGEX_NS}/Robot")
-        self.scene.height_scanner.prim_path = "{ENV_REGEX_NS}/Robot/base"
+        # switch robot to unitree-a1
+        self.scene.robot = UNITREE_A1_CFG.replace(prim_path="{ENV_REGEX_NS}/Robot")
+        self.scene.height_scanner.prim_path = "{ENV_REGEX_NS}/Robot/trunk"
+        # scale down the terrains because the robot is small
+        self.scene.terrain.terrain_generator.sub_terrains["boxes"].grid_height_range = (0.025, 0.1)
+        self.scene.terrain.terrain_generator.sub_terrains["random_rough"].noise_range = (0.01, 0.06)
+        self.scene.terrain.terrain_generator.sub_terrains["random_rough"].noise_step = 0.01
 
         # ------------------------------Observations------------------------------
         self.observations.policy.base_lin_vel = None
@@ -25,12 +32,12 @@ class AnymalDRoughEnvCfg(LocomotionVelocityRoughEnvCfg):
 
         # ------------------------------Actions------------------------------
         # reduce action scale
-        self.actions.joint_pos.scale = 0.5
+        self.actions.joint_pos.scale = 0.25
 
         # ------------------------------Events------------------------------
-        self.events.add_base_mass.params["mass_distribution_params"] = (-5.0, 5.0)
-        self.events.add_base_mass.params["asset_cfg"].body_names = ["base"]
-        self.events.base_external_force_torque.params["asset_cfg"].body_names = ["base"]
+        self.events.add_base_mass.params["mass_distribution_params"] = (-1.0, 3.0)
+        self.events.add_base_mass.params["asset_cfg"].body_names = ["trunk"]
+        self.events.base_external_force_torque.params["asset_cfg"].body_names = ["trunk"]
         self.events.reset_base.params = {
             "pose_range": {"x": (-0.5, 0.5), "y": (-0.5, 0.5), "yaw": (-3.14, 3.14)},
             "velocity_range": {
@@ -57,9 +64,9 @@ class AnymalDRoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         self.rewards.flat_orientation_l2.weight = -0.5
         self.rewards.base_height_l2.weight = 0
         self.rewards.base_height_l2.params["target_height"] = 0.35
-        self.rewards.base_height_l2.params["asset_cfg"].body_names = ["base"]
+        self.rewards.base_height_l2.params["asset_cfg"].body_names = ["trunk"]
         self.rewards.body_lin_acc_l2.weight = 0
-        self.rewards.body_lin_acc_l2.params["asset_cfg"].body_names = ["base"]
+        self.rewards.body_lin_acc_l2.params["asset_cfg"].body_names = ["trunk"]
 
         # Joint penaltie
         self.rewards.joint_torques_l2.weight = -0.0002
@@ -73,15 +80,15 @@ class AnymalDRoughEnvCfg(LocomotionVelocityRoughEnvCfg):
 
         # Action penalties
         self.rewards.applied_torque_limits.weight = 0
-        self.rewards.applied_torque_limits.params["asset_cfg"].body_names = ["base"]
+        self.rewards.applied_torque_limits.params["asset_cfg"].body_names = ["trunk"]
         self.rewards.action_rate_l2.weight = -0.01
         # UNUESD self.rewards.action_l2.weight = 0.0
 
         # Contact sensor
         self.rewards.undesired_contacts.weight = -1.0
-        self.rewards.undesired_contacts.params["sensor_cfg"].body_names = [".*THIGH"]
+        self.rewards.undesired_contacts.params["sensor_cfg"].body_names = [".*_thigh"]
         self.rewards.contact_forces.weight = 0
-        self.rewards.contact_forces.params["sensor_cfg"].body_names = [".*FOOT"]
+        self.rewards.contact_forces.params["sensor_cfg"].body_names = [".*_foot"]
 
         # Velocity-tracking rewards
         self.rewards.track_lin_vel_xy_exp.weight = 1.5
@@ -89,26 +96,33 @@ class AnymalDRoughEnvCfg(LocomotionVelocityRoughEnvCfg):
 
         # Others
         self.rewards.feet_air_time.weight = 0.01
-        self.rewards.feet_air_time.params["sensor_cfg"].body_names = [".*FOOT"]
+        self.rewards.feet_air_time.params["sensor_cfg"].body_names = [".*_foot"]
         self.rewards.foot_contact.weight = 0
-        self.rewards.foot_contact.params["sensor_cfg"].body_names = [".*FOOT"]
+        self.rewards.foot_contact.params["sensor_cfg"].body_names = [".*_foot"]
         self.rewards.base_height_rough_l2.weight = 0
         self.rewards.base_height_rough_l2.params["target_height"] = 0.35
-        self.rewards.base_height_rough_l2.params["asset_cfg"].body_names = ["base"]
+        self.rewards.base_height_rough_l2.params["asset_cfg"].body_names = ["trunk"]
         self.rewards.feet_slide.weight = 0
-        self.rewards.feet_slide.params["sensor_cfg"].body_names = [".*FOOT"]
-        self.rewards.feet_slide.params["asset_cfg"].body_names = [".*FOOT"]
+        self.rewards.feet_slide.params["sensor_cfg"].body_names = [".*_foot"]
+        self.rewards.feet_slide.params["asset_cfg"].body_names = [".*_foot"]
         self.rewards.joint_power.weight = -2e-5
-        self.rewards.stand_still_when_zero_command.weight = 0
+        self.rewards.stand_still_when_zero_command.weight = -0.5
+
+        # If the weight of rewards is 0, set rewards to None
+        for attr in dir(self.rewards):
+            if not attr.startswith('__'):
+                reward_attr = getattr(self.rewards, attr)
+                if not callable(reward_attr) and reward_attr.weight == 0:
+                    setattr(self.rewards, attr, None)
 
         # ------------------------------Terminations------------------------------
-        self.terminations.illegal_contact.params["sensor_cfg"].body_names = ["base"]
+        self.terminations.illegal_contact.params["sensor_cfg"].body_names = ["trunk"]
 
         # ------------------------------Commands------------------------------
 
 
 @configclass
-class AnymalDRoughEnvCfg_PLAY(AnymalDRoughEnvCfg):
+class UnitreeA1RoughEnvCfg_PLAY(UnitreeA1RoughEnvCfg):
     def __post_init__(self):
         # post init of parent
         super().__post_init__()
@@ -125,7 +139,7 @@ class AnymalDRoughEnvCfg_PLAY(AnymalDRoughEnvCfg):
 
         # disable randomization for play
         self.observations.policy.enable_corruption = False
-        # remove random pushing
+        # remove random pushing event
         self.events.base_external_force_torque = None
         self.events.push_robot = None
 

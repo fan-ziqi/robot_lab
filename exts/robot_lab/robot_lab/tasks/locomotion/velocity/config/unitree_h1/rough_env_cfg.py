@@ -1,5 +1,5 @@
-import real_robot_lab.tasks.locomotion.velocity.mdp as mdp
-from real_robot_lab.tasks.locomotion.velocity.velocity_env_cfg import LocomotionVelocityRoughEnvCfg
+import robot_lab.tasks.locomotion.velocity.mdp as mdp
+from robot_lab.tasks.locomotion.velocity.velocity_env_cfg import LocomotionVelocityRoughEnvCfg
 
 from omni.isaac.lab.utils import configclass
 
@@ -70,6 +70,7 @@ class UnitreeH1RoughEnvCfg(LocomotionVelocityRoughEnvCfg):
             ".*_hip_roll",
             ".*_shoulder_.*",
             ".*_elbow",
+            "torso",
         ]
         self.rewards.joint_pos_limits.weight = -1.0
         self.rewards.joint_pos_limits.params["asset_cfg"].joint_names = [".*_ankle"]
@@ -104,8 +105,13 @@ class UnitreeH1RoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         self.rewards.feet_slide.params["asset_cfg"].body_names = [".*ankle_link"]
         self.rewards.joint_power.weight = 0
         self.rewards.stand_still_when_zero_command.weight = 0
-        self.rewards.joint_deviation_torso_l1.weight = -0.1
-        self.rewards.joint_deviation_torso_l1.params["asset_cfg"].joint_names = ["torso"]
+
+        # If the weight of rewards is 0, set rewards to None
+        for attr in dir(self.rewards):
+            if not attr.startswith('__'):
+                reward_attr = getattr(self.rewards, attr)
+                if not callable(reward_attr) and reward_attr.weight == 0:
+                    setattr(self.rewards, attr, None)
 
         # ------------------------------Terminations------------------------------
         self.terminations.illegal_contact.params["sensor_cfg"].body_names = [".*torso_link"]

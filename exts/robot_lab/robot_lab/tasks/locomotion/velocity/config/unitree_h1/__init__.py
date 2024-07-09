@@ -7,7 +7,7 @@ from . import agents, flat_env_cfg, rough_env_cfg
 ##
 
 gym.register(
-    id="RealRobot-Isaac-Velocity-Rough-Unitree-H1-v0",
+    id="RobotLab-Isaac-Velocity-Rough-Unitree-H1-v0",
     entry_point="omni.isaac.lab.envs:ManagerBasedRLEnv",
     disable_env_checker=True,
     kwargs={
@@ -17,7 +17,7 @@ gym.register(
 )
 
 gym.register(
-    id="RealRobot-Isaac-Velocity-Rough-Unitree-H1-Play-v0",
+    id="RobotLab-Isaac-Velocity-Rough-Unitree-H1-Play-v0",
     entry_point="omni.isaac.lab.envs:ManagerBasedRLEnv",
     disable_env_checker=True,
     kwargs={
@@ -27,7 +27,7 @@ gym.register(
 )
 
 gym.register(
-    id="RealRobot-Isaac-Velocity-Flat-Unitree-H1-v0",
+    id="RobotLab-Isaac-Velocity-Flat-Unitree-H1-v0",
     entry_point="omni.isaac.lab.envs:ManagerBasedRLEnv",
     disable_env_checker=True,
     kwargs={
@@ -37,7 +37,7 @@ gym.register(
 )
 
 gym.register(
-    id="RealRobot-Isaac-Velocity-Flat-Unitree-H1-Play-v0",
+    id="RobotLab-Isaac-Velocity-Flat-Unitree-H1-Play-v0",
     entry_point="omni.isaac.lab.envs:ManagerBasedRLEnv",
     disable_env_checker=True,
     kwargs={

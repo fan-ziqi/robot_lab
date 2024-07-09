@@ -1,4 +1,4 @@
-# real_robot_lab
+# robot_lab
 
 ## Get Ready
 
@@ -9,16 +9,45 @@ You need to install `Isaac Lab`.
 Using a python interpreter that has Isaac Lab installed, install the library
 
 ```bash
-python -m pip install -e ./exts/real_robot_lab
+python -m pip install -e ./exts/robot_lab
 ```
 
-## Try unitree-a1 example
+## Try examples
+
+Unitree A1
 
 ```bash
 # To train
-python scripts/rsl_rl/train.py --task RealRobot-Isaac-Velocity-Rough-Unitree-A1-v0 --headless
+python scripts/rsl_rl/train.py --task RobotLab-Isaac-Velocity-Flat-Unitree-A1-v0 --headless
 # To play
-python scripts/rsl_rl/play.py --task RealRobot-Isaac-Velocity-Rough-Unitree-A1-Play-v0
+python scripts/rsl_rl/play.py --task RobotLab-Isaac-Velocity-Flat-Unitree-A1-Play-v0
+```
+
+Unitree H1
+
+```bash
+# To train
+python scripts/rsl_rl/train.py --task RobotLab-Isaac-Velocity-Flat-Unitree-H1-v0 --headless
+# To play
+python scripts/rsl_rl/play.py --task RobotLab-Isaac-Velocity-Flat-Unitree-H1-Play-v0
+```
+
+Anymal D
+
+```bash
+# To train
+python scripts/rsl_rl/train.py --task RobotLab-Isaac-Velocity-Flat-Anymal-D-v0 --headless
+# To play
+python scripts/rsl_rl/play.py --task RobotLab-Isaac-Velocity-Flat-Anymal-D-Play-v0
+```
+
+FFTAI GR1T1
+
+```bash
+# To train
+python scripts/rsl_rl/train.py --task RobotLab-Isaac-Velocity-Rough-FFTAI-GR1T1-v0 --headless
+# To play
+python scripts/rsl_rl/play.py --task RobotLab-Isaac-Velocity-Rough-FFTAI-GR1T1-Play-v0
 ```
 
 ## Add your own robot

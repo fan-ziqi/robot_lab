@@ -3,7 +3,7 @@ from __future__ import annotations
 import math
 from dataclasses import MISSING
 
-import real_robot_lab.tasks.locomotion.velocity.mdp as mdp
+import robot_lab.tasks.locomotion.velocity.mdp as mdp
 
 import omni.isaac.lab.sim as sim_utils
 from omni.isaac.lab.assets import ArticulationCfg, AssetBaseCfg
@@ -356,10 +356,6 @@ class RewardsCfg:
         func=mdp.stand_still_when_zero_command,
         weight=0,
         params={"command_name": "base_velocity"},
-    )
-
-    joint_deviation_torso_l1 = RewTerm(
-        func=mdp.joint_deviation_l1, weight=-0.1, params={"asset_cfg": SceneEntityCfg("robot", joint_names="torso")}
     )
 
 

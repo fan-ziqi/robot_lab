@@ -1,4 +1,4 @@
-"""Installation script for the 'real_robot_lab' python package."""
+"""Installation script for the 'robot_lab' python package."""
 
 import os
 import toml
@@ -18,8 +18,8 @@ INSTALL_REQUIRES = [
 
 # Installation operation
 setup(
-    name="real_robot_lab",
-    packages=["real_robot_lab"],
+    name="robot_lab",
+    packages=["robot_lab"],
     author=EXTENSION_TOML_DATA["package"]["author"],
     maintainer=EXTENSION_TOML_DATA["package"]["maintainer"],
     url=EXTENSION_TOML_DATA["package"]["repository"],
