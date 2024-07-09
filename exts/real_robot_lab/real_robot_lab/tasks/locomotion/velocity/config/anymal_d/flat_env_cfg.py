@@ -1,5 +1,3 @@
-import math
-
 from omni.isaac.lab.utils import configclass
 
 from .rough_env_cfg import AnymalDRoughEnvCfg
@@ -39,3 +37,8 @@ class AnymalDFlatEnvCfg_PLAY(AnymalDFlatEnvCfg):
         # remove random pushing
         self.events.base_external_force_torque = None
         self.events.push_robot = None
+
+        self.commands.base_velocity.ranges.lin_vel_x = (1.0, 1.0)
+        self.commands.base_velocity.ranges.lin_vel_y = (0.0, 0.0)
+        self.commands.base_velocity.ranges.ang_vel_z = (-1.0, 1.0)
+        self.commands.base_velocity.ranges.heading = (0.0, 0.0)

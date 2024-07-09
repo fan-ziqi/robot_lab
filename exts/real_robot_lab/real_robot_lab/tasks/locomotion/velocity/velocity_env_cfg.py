@@ -202,7 +202,7 @@ class EventCfg:
         },
     )
 
-    randomize_actuator_gains = EventTerm( # add
+    randomize_actuator_gains = EventTerm(
         func=mdp.randomize_actuator_gains,
         mode="reset",
         params={
@@ -214,7 +214,7 @@ class EventCfg:
         },
     )
 
-    randomize_joint_parameters = EventTerm( # add
+    randomize_joint_parameters = EventTerm(
         func=mdp.randomize_joint_parameters,
         mode="reset",
         params={
@@ -243,36 +243,40 @@ class RewardsCfg:
 
     # General
     # UNUESD is_alive
-    # UNUESD is_terminated
+    is_terminated = RewTerm(func=mdp.is_terminated, weight=0)
 
     # Root penalties
-    lin_vel_z_l2 = RewTerm(func=mdp.lin_vel_z_l2, weight=-2.0)
-    ang_vel_xy_l2 = RewTerm(func=mdp.ang_vel_xy_l2, weight=-0.05)
-    flat_orientation_l2 = RewTerm(func=mdp.flat_orientation_l2, weight=0.0)
+    lin_vel_z_l2 = RewTerm(func=mdp.lin_vel_z_l2, weight=0)
+    ang_vel_xy_l2 = RewTerm(func=mdp.ang_vel_xy_l2, weight=0)
+    flat_orientation_l2 = RewTerm(func=mdp.flat_orientation_l2, weight=0)
     base_height_l2 = RewTerm(
         func=mdp.base_height_l2,
-        weight=0.0,
+        weight=0,
         params={"asset_cfg": SceneEntityCfg("robot", body_names="base"), "target_height": 0.0},
     )
     body_lin_acc_l2 = RewTerm(
         func=mdp.body_lin_acc_l2,
-        weight=0.0,
+        weight=0,
         params={"asset_cfg": SceneEntityCfg("robot", body_names="base")},
     )
 
     # Joint penaltie
-    joint_torques_l2 = RewTerm(func=mdp.joint_torques_l2, weight=-1.0e-5)
+    joint_torques_l2 = RewTerm(func=mdp.joint_torques_l2, weight=0)
     # UNUESD joint_vel_l1
-    joint_vel_l2 = RewTerm(func=mdp.joint_vel_l2, weight=0.0)
-    joint_acc_l2 = RewTerm(func=mdp.joint_acc_l2, weight=-2.5e-7)
-    # UNUESD joint_deviation_l1 # when zero command
-    joint_pos_limits = RewTerm(func=mdp.joint_pos_limits, weight=0.0)
-    joint_vel_limits = RewTerm(func=mdp.joint_vel_limits, weight=0.0)
+    joint_vel_l2 = RewTerm(func=mdp.joint_vel_l2, weight=0)
+    joint_acc_l2 = RewTerm(func=mdp.joint_acc_l2, weight=0)
+    joint_deviation_l1 = RewTerm(  # not essential for locomotion
+        func=mdp.joint_deviation_l1,
+        weight=0,
+        params={"asset_cfg": SceneEntityCfg("robot", joint_names=[".*"])},
+    )
+    joint_pos_limits = RewTerm(func=mdp.joint_pos_limits, weight=0, params={"asset_cfg": SceneEntityCfg("robot", joint_names=".*")})
+    joint_vel_limits = RewTerm(func=mdp.joint_vel_limits, weight=0, params={"asset_cfg": SceneEntityCfg("robot", joint_names=".*")})
 
     # Action penalties
     applied_torque_limits = RewTerm(
         func=mdp.applied_torque_limits,
-        weight=0.0,
+        weight=0,
         params={"asset_cfg": SceneEntityCfg("robot", joint_names=".*")},
     )
     action_rate_l2 = RewTerm(func=mdp.action_rate_l2, weight=-0.01)
@@ -281,37 +285,37 @@ class RewardsCfg:
     # Contact sensor
     undesired_contacts = RewTerm(
         func=mdp.undesired_contacts,
-        weight=-1.0,
+        weight=0,
         params={"sensor_cfg": SceneEntityCfg("contact_forces", body_names=".*THIGH"), "threshold": 1.0},
     )
     contact_forces = RewTerm(
         func=mdp.contact_forces,
-        weight=0.0,
+        weight=0,
         params={"sensor_cfg": SceneEntityCfg("contact_forces", body_names=".*FOOT"), "threshold": 1.0},
     )
 
     # Velocity-tracking rewards
     track_lin_vel_xy_exp = RewTerm(
-        func=mdp.track_lin_vel_xy_exp, weight=1.0, params={"command_name": "base_velocity", "std": math.sqrt(0.25)}
+        func=mdp.track_lin_vel_xy_exp, weight=0, params={"command_name": "base_velocity", "std": math.sqrt(0.25)}
     )
     track_ang_vel_z_exp = RewTerm(
-        func=mdp.track_ang_vel_z_exp, weight=0.5, params={"command_name": "base_velocity", "std": math.sqrt(0.25)}
+        func=mdp.track_ang_vel_z_exp, weight=0, params={"command_name": "base_velocity", "std": math.sqrt(0.25)}
     )
 
     # Others
     feet_air_time = RewTerm(
         func=mdp.feet_air_time,
-        weight=0.125,
+        weight=0,
         params={
-            "sensor_cfg": SceneEntityCfg("contact_forces", body_names=".*FOOT"),
             "command_name": "base_velocity",
+            "sensor_cfg": SceneEntityCfg("contact_forces", body_names=".*FOOT"),
             "threshold": 0.5,
         },
     )
 
     foot_contact = RewTerm(
         func=mdp.foot_contact,
-        weight=0.01,
+        weight=0,
         params={
             "sensor_cfg": SceneEntityCfg("contact_forces", body_names=".*FOOT"),
             "command_name": "base_velocity",
@@ -321,30 +325,43 @@ class RewardsCfg:
 
     base_height_rough_l2 = RewTerm(
         func=mdp.base_height_rough_l2,
-        weight=0.01,
+        weight=0,
         params={
-            "asset_cfg": SceneEntityCfg("robot", body_names="base"), 
+            "asset_cfg": SceneEntityCfg("robot", body_names="base"),
             "sensor_cfg": SceneEntityCfg("height_scanner"),
             "target_height": 0.0,
         },
     )
 
-    foot_slip = RewTerm(
-        func=mdp.foot_slip,
-        weight=0.01,
+    # foot_slip = RewTerm(
+    #     func=mdp.foot_slip,
+    #     weight=0,
+    #     params={
+    #         "asset_cfg": SceneEntityCfg("robot", body_names=".*FOOT"),
+    #         "sensor_cfg": SceneEntityCfg("contact_forces", body_names=".*FOOT"),
+    #     },
+    # )
+    feet_slide = RewTerm(
+        func=mdp.feet_slide,
+        weight=-0.25,
         params={
-            "asset_cfg": SceneEntityCfg("robot", body_names=".*FOOT"), 
-            "sensor_cfg": SceneEntityCfg("contact_forces", body_names=".*FOOT"),
+            "sensor_cfg": SceneEntityCfg("contact_forces", body_names=".*ankle_link"),
+            "asset_cfg": SceneEntityCfg("robot", body_names=".*ankle_link"),
         },
     )
 
-    joint_power = RewTerm(func=mdp.joint_power, weight=0.01)
+    joint_power = RewTerm(func=mdp.joint_power, weight=0)
 
     stand_still_when_zero_command = RewTerm(
-        func=mdp.stand_still_when_zero_command, 
-        weight=0.01, 
+        func=mdp.stand_still_when_zero_command,
+        weight=0,
         params={"command_name": "base_velocity"},
     )
+
+    joint_deviation_torso_l1 = RewTerm(
+        func=mdp.joint_deviation_l1, weight=-0.1, params={"asset_cfg": SceneEntityCfg("robot", joint_names="torso")}
+    )
+
 
 @configclass
 class TerminationsCfg:
