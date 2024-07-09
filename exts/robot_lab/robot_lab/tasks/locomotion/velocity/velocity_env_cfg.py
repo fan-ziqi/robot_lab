@@ -265,13 +265,21 @@ class RewardsCfg:
     # UNUESD joint_vel_l1
     joint_vel_l2 = RewTerm(func=mdp.joint_vel_l2, weight=0)
     joint_acc_l2 = RewTerm(func=mdp.joint_acc_l2, weight=0)
-    joint_deviation_l1 = RewTerm(  # not essential for locomotion
-        func=mdp.joint_deviation_l1,
-        weight=0,
-        params={"asset_cfg": SceneEntityCfg("robot", joint_names=[".*"])},
+
+    def create_joint_deviation_l1_rewterm(self, attr_name, weight, joint_names_pattern):
+        rew_term = RewTerm(
+            func=mdp.joint_deviation_l1,
+            weight=weight,
+            params={"asset_cfg": SceneEntityCfg("robot", joint_names=joint_names_pattern)},
+        )
+        setattr(self, attr_name, rew_term)
+
+    joint_pos_limits = RewTerm(
+        func=mdp.joint_pos_limits, weight=0, params={"asset_cfg": SceneEntityCfg("robot", joint_names=".*")}
     )
-    joint_pos_limits = RewTerm(func=mdp.joint_pos_limits, weight=0, params={"asset_cfg": SceneEntityCfg("robot", joint_names=".*")})
-    joint_vel_limits = RewTerm(func=mdp.joint_vel_limits, weight=0, params={"asset_cfg": SceneEntityCfg("robot", joint_names=".*")})
+    joint_vel_limits = RewTerm(
+        func=mdp.joint_vel_limits, weight=0, params={"asset_cfg": SceneEntityCfg("robot", joint_names=".*")}
+    )
 
     # Action penalties
     applied_torque_limits = RewTerm(

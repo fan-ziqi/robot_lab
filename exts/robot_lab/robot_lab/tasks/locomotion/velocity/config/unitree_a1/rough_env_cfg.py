@@ -73,8 +73,7 @@ class UnitreeA1RoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         # UNUESD self.rewards.joint_vel_l1.weight = 0.0
         self.rewards.joint_vel_l2.weight = 0
         self.rewards.joint_acc_l2.weight = -2.5e-7
-        self.rewards.joint_deviation_l1.weight = 0
-        self.rewards.joint_deviation_l1.params["asset_cfg"].body_names = [""]
+        # self.rewards.create_joint_deviation_l1_rewterm("joint_deviation_l1", 0, [""])
         self.rewards.joint_pos_limits.weight = -5.0
         self.rewards.joint_vel_limits.weight = 0
 
@@ -110,7 +109,7 @@ class UnitreeA1RoughEnvCfg(LocomotionVelocityRoughEnvCfg):
 
         # If the weight of rewards is 0, set rewards to None
         for attr in dir(self.rewards):
-            if not attr.startswith('__'):
+            if not attr.startswith("__"):
                 reward_attr = getattr(self.rewards, attr)
                 if not callable(reward_attr) and reward_attr.weight == 0:
                     setattr(self.rewards, attr, None)

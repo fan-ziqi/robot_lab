@@ -64,14 +64,10 @@ class UnitreeH1RoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         # UNUESD self.rewards.joint_vel_l1.weight = 0.0
         self.rewards.joint_vel_l2.weight = 0
         self.rewards.joint_acc_l2.weight = -1.25e-7
-        self.rewards.joint_deviation_l1.weight = -0.2
-        self.rewards.joint_deviation_l1.params["asset_cfg"].joint_names = [
-            ".*_hip_yaw",
-            ".*_hip_roll",
-            ".*_shoulder_.*",
-            ".*_elbow",
-            "torso",
-        ]
+        self.rewards.create_joint_deviation_l1_rewterm(
+            "joint_deviation_other_l1", -0.2, [".*_hip_yaw", ".*_hip_roll", ".*_shoulder_.*", ".*_elbow"]
+        )
+        self.rewards.create_joint_deviation_l1_rewterm("joint_deviation_torso_l1", -0.1, ["torso"])
         self.rewards.joint_pos_limits.weight = -1.0
         self.rewards.joint_pos_limits.params["asset_cfg"].joint_names = [".*_ankle"]
         self.rewards.joint_vel_limits.weight = 0
@@ -108,7 +104,7 @@ class UnitreeH1RoughEnvCfg(LocomotionVelocityRoughEnvCfg):
 
         # If the weight of rewards is 0, set rewards to None
         for attr in dir(self.rewards):
-            if not attr.startswith('__'):
+            if not attr.startswith("__"):
                 reward_attr = getattr(self.rewards, attr)
                 if not callable(reward_attr) and reward_attr.weight == 0:
                     setattr(self.rewards, attr, None)
