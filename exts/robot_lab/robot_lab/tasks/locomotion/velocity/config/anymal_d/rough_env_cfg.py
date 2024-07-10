@@ -42,7 +42,6 @@ class AnymalDRoughEnvCfg(LocomotionVelocityRoughEnvCfg):
                 "yaw": (-0.5, 0.5),
             },
         }
-        # randomize_actuator_gains is currently not supported for explicit actuator models
         self.events.randomize_actuator_gains = None
         self.events.randomize_joint_parameters = None
 
