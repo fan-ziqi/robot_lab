@@ -6,6 +6,8 @@ from .rough_env_cfg import UnitreeA1RoughEnvCfg
 @configclass
 class UnitreeA1FlatEnvCfg(UnitreeA1RoughEnvCfg):
     def __post_init__(self):
+        # Temporarily not run disable_zerow_eight_rewards() in parent class to override rewards
+        self._run_disable_zero_weight_rewards = False
         # post init of parent
         super().__post_init__()
 
@@ -23,6 +25,11 @@ class UnitreeA1FlatEnvCfg(UnitreeA1RoughEnvCfg):
         # no terrain curriculum
         self.curriculum.terrain_levels = None
 
+        # Now executing disable_zerow_eight_rewards()
+        self._run_disable_zero_weight_rewards = True
+        if self._run_disable_zero_weight_rewards:
+            self.disable_zero_weight_rewards()
+
 
 class UnitreeA1FlatEnvCfg_PLAY(UnitreeA1FlatEnvCfg):
     def __post_init__(self) -> None:
@@ -33,7 +40,7 @@ class UnitreeA1FlatEnvCfg_PLAY(UnitreeA1FlatEnvCfg):
         self.scene.num_envs = 50
         # disable randomization for play
         self.observations.policy.enable_corruption = False
-        # remove random pushing event
+        # remove random pushing
         self.events.base_external_force_torque = None
         self.events.push_robot = None
 

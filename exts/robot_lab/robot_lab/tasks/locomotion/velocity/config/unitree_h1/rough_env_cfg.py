@@ -12,6 +12,8 @@ from omni.isaac.lab_assets import H1_MINIMAL_CFG  # isort: skip
 
 @configclass
 class UnitreeH1RoughEnvCfg(LocomotionVelocityRoughEnvCfg):
+    _run_disable_zero_weight_rewards = True
+
     def __post_init__(self):
         # post init of parent
         super().__post_init__()
@@ -102,11 +104,8 @@ class UnitreeH1RoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         self.rewards.stand_still_when_zero_command.weight = 0
 
         # If the weight of rewards is 0, set rewards to None
-        for attr in dir(self.rewards):
-            if not attr.startswith("__"):
-                reward_attr = getattr(self.rewards, attr)
-                if not callable(reward_attr) and reward_attr.weight == 0:
-                    setattr(self.rewards, attr, None)
+        if self._run_disable_zero_weight_rewards:
+            self.disable_zero_weight_rewards()
 
         # ------------------------------Terminations------------------------------
         self.terminations.illegal_contact.params["sensor_cfg"].body_names = [".*torso_link"]
