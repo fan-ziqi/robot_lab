@@ -13,6 +13,7 @@ from robot_lab.assets.fftai import FFTAI_GR1T1_CFG  # isort: skip
 @configclass
 class FFTAIGR1T1RoughEnvCfg(LocomotionVelocityRoughEnvCfg):
     _run_disable_zero_weight_rewards = True
+
     def __post_init__(self):
         # post init of parent
         super().__post_init__()
@@ -27,6 +28,8 @@ class FFTAIGR1T1RoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         # self.observations.policy.height_scan = None
 
         # ------------------------------Actions------------------------------
+        # reduce action scale
+        self.actions.joint_pos.scale = 1.0
 
         # ------------------------------Events------------------------------
         self.events.base_external_force_torque.params["asset_cfg"].body_names = ["base"]
@@ -64,7 +67,9 @@ class FFTAIGR1T1RoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         # UNUESD self.rewards.joint_vel_l1.weight = 0.0
         self.rewards.joint_vel_l2.weight = 0
         self.rewards.joint_acc_l2.weight = -1.25e-7
-        self.rewards.create_joint_deviation_l1_rewterm("joint_deviation_other_l1", -0.2, ["head_.*", ".*_hip_yaw", ".*_hip_roll", ".*_shoulder_.*", ".*_wrist_.*"])
+        self.rewards.create_joint_deviation_l1_rewterm(
+            "joint_deviation_other_l1", -0.2, ["head_.*", ".*_hip_yaw", ".*_hip_roll", ".*_shoulder_.*", ".*_wrist_.*"]
+        )
         self.rewards.create_joint_deviation_l1_rewterm("joint_deviation_torso_l1", -0.4, ["waist_.*"])
         self.rewards.create_joint_deviation_l1_rewterm("joint_deviation_elbow_l1", -0.05, [".*_elbow_pitch"])
         self.rewards.create_joint_deviation_l1_rewterm("joint_deviation_knee_l1", -0.1, [".*_knee_pitch"])
@@ -107,37 +112,15 @@ class FFTAIGR1T1RoughEnvCfg(LocomotionVelocityRoughEnvCfg):
             self.disable_zero_weight_rewards()
 
         # ------------------------------Terminations------------------------------
-        self.terminations.illegal_contact.params["sensor_cfg"].body_names = ['waist_.*', "head_.*", '.*_thigh_.*', '.*_arm_.*', '.*_hand_.*']
+        self.terminations.illegal_contact.params["sensor_cfg"].body_names = [
+            "waist_.*",
+            "head_.*",
+            ".*_thigh_.*",
+            ".*_arm_.*",
+            ".*_hand_.*",
+        ]
 
         # ------------------------------Commands------------------------------
         self.commands.base_velocity.ranges.lin_vel_x = (0.0, 1.0)
         self.commands.base_velocity.ranges.lin_vel_y = (0.0, 0.0)
         self.commands.base_velocity.ranges.ang_vel_z = (-1.0, 1.0)
-
-
-@configclass
-class FFTAIGR1T1RoughEnvCfg_PLAY(FFTAIGR1T1RoughEnvCfg):
-    def __post_init__(self):
-        # post init of parent
-        super().__post_init__()
-
-        # make a smaller scene for play
-        self.scene.num_envs = 50
-        # spawn the robot randomly in the grid (instead of their terrain levels)
-        self.scene.terrain.max_init_terrain_level = None
-        # reduce the number of terrains to save memory
-        if self.scene.terrain.terrain_generator is not None:
-            self.scene.terrain.terrain_generator.num_rows = 5
-            self.scene.terrain.terrain_generator.num_cols = 5
-            self.scene.terrain.terrain_generator.curriculum = False
-
-        # disable randomization for play
-        self.observations.policy.enable_corruption = False
-        # remove random pushing
-        self.events.base_external_force_torque = None
-        self.events.push_robot = None
-
-        self.commands.base_velocity.ranges.lin_vel_x = (1.0, 1.0)
-        self.commands.base_velocity.ranges.lin_vel_y = (0.0, 0.0)
-        self.commands.base_velocity.ranges.ang_vel_z = (-1.0, 1.0)
-        self.commands.base_velocity.ranges.heading = (0.0, 0.0)
