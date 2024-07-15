@@ -29,22 +29,3 @@ class UnitreeA1FlatEnvCfg(UnitreeA1RoughEnvCfg):
         self._run_disable_zero_weight_rewards = True
         if self._run_disable_zero_weight_rewards:
             self.disable_zero_weight_rewards()
-
-
-class UnitreeA1FlatEnvCfg_PLAY(UnitreeA1FlatEnvCfg):
-    def __post_init__(self) -> None:
-        # post init of parent
-        super().__post_init__()
-
-        # make a smaller scene for play
-        self.scene.num_envs = 50
-        # disable randomization for play
-        self.observations.policy.enable_corruption = False
-        # remove random pushing
-        self.events.base_external_force_torque = None
-        self.events.push_robot = None
-
-        self.commands.base_velocity.ranges.lin_vel_x = (1.0, 1.0)
-        self.commands.base_velocity.ranges.lin_vel_y = (0.0, 0.0)
-        self.commands.base_velocity.ranges.ang_vel_z = (-1.0, 1.0)
-        self.commands.base_velocity.ranges.heading = (0.0, 0.0)

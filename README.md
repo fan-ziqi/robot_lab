@@ -18,13 +18,22 @@ python -m pip install -e ./exts/robot_lab
 
 ## Try examples
 
+FFTAI GR1T1
+
+```bash
+# To train
+python scripts/rsl_rl/train.py --task RobotLab-Isaac-Velocity-Flat-FFTAI-GR1T1-v0 --headless
+# To play
+python scripts/rsl_rl/play.py --task RobotLab-Isaac-Velocity-Flat-FFTAI-GR1T1-v0
+```
+
 Anymal D
 
 ```bash
 # To train
 python scripts/rsl_rl/train.py --task RobotLab-Isaac-Velocity-Flat-Anymal-D-v0 --headless
 # To play
-python scripts/rsl_rl/play.py --task RobotLab-Isaac-Velocity-Flat-Anymal-D-Play-v0
+python scripts/rsl_rl/play.py --task RobotLab-Isaac-Velocity-Flat-Anymal-D-v0
 ```
 
 Unitree A1
@@ -33,7 +42,7 @@ Unitree A1
 # To train
 python scripts/rsl_rl/train.py --task RobotLab-Isaac-Velocity-Flat-Unitree-A1-v0 --headless
 # To play
-python scripts/rsl_rl/play.py --task RobotLab-Isaac-Velocity-Flat-Unitree-A1-Play-v0
+python scripts/rsl_rl/play.py --task RobotLab-Isaac-Velocity-Flat-Unitree-A1-v0
 ```
 
 Unitree H1
@@ -42,16 +51,7 @@ Unitree H1
 # To train
 python scripts/rsl_rl/train.py --task RobotLab-Isaac-Velocity-Flat-Unitree-H1-v0 --headless
 # To play
-python scripts/rsl_rl/play.py --task RobotLab-Isaac-Velocity-Flat-Unitree-H1-Play-v0
-```
-
-FFTAI GR1T1
-
-```bash
-# To train
-python scripts/rsl_rl/train.py --task RobotLab-Isaac-Velocity-Flat-FFTAI-GR1T1-v0 --headless
-# To play
-python scripts/rsl_rl/play.py --task RobotLab-Isaac-Velocity-Flat-FFTAI-GR1T1-Play-v0
+python scripts/rsl_rl/play.py --task RobotLab-Isaac-Velocity-Flat-Unitree-H1-v0
 ```
 
 The above configs are flat, you can change Flat to Rough

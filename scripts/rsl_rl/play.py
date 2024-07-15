@@ -38,7 +38,12 @@ from rsl_rl.runners import OnPolicyRunner
 import robot_lab.tasks  # noqa: F401
 
 from omni.isaac.lab_tasks.utils import get_checkpoint_path, parse_env_cfg
-from omni.isaac.lab_tasks.utils.wrappers.rsl_rl import RslRlOnPolicyRunnerCfg, RslRlVecEnvWrapper, export_policy_as_onnx
+from omni.isaac.lab_tasks.utils.wrappers.rsl_rl import (
+    RslRlOnPolicyRunnerCfg,
+    RslRlVecEnvWrapper,
+    export_policy_as_jit,
+    export_policy_as_onnx,
+)
 
 
 def main():
@@ -46,6 +51,27 @@ def main():
     # parse configuration
     env_cfg = parse_env_cfg(args_cli.task, use_gpu=not args_cli.cpu, num_envs=args_cli.num_envs)
     agent_cfg: RslRlOnPolicyRunnerCfg = cli_args.parse_rsl_rl_cfg(args_cli.task, args_cli)
+
+    # make a smaller scene for play
+    env_cfg.scene.num_envs = 50
+    # spawn the robot randomly in the grid (instead of their terrain levels)
+    env_cfg.scene.terrain.max_init_terrain_level = None
+    # reduce the number of terrains to save memory
+    if env_cfg.scene.terrain.terrain_generator is not None:
+        env_cfg.scene.terrain.terrain_generator.num_rows = 5
+        env_cfg.scene.terrain.terrain_generator.num_cols = 5
+        env_cfg.scene.terrain.terrain_generator.curriculum = False
+
+    # disable randomization for play
+    env_cfg.observations.policy.enable_corruption = False
+    # remove random pushing
+    env_cfg.events.base_external_force_torque = None
+    env_cfg.events.push_robot = None
+
+    env_cfg.commands.base_velocity.ranges.lin_vel_x = (1.0, 1.0)
+    env_cfg.commands.base_velocity.ranges.lin_vel_y = (0.0, 0.0)
+    env_cfg.commands.base_velocity.ranges.ang_vel_z = (-1.0, 1.0)
+    env_cfg.commands.base_velocity.ranges.heading = (0.0, 0.0)
 
     # create isaac environment
     env = gym.make(args_cli.task, cfg=env_cfg)
@@ -69,7 +95,18 @@ def main():
 
     # export policy to onnx
     export_model_dir = os.path.join(os.path.dirname(resume_path), "exported")
-    export_policy_as_onnx(ppo_runner.alg.actor_critic, export_model_dir, filename="policy.onnx")
+    export_policy_as_onnx(
+        actor_critic=ppo_runner.alg.actor_critic,
+        normalizer=ppo_runner.obs_normalizer,
+        path=export_model_dir,
+        filename="policy.onnx",
+    )
+    export_policy_as_jit(
+        actor_critic=ppo_runner.alg.actor_critic,
+        normalizer=ppo_runner.obs_normalizer,
+        path=export_model_dir,
+        filename="policy.pt",
+    )
 
     # reset environment
     obs, _ = env.get_observations()
