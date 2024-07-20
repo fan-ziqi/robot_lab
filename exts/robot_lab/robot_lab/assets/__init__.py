@@ -22,3 +22,4 @@ __version__ = ISAACLAB_ASSETS_METADATA["package"]["version"]
 
 
 from .unitree import *
+from .fftai import *
