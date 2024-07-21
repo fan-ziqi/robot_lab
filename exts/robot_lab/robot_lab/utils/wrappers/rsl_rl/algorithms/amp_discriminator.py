@@ -3,13 +3,10 @@ import torch.nn as nn
 import torch.utils.data
 from torch import autograd
 
-from rsl_rl.utils import utils
-
 
 class AMPDiscriminator(nn.Module):
-    def __init__(
-            self, input_dim, amp_reward_coef, hidden_layer_sizes, device, task_reward_lerp=0.0):
-        super(AMPDiscriminator, self).__init__()
+    def __init__(self, input_dim, amp_reward_coef, hidden_layer_sizes, device, task_reward_lerp=0.0):
+        super().__init__()
 
         self.device = device
         self.input_dim = input_dim
@@ -34,26 +31,21 @@ class AMPDiscriminator(nn.Module):
         d = self.amp_linear(h)
         return d
 
-    def compute_grad_pen(self,
-                         expert_state,
-                         expert_next_state,
-                         lambda_=10):
+    def compute_grad_pen(self, expert_state, expert_next_state, lambda_=10):
         expert_data = torch.cat([expert_state, expert_next_state], dim=-1)
         expert_data.requires_grad = True
 
         disc = self.amp_linear(self.trunk(expert_data))
         ones = torch.ones(disc.size(), device=disc.device)
         grad = autograd.grad(
-            outputs=disc, inputs=expert_data,
-            grad_outputs=ones, create_graph=True,
-            retain_graph=True, only_inputs=True)[0]
+            outputs=disc, inputs=expert_data, grad_outputs=ones, create_graph=True, retain_graph=True, only_inputs=True
+        )[0]
 
         # Enforce that the grad norm approaches 0.
         grad_pen = lambda_ * (grad.norm(2, dim=1) - 0).pow(2).mean()
         return grad_pen
 
-    def predict_amp_reward(
-            self, state, next_state, task_reward, normalizer=None):
+    def predict_amp_reward(self, state, next_state, task_reward, normalizer=None):
         with torch.no_grad():
             self.eval()
             if normalizer is not None:
@@ -61,7 +53,7 @@ class AMPDiscriminator(nn.Module):
                 next_state = normalizer.normalize_torch(next_state, self.device)
 
             d = self.amp_linear(self.trunk(torch.cat([state, next_state], dim=-1)))
-            reward = self.amp_reward_coef * torch.clamp(1 - (1/4) * torch.square(d - 1), min=0)
+            reward = self.amp_reward_coef * torch.clamp(1 - (1 / 4) * torch.square(d - 1), min=0)
             if self.task_reward_lerp > 0:
                 reward = self._lerp_reward(reward, task_reward.unsqueeze(-1))
             self.train()

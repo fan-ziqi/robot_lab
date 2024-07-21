@@ -1,14 +1,17 @@
 """3D transformations."""
 
 import math
+import torch
 import typing
 import warnings
 from typing import Optional
 
-import torch
-
-from .rotation_conversions import _axis_angle_rotation, matrix_to_quaternion, quaternion_to_matrix, \
-    euler_angles_to_matrix
+from .rotation_conversions import (
+    _axis_angle_rotation,
+    euler_angles_to_matrix,
+    matrix_to_quaternion,
+    quaternion_to_matrix,
+)
 
 DEFAULT_EULER_CONVENTION = "XYZ"
 
@@ -142,13 +145,13 @@ class Transform3d:
     """
 
     def __init__(
-            self,
-            default_batch_size=1,
-            dtype: torch.dtype = torch.float32,
-            device='cpu',
-            matrix: Optional[torch.Tensor] = None,
-            rot: Optional[typing.Iterable] = None,
-            pos: Optional[typing.Iterable] = None,
+        self,
+        default_batch_size=1,
+        dtype: torch.dtype = torch.float32,
+        device="cpu",
+        matrix: Optional[torch.Tensor] = None,
+        rot: Optional[typing.Iterable] = None,
+        pos: Optional[typing.Iterable] = None,
     ):
         """
         Args:
@@ -177,9 +180,7 @@ class Transform3d:
             if matrix.ndim not in (2, 3):
                 raise ValueError('"matrix" has to be a 2- or a 3-dimensional tensor.')
             if matrix.shape[-2] != 4 or matrix.shape[-1] != 4:
-                raise ValueError(
-                    '"matrix" has to be a tensor of shape (minibatch, 4, 4)'
-                )
+                raise ValueError('"matrix" has to be a tensor of shape (minibatch, 4, 4)')
             # set the device from matrix
             device = matrix.device
             self._matrix = matrix.view(-1, 4, 4)
@@ -214,7 +215,7 @@ class Transform3d:
         m = self.get_matrix()
         pos = m[:, :3, 3]
         rot = matrix_to_quaternion(m[:, :3, :3])
-        return "Transform3d(rot={}, pos={})".format(rot, pos).replace('\n       ', '')
+        return f"Transform3d(rot={rot}, pos={pos})".replace("\n       ", "")
 
     def compose(self, *others):
         """
@@ -534,9 +535,7 @@ class Scale(Transform3d):
 
 
 class Rotate(Transform3d):
-    def __init__(
-            self, R, dtype=torch.float32, device: str = "cpu", orthogonal_tol: float = 1e-5
-    ):
+    def __init__(self, R, dtype=torch.float32, device: str = "cpu", orthogonal_tol: float = 1e-5):
         """
         Create a new Transform3d representing 3D rotation using a rotation
         matrix as the input.
@@ -577,12 +576,12 @@ class Rotate(Transform3d):
 
 class RotateAxisAngle(Rotate):
     def __init__(
-            self,
-            angle,
-            axis: str = "X",
-            degrees: bool = True,
-            dtype=torch.float64,
-            device: str = "cpu",
+        self,
+        angle,
+        axis: str = "X",
+        degrees: bool = True,
+        dtype=torch.float64,
+        device: str = "cpu",
     ):
         """
         Create a new Transform3d representing 3D rotation about an axis
@@ -682,7 +681,7 @@ def _handle_input(x, y, z, dtype, device, name: str, allow_singleton: bool = Fal
     N = max(sizes)
     for c in xyz:
         if c.shape[0] != 1 and c.shape[0] != N:
-            msg = "Got non-broadcastable sizes %r (in %s)" % (sizes, name)
+            msg = f"Got non-broadcastable sizes {sizes!r} (in {name})"
             raise ValueError(msg)
     xyz = [c.expand(N) for c in xyz]
     xyz = torch.stack(xyz, dim=1)

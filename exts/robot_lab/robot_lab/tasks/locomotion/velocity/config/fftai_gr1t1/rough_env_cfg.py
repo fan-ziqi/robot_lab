@@ -13,6 +13,7 @@ from robot_lab.assets.fftai import FFTAI_GR1T1_CFG  # isort: skip
 @configclass
 class FFTAIGR1T1RoughEnvCfg(LocomotionVelocityRoughEnvCfg):
     _run_disable_zero_weight_rewards = True
+
     def __post_init__(self):
         # post init of parent
         super().__post_init__()
@@ -64,7 +65,9 @@ class FFTAIGR1T1RoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         # UNUESD self.rewards.joint_vel_l1.weight = 0.0
         self.rewards.joint_vel_l2.weight = 0
         self.rewards.joint_acc_l2.weight = -1.25e-7
-        self.rewards.create_joint_deviation_l1_rewterm("joint_deviation_other_l1", -0.2, ["head_.*", ".*_hip_yaw", ".*_hip_roll", ".*_shoulder_.*", ".*_wrist_.*"])
+        self.rewards.create_joint_deviation_l1_rewterm(
+            "joint_deviation_other_l1", -0.2, ["head_.*", ".*_hip_yaw", ".*_hip_roll", ".*_shoulder_.*", ".*_wrist_.*"]
+        )
         self.rewards.create_joint_deviation_l1_rewterm("joint_deviation_torso_l1", -0.4, ["waist_.*"])
         self.rewards.create_joint_deviation_l1_rewterm("joint_deviation_elbow_l1", -0.05, [".*_elbow_pitch"])
         self.rewards.create_joint_deviation_l1_rewterm("joint_deviation_knee_l1", -0.1, [".*_knee_pitch"])
@@ -107,7 +110,13 @@ class FFTAIGR1T1RoughEnvCfg(LocomotionVelocityRoughEnvCfg):
             self.disable_zero_weight_rewards()
 
         # ------------------------------Terminations------------------------------
-        self.terminations.illegal_contact.params["sensor_cfg"].body_names = ['waist_.*', "head_.*", '.*_thigh_.*', '.*_arm_.*', '.*_hand_.*']
+        self.terminations.illegal_contact.params["sensor_cfg"].body_names = [
+            "waist_.*",
+            "head_.*",
+            ".*_thigh_.*",
+            ".*_arm_.*",
+            ".*_hand_.*",
+        ]
 
         # ------------------------------Commands------------------------------
         self.commands.base_velocity.ranges.lin_vel_x = (0.0, 1.0)

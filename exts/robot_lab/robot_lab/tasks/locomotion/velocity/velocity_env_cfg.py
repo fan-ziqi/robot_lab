@@ -447,8 +447,6 @@ class LocomotionVelocityRoughEnvCfg(ManagerBasedRLEnvCfg):
     events: EventCfg = EventCfg()
     curriculum: CurriculumCfg = CurriculumCfg()
 
-    
-
     def disable_zero_weight_rewards(self):
         """If the weight of rewards is 0, set rewards to None"""
         # If the weight of rewards is 0, set rewards to None

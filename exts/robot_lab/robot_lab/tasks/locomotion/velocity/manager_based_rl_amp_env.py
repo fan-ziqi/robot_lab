@@ -7,22 +7,14 @@
 from __future__ import annotations
 
 import gymnasium as gym
-import math
-import numpy as np
 import torch
-from collections.abc import Sequence
-from typing import Any, ClassVar
 
-from omni.isaac.version import get_version
-
-from omni.isaac.lab.managers import CommandManager, CurriculumManager, RewardManager, TerminationManager
+import robot_lab.utils.kinematics.urdf as urdf
+from robot_lab.utils.wrappers.rsl_rl.datasets.motion_loader import AMPLoader
 
 from omni.isaac.lab.envs.common import VecEnvStepReturn
 from omni.isaac.lab.envs.manager_based_rl_env import ManagerBasedRLEnv
 from omni.isaac.lab.envs.manager_based_rl_env_cfg import ManagerBasedRLEnvCfg
-
-import robot_lab.utils.kinematics.urdf as urdf
-
 
 
 class ManagerBasedRLAmpEnv(ManagerBasedRLEnv, gym.Env):
@@ -34,14 +26,26 @@ class ManagerBasedRLAmpEnv(ManagerBasedRLEnv, gym.Env):
         self.chain_ee = []
         for ee_name in self.cfg.ee_names:
             self.chain_ee.append(
-                urdf.build_serial_chain_from_urdf(
-                    open(self.cfg.urdf_path, 'rb').read(),
-                    ee_name).to(device=self.device))
-            
+                urdf.build_serial_chain_from_urdf(open(self.cfg.urdf_path, "rb").read(), ee_name).to(device=self.device)
+            )
+
         if self.cfg.reference_state_initialization:
             print("motion_files dir: ")
             print(self.cfg.amp_motion_files)
-            self.amp_loader = self.cfg.amp_loader
+            self.amp_loader = AMPLoader(
+                device=self.device,
+                motion_files=self.cfg.amp_motion_files,
+                time_between_frames=self.cfg.sim.dt,
+                preload_transitions=True,
+                num_preload_transitions=self.cfg.amp_num_preload_transitions,
+            )
+
+        # print(self.cfg.scene.robot)
+        # _robot = Articulation(self.cfg.scene.robot)
+        # joint_pos_limits = _robot.data.soft_joint_pos_limits[0]
+        # print(joint_pos_limits)
+        # joint_pos_limits[..., 0]
+        # joint_pos_limits[..., 1]
 
     """
     Properties
@@ -75,7 +79,7 @@ class ManagerBasedRLAmpEnv(ManagerBasedRLEnv, gym.Env):
         foot_pos = []
         with torch.no_grad():
             for i, chain_ee in enumerate(self.chain_ee):
-                foot_pos.append(chain_ee.forward_kinematics(joint_pos[:, i*3:i*3+3]).get_matrix()[:, :3, 3])
+                foot_pos.append(chain_ee.forward_kinematics(joint_pos[:, i * 3 : i * 3 + 3]).get_matrix()[:, :3, 3])
         foot_pos = torch.cat(foot_pos, dim=-1)
         base_lin_vel = group_obs["base_lin_vel"]
         base_ang_vel = group_obs["base_ang_vel"]

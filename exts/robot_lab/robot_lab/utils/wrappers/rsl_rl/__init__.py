@@ -5,5 +5,5 @@
 
 """Wrappers and utilities to configure an :class:`ManagerBasedRLEnv` for RSL-RL library."""
 
-from .rl_cfg import RslRlAmpPpoAlgorithmCfg
 from .amp_vecenv_wrapper import RslRlAmpVecEnvWrapper
+from .rl_cfg import RslRlAmpPpoAlgorithmCfg

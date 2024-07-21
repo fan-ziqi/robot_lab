@@ -12,9 +12,9 @@ from rsl_rl.algorithms import PPO
 from rsl_rl.env import VecEnv
 from rsl_rl.modules import ActorCritic, ActorCriticRecurrent, EmpiricalNormalization
 from rsl_rl.utils import store_code_state
-from robot_lab.utils.wrappers.rsl_rl.algorithms.amp_ppo import AMPPPO
+
 from robot_lab.utils.wrappers.rsl_rl.algorithms.amp_discriminator import AMPDiscriminator
-from robot_lab.utils.wrappers.rsl_rl.datasets.motion_loader import AMPLoader
+from robot_lab.utils.wrappers.rsl_rl.algorithms.amp_ppo import AMPPPO
 from robot_lab.utils.wrappers.rsl_rl.utils.amp_utils import Normalizer
 
 
@@ -37,27 +37,26 @@ class OnPolicyRunner:
         actor_critic: ActorCritic | ActorCriticRecurrent = actor_critic_class(
             num_obs, num_critic_obs, self.env.num_actions, **self.policy_cfg
         ).to(self.device)
-        amp_data = AMPLoader(
-            device, time_between_frames=self.cfg["dt"], preload_transitions=True,
-            num_preload_transitions=self.cfg["amp_num_preload_transitions"],
-            motion_files=self.cfg["amp_motion_files"]
-        )
-        amp_normalizer = Normalizer(amp_data.observation_dim)
+        amp_loader = self.env.amp_loader
+        amp_normalizer = Normalizer(amp_loader.observation_dim)
         discriminator = AMPDiscriminator(
-            amp_data.observation_dim * 2,
+            amp_loader.observation_dim * 2,
             self.cfg["amp_reward_coef"],
-            self.cfg["amp_discr_hidden_dims"], device,
-            self.cfg["amp_task_reward_lerp"]
+            self.cfg["amp_discr_hidden_dims"],
+            device,
+            self.cfg["amp_task_reward_lerp"],
         ).to(self.device)
         # min_std = (
         #     torch.tensor(self.cfg["min_normalized_std"], device=self.device) *
         #     (torch.abs(self.cfg["joint_pos_limits"][..., 1] - self.cfg["joint_pos_limits"][..., 0]))
         # )
-        min_std = None # TODO min_std
+        min_std = None  # TODO min_std
         # self.discr: AMPDiscriminator = AMPDiscriminator()
         alg_class = eval(self.alg_cfg.pop("class_name"))  # PPO
         # self.alg: PPO = alg_class(actor_critic, device=self.device, **self.alg_cfg)
-        self.alg: PPO = alg_class(actor_critic, discriminator, amp_data, amp_normalizer, min_std, device=self.device, **self.alg_cfg)
+        self.alg: PPO = alg_class(
+            actor_critic, discriminator, amp_loader, amp_normalizer, min_std, device=self.device, **self.alg_cfg
+        )
         self.num_steps_per_env = self.cfg["num_steps_per_env"]
         self.save_interval = self.cfg["save_interval"]
         self.empirical_normalization = self.cfg["empirical_normalization"]
@@ -151,7 +150,9 @@ class OnPolicyRunner:
                     # Account for terminal states.
                     next_amp_obs_with_term = torch.clone(next_amp_obs)
                     next_amp_obs_with_term[reset_env_ids] = terminal_amp_states
-                    rewards = self.alg.discriminator.predict_amp_reward(amp_obs, next_amp_obs_with_term, rewards, normalizer=self.alg.amp_normalizer)[0]
+                    rewards = self.alg.discriminator.predict_amp_reward(
+                        amp_obs, next_amp_obs_with_term, rewards, normalizer=self.alg.amp_normalizer
+                    )[0]
                     amp_obs = torch.clone(next_amp_obs)
                     self.alg.process_env_step(rewards, dones, infos, next_amp_obs_with_term)
                     if self.log_dir is not None:
@@ -177,7 +178,14 @@ class OnPolicyRunner:
                 start = stop
                 self.alg.compute_returns(critic_obs)
 
-            mean_value_loss, mean_surrogate_loss, mean_amp_loss, mean_grad_pen_loss, mean_policy_pred, mean_expert_pred = self.alg.update()
+            (
+                mean_value_loss,
+                mean_surrogate_loss,
+                mean_amp_loss,
+                mean_grad_pen_loss,
+                mean_policy_pred,
+                mean_expert_pred,
+            ) = self.alg.update()
             stop = time.time()
             learn_time = stop - start
             self.current_learning_iteration = it
@@ -240,8 +248,8 @@ class OnPolicyRunner:
                 self.writer.add_scalar(
                     "Train/mean_episode_length/time", statistics.mean(locs["lenbuffer"]), self.tot_time
                 )
-        self.writer.add_scalar('Loss/AMP', locs['mean_amp_loss'], locs['it'])
-        self.writer.add_scalar('Loss/AMP_grad', locs['mean_grad_pen_loss'], locs['it'])
+        self.writer.add_scalar("Loss/AMP", locs["mean_amp_loss"], locs["it"])
+        self.writer.add_scalar("Loss/AMP_grad", locs["mean_grad_pen_loss"], locs["it"])
 
         str = f" \033[1m Learning iteration {locs['it']}/{locs['tot_iter']} \033[0m "
 
@@ -293,8 +301,8 @@ class OnPolicyRunner:
             "optimizer_state_dict": self.alg.optimizer.state_dict(),
             "iter": self.current_learning_iteration,
             "infos": infos,
-            'discriminator_state_dict': self.alg.discriminator.state_dict(),
-            'amp_normalizer': self.alg.amp_normalizer,
+            "discriminator_state_dict": self.alg.discriminator.state_dict(),
+            "amp_normalizer": self.alg.amp_normalizer,
         }
         if self.empirical_normalization:
             saved_dict["obs_norm_state_dict"] = self.obs_normalizer.state_dict()

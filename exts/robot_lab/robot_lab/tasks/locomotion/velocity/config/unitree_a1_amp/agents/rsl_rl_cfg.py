@@ -1,5 +1,8 @@
 import glob
 
+from robot_lab.assets import ISAACLAB_ASSETS_DATA_DIR
+from robot_lab.utils.wrappers.rsl_rl import RslRlAmpPpoAlgorithmCfg
+
 from omni.isaac.lab.utils import configclass
 from omni.isaac.lab_tasks.utils.wrappers.rsl_rl import (
     RslRlOnPolicyRunnerCfg,
@@ -7,12 +10,8 @@ from omni.isaac.lab_tasks.utils.wrappers.rsl_rl import (
     RslRlPpoAlgorithmCfg,
 )
 
-from robot_lab.utils.wrappers.rsl_rl import (
-    RslRlAmpPpoAlgorithmCfg
-)
-
-from robot_lab.assets import ISAACLAB_ASSETS_DATA_DIR
 MOTION_FILES = glob.glob(f"{ISAACLAB_ASSETS_DATA_DIR}/motion_files/mocap_motions_a1/*")
+
 
 @configclass
 class UnitreeA1AmpRoughPPORunnerCfg(RslRlOnPolicyRunnerCfg):
@@ -41,17 +40,13 @@ class UnitreeA1AmpRoughPPORunnerCfg(RslRlOnPolicyRunnerCfg):
         lam=0.95,
         desired_kl=0.01,
         max_grad_norm=1.0,
-        amp_replay_buffer_size = 1000000
+        amp_replay_buffer_size=1000000,
     )
 
     amp_reward_coef = 2.0
-    amp_motion_files = MOTION_FILES
-    amp_num_preload_transitions = 2000000
     amp_task_reward_lerp = 0.3
     amp_discr_hidden_dims = [1024, 512]
     min_normalized_std = [0.05, 0.02, 0.05] * 4
-
-    dt = 0.005
 
 
 @configclass

@@ -16,4 +16,3 @@ class RslRlAmpPpoAlgorithmCfg(RslRlPpoAlgorithmCfg):
 
     amp_replay_buffer_size: int = MISSING
     """The size of the replay buffer for AMP"""
-
