@@ -12,11 +12,11 @@ from robot_lab.utils.wrappers.rsl_rl.utils import amp_utils
 class AMPLoader:
     POS_SIZE = 3
     ROT_SIZE = 4
-    JOINT_POS_SIZE = 12
-    TAR_TOE_POS_LOCAL_SIZE = 12
     LINEAR_VEL_SIZE = 3
     ANGULAR_VEL_SIZE = 3
+    JOINT_POS_SIZE = 12
     JOINT_VEL_SIZE = 12
+    TAR_TOE_POS_LOCAL_SIZE = 12
     TAR_TOE_VEL_LOCAL_SIZE = 12
 
     ROOT_POS_START_IDX = 0
@@ -122,6 +122,15 @@ class AMPLoader:
 
         self.all_trajectories_full = torch.vstack(self.trajectories_full)
 
+    def reorder_from_isaacgym_to_isaacgym(self, joint_tensor):
+        # Convert numpy array to a 4x3 array
+        reshaped_array = joint_tensor.reshape(-1, 4, 3)
+        # Transpose the array
+        transposed_array = np.transpose(reshaped_array, (0, 2, 1))
+        # Flatten the array back to 1 dimension
+        rearranged_array = transposed_array.reshape(-1, 12)
+        return rearranged_array
+
     def reorder_from_pybullet_to_isaac(self, motion_data):
         """Convert from PyBullet ordering to Isaac ordering.
 
@@ -133,20 +142,26 @@ class AMPLoader:
 
         jp_fr, jp_fl, jp_rr, jp_rl = np.split(AMPLoader.get_joint_pose_batch(motion_data), 4, axis=1)
         joint_pos = np.hstack([jp_fl, jp_fr, jp_rl, jp_rr])
+        joint_pos = self.reorder_from_isaacgym_to_isaacgym(joint_pos)
 
         fp_fr, fp_fl, fp_rr, fp_rl = np.split(AMPLoader.get_tar_toe_pos_local_batch(motion_data), 4, axis=1)
         foot_pos = np.hstack([fp_fl, fp_fr, fp_rl, fp_rr])
+        # foot_pos = self.reorder_from_isaacgym_to_isaacgym(foot_pos)
 
         lin_vel = AMPLoader.get_linear_vel_batch(motion_data)
         ang_vel = AMPLoader.get_angular_vel_batch(motion_data)
 
         jv_fr, jv_fl, jv_rr, jv_rl = np.split(AMPLoader.get_joint_vel_batch(motion_data), 4, axis=1)
         joint_vel = np.hstack([jv_fl, jv_fr, jv_rl, jv_rr])
+        joint_vel = self.reorder_from_isaacgym_to_isaacgym(joint_vel)
 
         fv_fr, fv_fl, fv_rr, fv_rl = np.split(AMPLoader.get_tar_toe_vel_local_batch(motion_data), 4, axis=1)
         foot_vel = np.hstack([fv_fl, fv_fr, fv_rl, fv_rr])
+        # foot_vel = self.reorder_from_isaacgym_to_isaacgym(foot_vel)
 
         return np.hstack([root_pos, root_rot, joint_pos, foot_pos, lin_vel, ang_vel, joint_vel, foot_vel])
+
+    
 
     def weighted_traj_idx_sample(self):
         """Get traj idx via weighted sampling."""

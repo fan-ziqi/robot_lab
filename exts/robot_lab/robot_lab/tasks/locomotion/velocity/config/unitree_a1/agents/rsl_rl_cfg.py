@@ -10,7 +10,7 @@ from omni.isaac.lab_tasks.utils.wrappers.rsl_rl import (
 class UnitreeA1RoughPPORunnerCfg(RslRlOnPolicyRunnerCfg):
     num_steps_per_env = 24
     max_iterations = 1500
-    save_interval = 50
+    save_interval = 100
     experiment_name = "unitree_a1_rough"
     empirical_normalization = False
     policy = RslRlPpoActorCriticCfg(

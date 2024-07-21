@@ -16,9 +16,9 @@ MOTION_FILES = glob.glob(f"{ISAACLAB_ASSETS_DATA_DIR}/motion_files/mocap_motions
 @configclass
 class UnitreeA1AmpRoughPPORunnerCfg(RslRlOnPolicyRunnerCfg):
     num_steps_per_env = 24
-    max_iterations = 1500
-    save_interval = 50
-    experiment_name = "unitree_a1_rough"
+    max_iterations = 3000
+    save_interval = 100
+    experiment_name = "unitree_a1_amp_rough"
     empirical_normalization = False
     policy = RslRlPpoActorCriticCfg(
         init_noise_std=1.0,
@@ -55,6 +55,6 @@ class UnitreeA1AmpFlatPPORunnerCfg(UnitreeA1AmpRoughPPORunnerCfg):
         super().__post_init__()
 
         # self.max_iterations = 300
-        self.experiment_name = "unitree_a1_flat"
+        self.experiment_name = "unitree_a1_amp_flat"
         # self.policy.actor_hidden_dims = [128, 128, 128]
         # self.policy.critic_hidden_dims = [128, 128, 128]
