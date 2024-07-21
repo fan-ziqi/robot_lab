@@ -56,6 +56,17 @@ python scripts/rsl_rl/play.py --task RobotLab-Isaac-Velocity-Flat-Unitree-H1-v0
 
 The above configs are flat, you can change Flat to Rough
 
+## AMP training
+
+Unitree A1
+
+```bash
+# To train
+python scripts/rsl_rl/train_amp.py --task RobotLab-Isaac-Velocity-Flat-Amp-Unitree-A1-v0 --headless
+# To play
+python scripts/rsl_rl/play_amp.py --task RobotLab-Isaac-Velocity-Flat-Amp-Unitree-A1-v0
+```
+
 ## Add your own robot
 
 To convert urdf, you need to run `convert_urdf.py` of dir `IsaacLab`

@@ -1,9 +1,3 @@
-"""Common functions that can be used to create curriculum for the learning environment.
-
-The functions can be passed to the :class:`omni.isaac.lab.managers.CurriculumTermCfg` object to enable
-the curriculum introduced by the function.
-"""
-
 from __future__ import annotations
 
 import torch

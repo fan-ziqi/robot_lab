@@ -153,6 +153,22 @@ class ObservationsCfg:
     # observation groups
     policy: PolicyCfg = PolicyCfg()
 
+    @configclass
+    class AMPCfg(ObsGroup):
+        base_pos_z = ObsTerm(func=mdp.base_pos_z)
+        base_lin_vel = ObsTerm(func=mdp.base_lin_vel)
+        base_ang_vel = ObsTerm(func=mdp.base_ang_vel)
+        projected_gravity = ObsTerm(func=mdp.projected_gravity)
+        joint_pos = ObsTerm(func=mdp.joint_pos_rel)
+        joint_vel = ObsTerm(func=mdp.joint_vel_rel)
+        actions = ObsTerm(func=mdp.last_action)
+
+        def __post_init__(self):
+            self.enable_corruption = True
+            self.concatenate_terms = True
+
+    AMP: AMPCfg = AMPCfg()
+
 
 @configclass
 class EventCfg:
@@ -215,6 +231,16 @@ class EventCfg:
             "position_range": (0.5, 1.5),
             "velocity_range": (0.0, 0.0),
         },
+    )
+
+    reset_base_amp = EventTerm(
+        func=mdp.reset_root_state_amp,
+        mode="reset",
+    )
+
+    reset_robot_joints_amp = EventTerm(
+        func=mdp.reset_joints_amp,
+        mode="reset",
     )
 
     randomize_actuator_gains = EventTerm(
