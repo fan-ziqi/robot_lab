@@ -67,31 +67,24 @@ class UnitreeA1AmpRoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         self.rewards.ang_vel_xy_l2.weight = 0
         self.rewards.flat_orientation_l2.weight = 0
         self.rewards.base_height_l2.weight = 0
-        self.rewards.base_height_l2.params["target_height"] = 0.35
-        self.rewards.base_height_l2.params["asset_cfg"].body_names = ["trunk"]
         self.rewards.body_lin_acc_l2.weight = 0
-        self.rewards.body_lin_acc_l2.params["asset_cfg"].body_names = ["trunk"]
 
         # Joint penaltie
         self.rewards.joint_torques_l2.weight = 0
         # UNUESD self.rewards.joint_vel_l1.weight = 0.0
         self.rewards.joint_vel_l2.weight = 0
         self.rewards.joint_acc_l2.weight = 0
-        # self.rewards.create_joint_deviation_l1_rewterm("joint_deviation_l1", 0, [""])
         self.rewards.joint_pos_limits.weight = 0
         self.rewards.joint_vel_limits.weight = 0
 
         # Action penalties
         self.rewards.applied_torque_limits.weight = 0
-        self.rewards.applied_torque_limits.params["asset_cfg"].body_names = ["trunk"]
         self.rewards.action_rate_l2.weight = 0
         # UNUESD self.rewards.action_l2.weight = 0.0
 
         # Contact sensor
         self.rewards.undesired_contacts.weight = 0
-        self.rewards.undesired_contacts.params["sensor_cfg"].body_names = [".*_thigh"]
         self.rewards.contact_forces.weight = 0
-        self.rewards.contact_forces.params["sensor_cfg"].body_names = [".*_foot"]
 
         # Velocity-tracking rewards
         self.rewards.track_lin_vel_xy_exp.weight = 1.5 * 1. / (.005 * 6)
@@ -99,15 +92,9 @@ class UnitreeA1AmpRoughEnvCfg(LocomotionVelocityRoughEnvCfg):
 
         # Others
         self.rewards.feet_air_time.weight = 0
-        self.rewards.feet_air_time.params["sensor_cfg"].body_names = [".*_foot"]
         self.rewards.foot_contact.weight = 0
-        self.rewards.foot_contact.params["sensor_cfg"].body_names = [".*_foot"]
         self.rewards.base_height_rough_l2.weight = 0
-        self.rewards.base_height_rough_l2.params["target_height"] = 0.35
-        self.rewards.base_height_rough_l2.params["asset_cfg"].body_names = ["trunk"]
         self.rewards.feet_slide.weight = 0
-        self.rewards.feet_slide.params["sensor_cfg"].body_names = [".*_foot"]
-        self.rewards.feet_slide.params["asset_cfg"].body_names = [".*_foot"]
         self.rewards.joint_power.weight = 0
         self.rewards.stand_still_when_zero_command.weight = 0
 

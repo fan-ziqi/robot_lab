@@ -11,11 +11,6 @@ class UnitreeA1AmpFlatEnvCfg(UnitreeA1AmpRoughEnvCfg):
         # post init of parent
         super().__post_init__()
 
-        # override rewards
-        self.rewards.flat_orientation_l2.weight = 0
-        self.rewards.feet_air_time.weight = 0
-        self.rewards.base_height_l2.weight = 0
-        self.rewards.base_height_rough_l2.weight = 0
         # change terrain to flat
         self.scene.terrain.terrain_type = "plane"
         self.scene.terrain.terrain_generator = None
