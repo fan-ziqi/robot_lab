@@ -226,7 +226,7 @@ class AMPLoader:
 
     def get_full_frame_at_time_batch(self, traj_idxs, times):
         p = times / self.trajectory_lens[traj_idxs]
-        n = self.trajectory_num_frames[traj_idxs]
+        n = self.trajectory_num_frames[traj_idxs] - 1
         idx_low, idx_high = np.floor(p * n).astype(int), np.ceil(p * n).astype(int)
         all_frame_pos_starts = torch.zeros(len(traj_idxs), AMPLoader.POS_SIZE, device=self.device)
         all_frame_pos_ends = torch.zeros(len(traj_idxs), AMPLoader.POS_SIZE, device=self.device)
