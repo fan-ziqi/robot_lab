@@ -21,36 +21,36 @@ python -m pip install -e ./exts/robot_lab
 FFTAI GR1T1
 
 ```bash
-# To train
+# Train
 python scripts/rsl_rl/train.py --task RobotLab-Isaac-Velocity-Flat-FFTAI-GR1T1-v0 --headless
-# To play
+# Play
 python scripts/rsl_rl/play.py --task RobotLab-Isaac-Velocity-Flat-FFTAI-GR1T1-v0
 ```
 
 Anymal D
 
 ```bash
-# To train
+# Train
 python scripts/rsl_rl/train.py --task RobotLab-Isaac-Velocity-Flat-Anymal-D-v0 --headless
-# To play
+# Play
 python scripts/rsl_rl/play.py --task RobotLab-Isaac-Velocity-Flat-Anymal-D-v0
 ```
 
 Unitree A1
 
 ```bash
-# To train
+# Train
 python scripts/rsl_rl/train.py --task RobotLab-Isaac-Velocity-Flat-Unitree-A1-v0 --headless
-# To play
+# Play
 python scripts/rsl_rl/play.py --task RobotLab-Isaac-Velocity-Flat-Unitree-A1-v0
 ```
 
 Unitree H1
 
 ```bash
-# To train
+# Train
 python scripts/rsl_rl/train.py --task RobotLab-Isaac-Velocity-Flat-Unitree-H1-v0 --headless
-# To play
+# Play
 python scripts/rsl_rl/play.py --task RobotLab-Isaac-Velocity-Flat-Unitree-H1-v0
 ```
 
@@ -61,12 +61,14 @@ The above configs are flat, you can change Flat to Rough
 Unitree A1
 
 ```bash
-# retarget A1 motion files
-python exts/robot_lab/data/motion_files/retarget_kp_motions.py
-# To train
+# Retarget motion files
+python exts/robot_lab/amp_utils/scripts/retarget_kp_motions.py
+# Train
 python scripts/rsl_rl/train_amp.py --task RobotLab-Isaac-Velocity-Flat-Amp-Unitree-A1-v0 --headless
-# To play
+# Play
 python scripts/rsl_rl/play_amp.py --task RobotLab-Isaac-Velocity-Flat-Amp-Unitree-A1-v0
+# Replay AMP data
+python scripts/rsl_rl/replay_amp_data.py --task RobotLab-Isaac-Velocity-Flat-Amp-Unitree-A1-v0
 ```
 
 ## Add your own robot
