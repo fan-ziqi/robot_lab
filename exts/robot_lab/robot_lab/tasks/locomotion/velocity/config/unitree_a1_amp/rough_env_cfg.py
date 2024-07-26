@@ -1,6 +1,6 @@
 import glob
 
-from robot_lab.assets import ISAACLAB_ASSETS_DATA_DIR
+from amp_utils import AMP_UTILS_DIR
 from robot_lab.tasks.locomotion.velocity.velocity_env_cfg import LocomotionVelocityRoughEnvCfg
 
 from omni.isaac.lab.utils import configclass
@@ -12,10 +12,6 @@ from omni.isaac.lab.utils import configclass
 # from omni.isaac.lab_assets.unitree import UNITREE_A1_CFG  # isort: skip
 # use local assets
 from robot_lab.assets.unitree import UNITREE_A1_CFG  # isort: skip
-
-
-MOTION_FILES = glob.glob(f"{ISAACLAB_ASSETS_DATA_DIR}/motion_files/mocap_motions_a1/*")
-
 
 @configclass
 class UnitreeA1AmpRoughEnvCfg(LocomotionVelocityRoughEnvCfg):
@@ -111,9 +107,9 @@ class UnitreeA1AmpRoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         self.commands.base_velocity.ranges.ang_vel_z = (-1.57, 1.57)
 
         # ------------------------------AMP------------------------------
-        self.urdf_path = f"{ISAACLAB_ASSETS_DATA_DIR}/Robots/Unitree/A1/a1.urdf"
+        self.urdf_path = f"{AMP_UTILS_DIR}/models/a1/urdf/a1.urdf"
         self.ee_names = ["FL_foot", "FR_foot", "RL_foot", "RR_foot"]
         self.base_name = "trunk"
         self.reference_state_initialization = True
-        self.amp_motion_files = MOTION_FILES
+        self.amp_motion_files = glob.glob(f"{AMP_UTILS_DIR}/motion_files/mocap_motions_a1/*")
         self.amp_num_preload_transitions = 2000000

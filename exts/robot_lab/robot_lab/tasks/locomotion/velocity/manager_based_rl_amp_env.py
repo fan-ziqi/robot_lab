@@ -9,8 +9,8 @@ from __future__ import annotations
 import gymnasium as gym
 import torch
 
-import robot_lab.utils.kinematics.urdf as urdf
-from robot_lab.utils.wrappers.rsl_rl.datasets.motion_loader import AMPLoader
+from amp_utils.kinematics import urdf
+from rsl_rl_extension.datasets.motion_loader import AMPLoader
 
 from omni.isaac.lab.envs.common import VecEnvStepReturn
 from omni.isaac.lab.envs.manager_based_rl_env import ManagerBasedRLEnv

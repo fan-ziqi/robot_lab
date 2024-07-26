@@ -37,18 +37,11 @@ from omni.isaac.lab.utils.math import quat_rotate
 # Import extensions to set up environment tasks
 import robot_lab.tasks  # noqa: F401
 
-# from rsl_rl.runners import OnPolicyRunner
-from robot_lab.utils.wrappers.rsl_rl.runners import OnPolicyRunner
-
-from omni.isaac.lab_tasks.utils import get_checkpoint_path, parse_env_cfg
+from omni.isaac.lab_tasks.utils import parse_env_cfg
 from omni.isaac.lab_tasks.utils.wrappers.rsl_rl import (
     RslRlOnPolicyRunnerCfg,
     RslRlVecEnvWrapper,
-    export_policy_as_jit,
-    export_policy_as_onnx,
 )
-
-from robot_lab.utils.wrappers.rsl_rl.datasets.motion_loader import AMPLoader
 
 
 def main():
@@ -101,15 +94,15 @@ def main():
                     t += env_cfg.sim.dt
 
                 frames = env.unwrapped.amp_loader.get_full_frame_at_time_batch(np.array([traj_idx]), np.array([t]))
-                positions = AMPLoader.get_root_pos_batch(frames)
-                orientations = AMPLoader.get_root_rot_batch(frames)
-                lin_vel = quat_rotate(orientations, AMPLoader.get_linear_vel_batch(frames))
-                ang_vel = quat_rotate(orientations, AMPLoader.get_angular_vel_batch(frames))
+                positions = env.unwrapped.amp_loader.get_root_pos_batch(frames)
+                orientations = env.unwrapped.amp_loader.get_root_rot_batch(frames)
+                lin_vel = quat_rotate(orientations, env.unwrapped.amp_loader.get_linear_vel_batch(frames))
+                ang_vel = quat_rotate(orientations, env.unwrapped.amp_loader.get_angular_vel_batch(frames))
                 velocities = torch.cat([lin_vel, ang_vel], dim=-1)
                 env.unwrapped.robot.write_root_pose_to_sim(torch.cat([positions, orientations], dim=-1), env_ids=env_ids)
                 env.unwrapped.robot.write_root_velocity_to_sim(velocities, env_ids=env_ids)
-                joint_pos = AMPLoader.get_joint_pose_batch(frames)
-                joint_vel = AMPLoader.get_joint_vel_batch(frames)
+                joint_pos = env.unwrapped.amp_loader.get_joint_pose_batch(frames)
+                joint_vel = env.unwrapped.amp_loader.get_joint_vel_batch(frames)
                 joint_pos_limits = env.unwrapped.robot.data.soft_joint_pos_limits[env_ids]
                 joint_pos = joint_pos.clamp_(joint_pos_limits[..., 0], joint_pos_limits[..., 1])
                 joint_vel_limits = env.unwrapped.robot.data.soft_joint_vel_limits[env_ids]
@@ -117,7 +110,7 @@ def main():
                 env.unwrapped.robot.write_joint_state_to_sim(joint_pos, joint_vel, env_ids=env_ids)
 
                 # print("---")
-                # foot_pos_amp = AMPLoader.get_tar_toe_pos_local_batch(frames)
+                # foot_pos_amp = env.unwrapped.amp_loader.get_tar_toe_pos_local_batch(frames)
                 # print(env.unwrapped.get_amp_observations()[env_ids.item(), 12:24])
                 # print(foot_pos_amp[0])
 

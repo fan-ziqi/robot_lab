@@ -3,7 +3,6 @@ from __future__ import annotations
 import torch
 
 from robot_lab.tasks.locomotion.velocity.manager_based_rl_amp_env import ManagerBasedRLAmpEnv
-from robot_lab.utils.wrappers.rsl_rl.datasets.motion_loader import AMPLoader
 
 from omni.isaac.lab.utils.math import quat_rotate
 from omni.isaac.lab.assets import Articulation, RigidObject
@@ -20,12 +19,12 @@ def reset_root_state_amp(
 
     frames = env.unwrapped.amp_loader.get_full_frame_batch(len(env_ids))
     # base position
-    positions = AMPLoader.get_root_pos_batch(frames)
+    positions = env.unwrapped.amp_loader.get_root_pos_batch(frames)
     positions[:, :2] = positions[:, :2] + env.scene.env_origins[env_ids, :2]
-    orientations = AMPLoader.get_root_rot_batch(frames)
+    orientations = env.unwrapped.amp_loader.get_root_rot_batch(frames)
     # base velocities
-    lin_vel = quat_rotate(orientations, AMPLoader.get_linear_vel_batch(frames))
-    ang_vel = quat_rotate(orientations, AMPLoader.get_angular_vel_batch(frames))
+    lin_vel = quat_rotate(orientations, env.unwrapped.amp_loader.get_linear_vel_batch(frames))
+    ang_vel = quat_rotate(orientations, env.unwrapped.amp_loader.get_angular_vel_batch(frames))
     velocities = torch.cat([lin_vel, ang_vel], dim=-1)
 
     # set into the physics simulation
@@ -42,8 +41,8 @@ def reset_joints_amp(
     asset: Articulation = env.scene[asset_cfg.name]
 
     frames = env.unwrapped.amp_loader.get_full_frame_batch(len(env_ids))
-    joint_pos = AMPLoader.get_joint_pose_batch(frames)
-    joint_vel = AMPLoader.get_joint_vel_batch(frames)
+    joint_pos = env.unwrapped.amp_loader.get_joint_pose_batch(frames)
+    joint_vel = env.unwrapped.amp_loader.get_joint_vel_batch(frames)
 
     # clamp joint pos to limits
     joint_pos_limits = asset.data.soft_joint_pos_limits[env_ids]

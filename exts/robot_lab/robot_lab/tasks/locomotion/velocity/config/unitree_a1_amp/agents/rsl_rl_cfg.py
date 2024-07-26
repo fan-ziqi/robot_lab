@@ -1,6 +1,5 @@
 import glob
 
-from robot_lab.assets import ISAACLAB_ASSETS_DATA_DIR
 from robot_lab.utils.wrappers.rsl_rl import RslRlAmpPpoAlgorithmCfg
 
 from omni.isaac.lab.utils import configclass
@@ -9,9 +8,6 @@ from omni.isaac.lab_tasks.utils.wrappers.rsl_rl import (
     RslRlPpoActorCriticCfg,
     RslRlPpoAlgorithmCfg,
 )
-
-MOTION_FILES = glob.glob(f"{ISAACLAB_ASSETS_DATA_DIR}/motion_files/mocap_motions_a1/*")
-
 
 @configclass
 class UnitreeA1AmpRoughPPORunnerCfg(RslRlOnPolicyRunnerCfg):

@@ -1,0 +1,4 @@
+The motion capture data is available only under the terms of the Attribution-NonCommercial 4.0 International (CC BY-NC 4.0) license.
+https://creativecommons.org/licenses/by-nc/4.0/legalcode
+https://github.com/sebastianstarke/AI4Animation
+

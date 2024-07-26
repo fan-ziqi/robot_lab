@@ -35,8 +35,7 @@ import torch
 # Import extensions to set up environment tasks
 import robot_lab.tasks  # noqa: F401
 
-# from rsl_rl.runners import OnPolicyRunner
-from robot_lab.utils.wrappers.rsl_rl.runners import OnPolicyRunner
+from rsl_rl_extension.runners import AmpOnPolicyRunner
 
 from omni.isaac.lab_tasks.utils import get_checkpoint_path, parse_env_cfg
 from omni.isaac.lab_tasks.utils.wrappers.rsl_rl import (
@@ -82,7 +81,7 @@ def main():
     print(f"[INFO]: Loading model checkpoint from: {resume_path}")
 
     # load previously trained model
-    ppo_runner = OnPolicyRunner(env, agent_cfg.to_dict(), log_dir=None, device=agent_cfg.device)
+    ppo_runner = AmpOnPolicyRunner(env, agent_cfg.to_dict(), log_dir=None, device=agent_cfg.device)
     ppo_runner.load(resume_path)
     print(f"[INFO]: Loading model checkpoint from: {resume_path}")
 
