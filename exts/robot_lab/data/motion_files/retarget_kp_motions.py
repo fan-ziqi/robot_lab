@@ -8,10 +8,9 @@ import time
 import numpy as np
 from pyquaternion import Quaternion
 
-from legged_gym.envs import *
-import legged_gym.utils.kinematics.urdf as pk
+import robot_lab.utils.kinematics.urdf as urdf
 
-from rsl_rl.datasets import pose3d
+from robot_lab.utils.wrappers.rsl_rl.datasets import pose3d
 from pybullet_utils import transformations
 import pybullet
 import pybullet_data as pd
@@ -45,16 +44,16 @@ REF_NECK_JOINT_ID = 3
 REF_TOE_JOINT_IDS = [10, 15, 19, 23]
 REF_HIP_JOINT_IDS = [6, 11, 16, 20]
 
-chain_foot_fl = pk.build_serial_chain_from_urdf(
+chain_foot_fl = urdf.build_serial_chain_from_urdf(
     open(config.URDF_FILENAME).read(), config.FL_FOOT_NAME
 )
-chain_foot_fr = pk.build_serial_chain_from_urdf(
+chain_foot_fr = urdf.build_serial_chain_from_urdf(
     open(config.URDF_FILENAME).read(), config.FR_FOOT_NAME
 )
-chain_foot_rl = pk.build_serial_chain_from_urdf(
+chain_foot_rl = urdf.build_serial_chain_from_urdf(
     open(config.URDF_FILENAME).read(), config.HL_FOOT_NAME
 )
-chain_foot_rr = pk.build_serial_chain_from_urdf(
+chain_foot_rr = urdf.build_serial_chain_from_urdf(
     open(config.URDF_FILENAME).read(), config.HR_FOOT_NAME
 )
 

@@ -15,6 +15,7 @@ INSTALL_REQUIRES = [
     # NOTE: Add dependencies
     "psutil",
     "pybullet",
+    "pyquaternion",
 ]
 
 # Installation operation

@@ -61,6 +61,8 @@ The above configs are flat, you can change Flat to Rough
 Unitree A1
 
 ```bash
+# retarget A1 motion files
+python exts/robot_lab/data/motion_files/retarget_kp_motions.py
 # To train
 python scripts/rsl_rl/train_amp.py --task RobotLab-Isaac-Velocity-Flat-Amp-Unitree-A1-v0 --headless
 # To play
