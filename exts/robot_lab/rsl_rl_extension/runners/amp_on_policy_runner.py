@@ -37,6 +37,7 @@ class AmpOnPolicyRunner:
         actor_critic: ActorCritic | ActorCriticRecurrent = actor_critic_class(
             num_obs, num_critic_obs, self.env.unwrapped.num_actions, **self.policy_cfg
         ).to(self.device)
+        self.alg_cfg["amp_replay_buffer_size"] = self.env.unwrapped.cfg.amp_replay_buffer_size
         amp_loader = self.env.unwrapped.amp_loader
         amp_normalizer = Normalizer(amp_loader.observation_dim)
         discriminator = AMPDiscriminator(
@@ -52,7 +53,7 @@ class AmpOnPolicyRunner:
         )
         alg_class = eval(self.alg_cfg.pop("class_name"))  # PPO
         # self.alg: PPO = alg_class(actor_critic, device=self.device, **self.alg_cfg)
-        self.alg: PPO = alg_class(
+        self.alg: AMPPPO = alg_class(
             actor_critic, discriminator, amp_loader, amp_normalizer, min_std, device=self.device, **self.alg_cfg
         )
         self.num_steps_per_env = self.cfg["num_steps_per_env"]

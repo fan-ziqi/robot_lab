@@ -1,7 +1,5 @@
 import glob
 
-from robot_lab.utils.wrappers.rsl_rl import RslRlAmpPpoAlgorithmCfg
-
 from omni.isaac.lab.utils import configclass
 from omni.isaac.lab_tasks.utils.wrappers.rsl_rl import (
     RslRlOnPolicyRunnerCfg,
@@ -22,7 +20,7 @@ class UnitreeA1AmpRoughPPORunnerCfg(RslRlOnPolicyRunnerCfg):
         critic_hidden_dims=[512, 256, 128],
         activation="elu",
     )
-    algorithm = RslRlAmpPpoAlgorithmCfg(
+    algorithm = RslRlPpoAlgorithmCfg(
         class_name="AMPPPO",
         value_loss_coef=1.0,
         use_clipped_value_loss=True,
@@ -36,7 +34,6 @@ class UnitreeA1AmpRoughPPORunnerCfg(RslRlOnPolicyRunnerCfg):
         lam=0.95,
         desired_kl=0.01,
         max_grad_norm=1.0,
-        amp_replay_buffer_size=1000000,
     )
 
     amp_reward_coef = 2.0

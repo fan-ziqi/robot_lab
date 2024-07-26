@@ -113,3 +113,4 @@ class UnitreeA1AmpRoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         self.reference_state_initialization = True
         self.amp_motion_files = glob.glob(f"{AMP_UTILS_DIR}/motion_files/mocap_motions_a1/*")
         self.amp_num_preload_transitions = 2000000
+        self.amp_replay_buffer_size = 1000000
