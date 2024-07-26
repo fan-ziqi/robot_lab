@@ -4,7 +4,6 @@ import numpy as np
 import torch
 
 from pybullet_utils import transformations
-
 from rsl_rl_extension.datasets import motion_util, pose3d
 from rsl_rl_extension.utils import amp_utils
 
@@ -118,7 +117,7 @@ class AMPLoader:
             times = self.traj_time_sample_batch(traj_idxs)
             self.preloaded_s = self.get_full_frame_at_time_batch(traj_idxs, times)
             self.preloaded_s_next = self.get_full_frame_at_time_batch(traj_idxs, times + self.time_between_frames)
-            print(f"Finished preloading")
+            print("Finished preloading")
 
         self.all_trajectories_full = torch.vstack(self.trajectories_full)
 
@@ -162,8 +161,6 @@ class AMPLoader:
         foot_vel = self.reorder_from_isaacgym_to_isaacgym(foot_vel)
 
         return np.hstack([root_pos, root_rot, joint_pos, foot_pos, lin_vel, ang_vel, joint_vel, foot_vel])
-
-    
 
     def weighted_traj_idx_sample(self):
         """Get traj idx via weighted sampling."""

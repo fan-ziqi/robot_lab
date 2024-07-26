@@ -34,7 +34,6 @@ import torch.optim as optim
 
 from rsl_rl.modules import ActorCritic
 from rsl_rl.storage import RolloutStorage
-
 from rsl_rl_extension.storage.replay_buffer import ReplayBuffer
 
 
@@ -198,7 +197,7 @@ class AMPPPO:
             entropy_batch = self.actor_critic.entropy
 
             # KL
-            if self.desired_kl != None and self.schedule == "adaptive":
+            if self.desired_kl is not None and self.schedule == "adaptive":
                 with torch.inference_mode():
                     kl = torch.sum(
                         torch.log(sigma_batch / old_sigma_batch + 1.0e-5)

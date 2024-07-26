@@ -29,26 +29,21 @@ simulation_app = app_launcher.app
 
 
 import gymnasium as gym
-import os
-import torch
 import numpy as np
-from omni.isaac.lab.utils.math import quat_rotate
+import torch
 
 # Import extensions to set up environment tasks
 import robot_lab.tasks  # noqa: F401
 
+from omni.isaac.lab.utils.math import quat_rotate
 from omni.isaac.lab_tasks.utils import parse_env_cfg
-from omni.isaac.lab_tasks.utils.wrappers.rsl_rl import (
-    RslRlOnPolicyRunnerCfg,
-    RslRlVecEnvWrapper,
-)
+from omni.isaac.lab_tasks.utils.wrappers.rsl_rl import RslRlVecEnvWrapper
 
 
 def main():
     """Play with RSL-RL agent."""
     # parse configuration
     env_cfg = parse_env_cfg(args_cli.task, use_gpu=not args_cli.cpu, num_envs=args_cli.num_envs)
-    agent_cfg: RslRlOnPolicyRunnerCfg = cli_args.parse_rsl_rl_cfg(args_cli.task, args_cli)
 
     # make a smaller scene for play
     env_cfg.scene.num_envs = 1
@@ -86,7 +81,9 @@ def main():
             while traj_idx < len(env.unwrapped.amp_loader.trajectory_lens):
                 actions = torch.zeros((env_cfg.scene.num_envs, env.unwrapped.num_actions), device=env.unwrapped.device)
 
-                if (t + env.unwrapped.amp_loader.time_between_frames + env_cfg.sim.dt) >= env.unwrapped.amp_loader.trajectory_lens[traj_idx]:
+                if (
+                    t + env.unwrapped.amp_loader.time_between_frames + env_cfg.sim.dt
+                ) >= env.unwrapped.amp_loader.trajectory_lens[traj_idx]:
                     print(f"finish traj {traj_idx}")
                     traj_idx += 1
                     t = 0
@@ -99,7 +96,9 @@ def main():
                 lin_vel = quat_rotate(orientations, env.unwrapped.amp_loader.get_linear_vel_batch(frames))
                 ang_vel = quat_rotate(orientations, env.unwrapped.amp_loader.get_angular_vel_batch(frames))
                 velocities = torch.cat([lin_vel, ang_vel], dim=-1)
-                env.unwrapped.robot.write_root_pose_to_sim(torch.cat([positions, orientations], dim=-1), env_ids=env_ids)
+                env.unwrapped.robot.write_root_pose_to_sim(
+                    torch.cat([positions, orientations], dim=-1), env_ids=env_ids
+                )
                 env.unwrapped.robot.write_root_velocity_to_sim(velocities, env_ids=env_ids)
                 joint_pos = env.unwrapped.amp_loader.get_joint_pose_batch(frames)
                 joint_vel = env.unwrapped.amp_loader.get_joint_vel_batch(frames)

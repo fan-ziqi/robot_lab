@@ -5,7 +5,7 @@
 
 from dataclasses import MISSING
 
-from omni.isaac.lab.controllers import DifferentialIKControllerCfg
+from omni.isaac.lab.controllers import DifferentialIKControllerCfg  # noqa: F401
 from omni.isaac.lab.managers.action_manager import ActionTerm, ActionTermCfg
 from omni.isaac.lab.utils import configclass
 
@@ -49,7 +49,6 @@ class JointPositionActionCfg(JointActionCfg):
     If True, this flag results in overwriting the values of :attr:`offset` to the default joint positions
     from the articulation asset.
     """
-
 
 
 @configclass

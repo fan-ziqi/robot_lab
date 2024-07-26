@@ -1,6 +1,7 @@
 import glob
 
 from amp_utils import AMP_UTILS_DIR
+
 from robot_lab.tasks.locomotion.velocity.velocity_env_cfg import LocomotionVelocityRoughEnvCfg
 
 from omni.isaac.lab.utils import configclass
@@ -12,6 +13,7 @@ from omni.isaac.lab.utils import configclass
 # from omni.isaac.lab_assets.unitree import UNITREE_A1_CFG  # isort: skip
 # use local assets
 from robot_lab.assets.unitree import UNITREE_A1_CFG  # isort: skip
+
 
 @configclass
 class UnitreeA1AmpRoughEnvCfg(LocomotionVelocityRoughEnvCfg):

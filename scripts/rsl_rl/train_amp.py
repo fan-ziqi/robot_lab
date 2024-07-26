@@ -35,10 +35,10 @@ import os
 import torch
 from datetime import datetime
 
+from rsl_rl_extension.runners import AmpOnPolicyRunner
+
 # Import extensions to set up environment tasks
 import robot_lab.tasks  # noqa: F401
-
-from rsl_rl_extension.runners import AmpOnPolicyRunner
 
 from omni.isaac.lab.envs import ManagerBasedRLEnvCfg
 from omni.isaac.lab.utils.dict import print_dict

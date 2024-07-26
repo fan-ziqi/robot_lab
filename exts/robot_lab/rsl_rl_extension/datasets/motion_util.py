@@ -24,7 +24,6 @@ os.sys.path.insert(0, parentdir)
 import numpy as np
 
 from pybullet_utils import transformations
-
 from rsl_rl_extension.datasets import pose3d
 
 

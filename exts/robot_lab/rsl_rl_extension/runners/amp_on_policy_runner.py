@@ -8,13 +8,11 @@ from collections import deque
 from torch.utils.tensorboard import SummaryWriter as TensorboardSummaryWriter
 
 import rsl_rl
-from rsl_rl.algorithms import PPO
 from rsl_rl.env import VecEnv
 from rsl_rl.modules import ActorCritic, ActorCriticRecurrent, EmpiricalNormalization
-from rsl_rl_extension.utils import store_code_state
-
-from rsl_rl_extension.algorithms.amp_discriminator import AMPDiscriminator
 from rsl_rl_extension.algorithms import AMPPPO
+from rsl_rl_extension.algorithms.amp_discriminator import AMPDiscriminator
+from rsl_rl_extension.utils import store_code_state
 from rsl_rl_extension.utils.amp_utils import Normalizer
 
 
@@ -47,9 +45,11 @@ class AmpOnPolicyRunner:
             device,
             self.cfg["amp_task_reward_lerp"],
         ).to(self.device)
-        min_std = (
-            torch.tensor(self.cfg["min_normalized_std"], device=self.device) *
-            (torch.abs(self.env.unwrapped.robot.data.soft_joint_pos_limits[..., 1] - self.env.unwrapped.robot.data.soft_joint_pos_limits[..., 0]))
+        min_std = torch.tensor(self.cfg["min_normalized_std"], device=self.device) * (
+            torch.abs(
+                self.env.unwrapped.robot.data.soft_joint_pos_limits[..., 1]
+                - self.env.unwrapped.robot.data.soft_joint_pos_limits[..., 0]
+            )
         )
         alg_class = eval(self.alg_cfg.pop("class_name"))  # PPO
         # self.alg: PPO = alg_class(actor_critic, device=self.device, **self.alg_cfg)

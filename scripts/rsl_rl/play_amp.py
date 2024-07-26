@@ -32,10 +32,10 @@ import gymnasium as gym
 import os
 import torch
 
+from rsl_rl_extension.runners import AmpOnPolicyRunner
+
 # Import extensions to set up environment tasks
 import robot_lab.tasks  # noqa: F401
-
-from rsl_rl_extension.runners import AmpOnPolicyRunner
 
 from omni.isaac.lab_tasks.utils import get_checkpoint_path, parse_env_cfg
 from omni.isaac.lab_tasks.utils.wrappers.rsl_rl import (

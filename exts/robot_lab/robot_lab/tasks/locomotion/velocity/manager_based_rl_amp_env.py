@@ -25,9 +25,10 @@ class ManagerBasedRLAmpEnv(ManagerBasedRLEnv, gym.Env):
 
         self.chain_ee = []
         for ee_name in self.cfg.ee_names:
-            self.chain_ee.append(
-                urdf.build_serial_chain_from_urdf(open(self.cfg.urdf_path, "rb").read(), ee_name).to(device=self.device)
-            )
+            with open(self.cfg.urdf_path, "rb") as urdf_file:
+                urdf_content = urdf_file.read()
+                chain_ee_instance = urdf.build_serial_chain_from_urdf(urdf_content, ee_name).to(device=self.device)
+                self.chain_ee.append(chain_ee_instance)
 
         if self.cfg.reference_state_initialization:
             print("motion_files dir: ")
@@ -42,7 +43,7 @@ class ManagerBasedRLAmpEnv(ManagerBasedRLEnv, gym.Env):
 
         self.num_actions = self.action_manager.total_action_dim
 
-        self.robot = self.scene.articulations['robot']
+        self.robot = self.scene.articulations["robot"]
 
     """
     Properties

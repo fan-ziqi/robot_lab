@@ -8,7 +8,7 @@ _EPS = np.finfo(float).eps * 4.0
 class RunningMeanStd:
     def __init__(self, epsilon: float = 1e-4, shape: Tuple[int, ...] = ()):
         """
-        Calulates the running mean and std of a data stream
+        Calculates the running mean and std of a data stream
         https://en.wikipedia.org/wiki/Algorithms_for_calculating_variance#Parallel_algorithm
         :param epsilon: helps with arithmetic issues
         :param shape: the shape of the data stream's output

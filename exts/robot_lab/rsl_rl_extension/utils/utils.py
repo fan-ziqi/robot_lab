@@ -3,10 +3,11 @@
 
 from __future__ import annotations
 
-import git
 import os
 import pathlib
 import torch
+
+import git
 
 
 def split_and_pad_trajectories(tensor, dones):
