@@ -63,8 +63,8 @@ def main():
     env_cfg.scene.terrain.max_init_terrain_level = None
     # reduce the number of terrains to save memory
     if env_cfg.scene.terrain.terrain_generator is not None:
-        env_cfg.scene.terrain.terrain_generator.num_rows = 5
-        env_cfg.scene.terrain.terrain_generator.num_cols = 5
+        env_cfg.scene.terrain.terrain_generator.num_rows = 1
+        env_cfg.scene.terrain.terrain_generator.num_cols = 1
         env_cfg.scene.terrain.terrain_generator.curriculum = False
 
     # disable randomization for play
@@ -81,42 +81,26 @@ def main():
     # wrap around environment for rsl-rl
     env = RslRlVecEnvWrapper(env)
 
-    # specify directory for logging experiments
-    log_root_path = os.path.join("logs", "rsl_rl", agent_cfg.experiment_name)
-    log_root_path = os.path.abspath(log_root_path)
-    print(f"[INFO] Loading experiment from directory: {log_root_path}")
-    resume_path = get_checkpoint_path(log_root_path, agent_cfg.load_run, agent_cfg.load_checkpoint)
-    print(f"[INFO]: Loading model checkpoint from: {resume_path}")
-
-    # load previously trained model
-    ppo_runner = OnPolicyRunner(env, agent_cfg.to_dict(), log_dir=None, device=agent_cfg.device)
-    ppo_runner.load(resume_path)
-    print(f"[INFO]: Loading model checkpoint from: {resume_path}")
-
-    # obtain the trained policy for inference
-    policy = ppo_runner.get_inference_policy(device=env.unwrapped.device)
-
     # reset environment
     obs, _ = env.get_observations()
     # simulate environment
     while simulation_app.is_running():
         # run everything in inference mode
         with torch.inference_mode():
-
+            env_ids = torch.tensor([0], device=env.unwrapped.device)
             t = 0.0
             traj_idx = 0
-
             while traj_idx < len(env.unwrapped.amp_loader.trajectory_lens):
                 actions = torch.zeros((env_cfg.scene.num_envs, env.unwrapped.num_actions), device=env.unwrapped.device)
 
                 if (t + env.unwrapped.amp_loader.time_between_frames + env_cfg.sim.dt) >= env.unwrapped.amp_loader.trajectory_lens[traj_idx]:
+                    print(f"finish traj {traj_idx}")
                     traj_idx += 1
                     t = 0
                 else:
                     t += env_cfg.sim.dt
 
                 frames = env.unwrapped.amp_loader.get_full_frame_at_time_batch(np.array([traj_idx]), np.array([t]))
-                env_ids = torch.tensor([0], device=env.unwrapped.device)
                 positions = AMPLoader.get_root_pos_batch(frames)
                 orientations = AMPLoader.get_root_rot_batch(frames)
                 lin_vel = quat_rotate(orientations, AMPLoader.get_linear_vel_batch(frames))
@@ -132,15 +116,21 @@ def main():
                 joint_vel = joint_vel.clamp_(-joint_vel_limits, joint_vel_limits)
                 env.unwrapped.robot.write_joint_state_to_sim(joint_pos, joint_vel, env_ids=env_ids)
 
-                print("---")
-                foot_pos_amp = AMPLoader.get_tar_toe_pos_local_batch(frames)
-                print(env.unwrapped.get_amp_observations()[0, 12:24])
-                print(foot_pos_amp[0])
+                # print("---")
+                # foot_pos_amp = AMPLoader.get_tar_toe_pos_local_batch(frames)
+                # print(env.unwrapped.get_amp_observations()[env_ids.item(), 12:24])
+                # print(foot_pos_amp[0])
 
                 # env stepping
                 obs, _, _, _ = env.step(actions)
 
+                # camera follow
                 env.unwrapped.viewport_camera_controller.set_view_env_index(env_index=0)
+                lookat = [env.unwrapped.robot.data.root_pos_w[env_ids.item(), i].cpu().item() for i in range(3)]
+                eye_offset = [2, 2, 2]
+                pairs = zip(lookat, eye_offset)
+                eye = [x + y for x, y in pairs]
+                env.unwrapped.viewport_camera_controller.update_view_location(eye, lookat)
 
     # close the simulator
     env.close()

@@ -140,13 +140,15 @@ class AMPLoader:
         root_pos = AMPLoader.get_root_pos_batch(motion_data)
         root_rot = AMPLoader.get_root_rot_batch(motion_data)
 
+        root_rot = np.concatenate((root_rot[:, 3].reshape(-1, 1), root_rot[:, 0:3]), axis=1)
+
         jp_fr, jp_fl, jp_rr, jp_rl = np.split(AMPLoader.get_joint_pose_batch(motion_data), 4, axis=1)
         joint_pos = np.hstack([jp_fl, jp_fr, jp_rl, jp_rr])
         joint_pos = self.reorder_from_isaacgym_to_isaacgym(joint_pos)
 
         fp_fr, fp_fl, fp_rr, fp_rl = np.split(AMPLoader.get_tar_toe_pos_local_batch(motion_data), 4, axis=1)
         foot_pos = np.hstack([fp_fl, fp_fr, fp_rl, fp_rr])
-        # foot_pos = self.reorder_from_isaacgym_to_isaacgym(foot_pos)
+        foot_pos = self.reorder_from_isaacgym_to_isaacgym(foot_pos)
 
         lin_vel = AMPLoader.get_linear_vel_batch(motion_data)
         ang_vel = AMPLoader.get_angular_vel_batch(motion_data)
@@ -157,7 +159,7 @@ class AMPLoader:
 
         fv_fr, fv_fl, fv_rr, fv_rl = np.split(AMPLoader.get_tar_toe_vel_local_batch(motion_data), 4, axis=1)
         foot_vel = np.hstack([fv_fl, fv_fr, fv_rl, fv_rr])
-        # foot_vel = self.reorder_from_isaacgym_to_isaacgym(foot_vel)
+        foot_vel = self.reorder_from_isaacgym_to_isaacgym(foot_vel)
 
         return np.hstack([root_pos, root_rot, joint_pos, foot_pos, lin_vel, ang_vel, joint_vel, foot_vel])
 

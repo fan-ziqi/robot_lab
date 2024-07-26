@@ -8,7 +8,6 @@ import time
 import numpy as np
 from pyquaternion import Quaternion
 
-import isaacgym
 from legged_gym.envs import *
 import legged_gym.utils.kinematics.urdf as pk
 
