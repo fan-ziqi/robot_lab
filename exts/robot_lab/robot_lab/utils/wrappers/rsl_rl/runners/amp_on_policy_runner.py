@@ -35,9 +35,9 @@ class OnPolicyRunner:
             num_critic_obs = num_obs
         actor_critic_class = eval(self.policy_cfg.pop("class_name"))  # ActorCritic
         actor_critic: ActorCritic | ActorCriticRecurrent = actor_critic_class(
-            num_obs, num_critic_obs, self.env.num_actions, **self.policy_cfg
+            num_obs, num_critic_obs, self.env.unwrapped.num_actions, **self.policy_cfg
         ).to(self.device)
-        amp_loader = self.env.amp_loader
+        amp_loader = self.env.unwrapped.amp_loader
         amp_normalizer = Normalizer(amp_loader.observation_dim)
         discriminator = AMPDiscriminator(
             amp_loader.observation_dim * 2,
@@ -46,12 +46,10 @@ class OnPolicyRunner:
             device,
             self.cfg["amp_task_reward_lerp"],
         ).to(self.device)
-        # min_std = (
-        #     torch.tensor(self.cfg["min_normalized_std"], device=self.device) *
-        #     (torch.abs(self.cfg["joint_pos_limits"][..., 1] - self.cfg["joint_pos_limits"][..., 0]))
-        # )
-        min_std = None  # TODO min_std
-        # self.discr: AMPDiscriminator = AMPDiscriminator()
+        min_std = (
+            torch.tensor(self.cfg["min_normalized_std"], device=self.device) *
+            (torch.abs(self.env.unwrapped.robot.data.soft_joint_pos_limits[..., 1] - self.env.unwrapped.robot.data.soft_joint_pos_limits[..., 0]))
+        )
         alg_class = eval(self.alg_cfg.pop("class_name"))  # PPO
         # self.alg: PPO = alg_class(actor_critic, device=self.device, **self.alg_cfg)
         self.alg: PPO = alg_class(
@@ -72,7 +70,7 @@ class OnPolicyRunner:
             self.num_steps_per_env,
             [num_obs],
             [num_critic_obs],
-            [self.env.num_actions],
+            [self.env.unwrapped.num_actions],
         )
 
         # Log
@@ -112,7 +110,7 @@ class OnPolicyRunner:
         obs, extras = self.env.get_observations()
         critic_obs = extras["observations"].get("critic", obs)
         obs, critic_obs = obs.to(self.device), critic_obs.to(self.device)
-        amp_obs = self.env.get_amp_observations()
+        amp_obs = self.env.unwrapped.get_amp_observations()
         amp_obs = amp_obs.to(self.device)
 
         self.train_mode()  # switch to train mode (for dropout for example)
@@ -145,7 +143,7 @@ class OnPolicyRunner:
                         rewards.to(self.device),
                         dones.to(self.device),
                     )
-                    next_amp_obs = self.env.get_amp_observations()
+                    next_amp_obs = self.env.unwrapped.get_amp_observations()
                     next_amp_obs = next_amp_obs.to(self.device)
                     # Account for terminal states.
                     next_amp_obs_with_term = torch.clone(next_amp_obs)

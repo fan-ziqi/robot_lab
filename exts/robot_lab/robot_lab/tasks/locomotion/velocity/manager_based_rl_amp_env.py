@@ -40,12 +40,9 @@ class ManagerBasedRLAmpEnv(ManagerBasedRLEnv, gym.Env):
                 num_preload_transitions=self.cfg.amp_num_preload_transitions,
             )
 
-        # print(self.cfg.scene.robot)
-        # _robot = Articulation(self.cfg.scene.robot)
-        # joint_pos_limits = _robot.data.soft_joint_pos_limits[0]
-        # print(joint_pos_limits)
-        # joint_pos_limits[..., 0]
-        # joint_pos_limits[..., 1]
+        self.num_actions = self.action_manager.total_action_dim
+
+        self.robot = self.scene.articulations['robot']
 
     """
     Properties

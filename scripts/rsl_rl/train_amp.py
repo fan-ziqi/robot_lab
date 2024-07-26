@@ -37,7 +37,6 @@ from datetime import datetime
 
 # Import extensions to set up environment tasks
 import robot_lab.tasks  # noqa: F401
-from robot_lab.utils.wrappers.rsl_rl import RslRlAmpVecEnvWrapper
 
 # from rsl_rl.runners import OnPolicyRunner
 from robot_lab.utils.wrappers.rsl_rl.runners import OnPolicyRunner
@@ -46,7 +45,7 @@ from omni.isaac.lab.envs import ManagerBasedRLEnvCfg
 from omni.isaac.lab.utils.dict import print_dict
 from omni.isaac.lab.utils.io import dump_pickle, dump_yaml
 from omni.isaac.lab_tasks.utils import get_checkpoint_path, parse_env_cfg
-from omni.isaac.lab_tasks.utils.wrappers.rsl_rl import RslRlOnPolicyRunnerCfg
+from omni.isaac.lab_tasks.utils.wrappers.rsl_rl import RslRlOnPolicyRunnerCfg, RslRlVecEnvWrapper
 
 torch.backends.cuda.matmul.allow_tf32 = True
 torch.backends.cudnn.allow_tf32 = True
@@ -84,7 +83,7 @@ def main():
         print_dict(video_kwargs, nesting=4)
         env = gym.wrappers.RecordVideo(env, **video_kwargs)
     # wrap around environment for rsl-rl
-    env = RslRlAmpVecEnvWrapper(env)
+    env = RslRlVecEnvWrapper(env)
 
     # create runner from rsl-rl
     runner = OnPolicyRunner(env, agent_cfg.to_dict(), log_dir=log_dir, device=agent_cfg.device)

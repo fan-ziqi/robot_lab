@@ -5,7 +5,7 @@ import torch
 from robot_lab.tasks.locomotion.velocity.manager_based_rl_amp_env import ManagerBasedRLAmpEnv
 from robot_lab.utils.wrappers.rsl_rl.datasets.motion_loader import AMPLoader
 
-import omni.isaac.lab.utils.math as math_utils
+from omni.isaac.lab.utils.math import quat_rotate
 from omni.isaac.lab.assets import Articulation, RigidObject
 from omni.isaac.lab.managers import SceneEntityCfg
 
@@ -18,14 +18,14 @@ def reset_root_state_amp(
     # extract the used quantities (to enable type-hinting)
     asset: RigidObject | Articulation = env.scene[asset_cfg.name]
 
-    frames = env.amp_loader.get_full_frame_batch(len(env_ids))
+    frames = env.unwrapped.amp_loader.get_full_frame_batch(len(env_ids))
     # base position
     positions = AMPLoader.get_root_pos_batch(frames)
     positions[:, :2] = positions[:, :2] + env.scene.env_origins[env_ids, :2]
     orientations = AMPLoader.get_root_rot_batch(frames)
     # base velocities
-    lin_vel = math_utils.quat_rotate(orientations, AMPLoader.get_linear_vel_batch(frames))
-    ang_vel = math_utils.quat_rotate(orientations, AMPLoader.get_angular_vel_batch(frames))
+    lin_vel = quat_rotate(orientations, AMPLoader.get_linear_vel_batch(frames))
+    ang_vel = quat_rotate(orientations, AMPLoader.get_angular_vel_batch(frames))
     velocities = torch.cat([lin_vel, ang_vel], dim=-1)
 
     # set into the physics simulation
@@ -41,7 +41,7 @@ def reset_joints_amp(
     # extract the used quantities (to enable type-hinting)
     asset: Articulation = env.scene[asset_cfg.name]
 
-    frames = env.amp_loader.get_full_frame_batch(len(env_ids))
+    frames = env.unwrapped.amp_loader.get_full_frame_batch(len(env_ids))
     joint_pos = AMPLoader.get_joint_pose_batch(frames)
     joint_vel = AMPLoader.get_joint_vel_batch(frames)
 

@@ -34,7 +34,6 @@ import torch
 
 # Import extensions to set up environment tasks
 import robot_lab.tasks  # noqa: F401
-from robot_lab.utils.wrappers.rsl_rl import RslRlAmpVecEnvWrapper
 
 # from rsl_rl.runners import OnPolicyRunner
 from robot_lab.utils.wrappers.rsl_rl.runners import OnPolicyRunner
@@ -42,6 +41,7 @@ from robot_lab.utils.wrappers.rsl_rl.runners import OnPolicyRunner
 from omni.isaac.lab_tasks.utils import get_checkpoint_path, parse_env_cfg
 from omni.isaac.lab_tasks.utils.wrappers.rsl_rl import (
     RslRlOnPolicyRunnerCfg,
+    RslRlVecEnvWrapper,
     export_policy_as_jit,
     export_policy_as_onnx,
 )
@@ -72,7 +72,7 @@ def main():
     # create isaac environment
     env = gym.make(args_cli.task, cfg=env_cfg)
     # wrap around environment for rsl-rl
-    env = RslRlAmpVecEnvWrapper(env)
+    env = RslRlVecEnvWrapper(env)
 
     # specify directory for logging experiments
     log_root_path = os.path.join("logs", "rsl_rl", agent_cfg.experiment_name)
