@@ -2,7 +2,7 @@ import numpy as np
 from pybullet_utils import transformations
 import pybullet
 
-from rsl_rl_extension.datasets.pose3d import QuaternionRotatePoint
+from rsl_rl_extension.datasets import pose3d
 
 POS_SIZE = 3
 ROT_SIZE = 4
@@ -30,7 +30,7 @@ def calc_heading(q):
 
     """
     ref_dir = np.array([1, 0, 0])
-    rot_dir = QuaternionRotatePoint(ref_dir, q)
+    rot_dir = pose3d.QuaternionRotatePoint(ref_dir, q)
     heading = np.arctan2(rot_dir[1], rot_dir[0])
     return heading
 

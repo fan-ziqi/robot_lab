@@ -1,8 +1,7 @@
 """Special orthogonal group."""
-
-import torch
 import warnings
 from typing import Tuple
+import torch
 
 from .math import acos_linear_extrapolation
 
@@ -10,7 +9,7 @@ HAT_INV_SKEW_SYMMETRIC_TOL = 1e-5
 
 
 def so3_relative_angle(R1, R2, cos_angle: bool = False):
-    """
+  """
     Calculates the relative angle (in radians) between pairs of
     rotation matrices `R1` and `R2` with `angle = acos(0.5 * (Trace(R1
     R2^T)-1))`
@@ -33,8 +32,8 @@ def so3_relative_angle(R1, R2, cos_angle: bool = False):
         ValueError if `R1` or `R2` is of incorrect shape.
         ValueError if `R1` or `R2` has an unexpected trace.
     """
-    R12 = torch.bmm(R1, R2.permute(0, 2, 1))
-    return so3_rotation_angle(R12, cos_angle=cos_angle)
+  R12 = torch.bmm(R1, R2.permute(0, 2, 1))
+  return so3_rotation_angle(R12, cos_angle=cos_angle)
 
 
 def so3_rotation_angle(
@@ -43,7 +42,7 @@ def so3_rotation_angle(
     cos_angle: bool = False,
     cos_bound: float = 1e-4,
 ) -> torch.Tensor:
-    """
+  """
     Calculates angles (in radians) of a batch of rotation matrices `R` with
     `angle = acos(0.5 * (Trace(R)-1))`. The trace of the
     input matrices is checked to be in the valid range `[-1-eps,3+eps]`.
@@ -68,29 +67,29 @@ def so3_rotation_angle(
         ValueError if `R` has an unexpected trace.
     """
 
-    N, dim1, dim2 = R.shape
-    if dim1 != 3 or dim2 != 3:
-        raise ValueError("Input has to be a batch of 3x3 Tensors.")
+  N, dim1, dim2 = R.shape
+  if dim1 != 3 or dim2 != 3:
+    raise ValueError("Input has to be a batch of 3x3 Tensors.")
 
-    rot_trace = R[:, 0, 0] + R[:, 1, 1] + R[:, 2, 2]
+  rot_trace = R[:, 0, 0] + R[:, 1, 1] + R[:, 2, 2]
 
-    if ((rot_trace < -1.0 - eps) + (rot_trace > 3.0 + eps)).any():
-        raise ValueError("A matrix has trace outside valid range [-1-eps,3+eps].")
+  if ((rot_trace < -1.0 - eps) + (rot_trace > 3.0 + eps)).any():
+    raise ValueError("A matrix has trace outside valid range [-1-eps,3+eps].")
 
-    # phi ... rotation angle
-    phi_cos = (rot_trace - 1.0) * 0.5
+  # phi ... rotation angle
+  phi_cos = (rot_trace - 1.0) * 0.5
 
-    if cos_angle:
-        return phi_cos
+  if cos_angle:
+    return phi_cos
+  else:
+    if cos_bound > 0.0:
+      return acos_linear_extrapolation(phi_cos, 1.0 - cos_bound)
     else:
-        if cos_bound > 0.0:
-            return acos_linear_extrapolation(phi_cos, 1.0 - cos_bound)
-        else:
-            return torch.acos(phi_cos)
+      return torch.acos(phi_cos)
 
 
 def so3_exp_map(log_rot: torch.Tensor, eps: float = 0.0001) -> torch.Tensor:
-    """
+  """
     Convert a batch of logarithmic representations of rotation matrices
     `log_rot`
     to a batch of 3x3 rotation matrices using Rodrigues formula [1].
@@ -110,42 +109,41 @@ def so3_exp_map(log_rot: torch.Tensor, eps: float = 0.0001) -> torch.Tensor:
         ValueError if `log_rot` is of incorrect shape.
     [1] https://en.wikipedia.org/wiki/Rodrigues%27_rotation_formula
     """
-    return _so3_exp_map(log_rot, eps=eps)[0]
+  return _so3_exp_map(log_rot, eps=eps)[0]
 
 
 def _so3_exp_map(
-    log_rot: torch.Tensor, eps: float = 0.0001
+    log_rot: torch.Tensor,
+    eps: float = 0.0001
 ) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor]:
-    """
+  """
     A helper function that computes the so3 exponential map and,
     apart from the rotation matrix, also returns intermediate variables
     that can be re-used in other functions.
     """
-    _, dim = log_rot.shape
-    if dim != 3:
-        raise ValueError("Input tensor shape has to be Nx3.")
+  _, dim = log_rot.shape
+  if dim != 3:
+    raise ValueError("Input tensor shape has to be Nx3.")
 
-    nrms = (log_rot * log_rot).sum(1)
-    # phis ... rotation angles
-    rot_angles = torch.clamp(nrms, eps).sqrt()
-    rot_angles_inv = 1.0 / rot_angles
-    fac1 = rot_angles_inv * rot_angles.sin()
-    fac2 = rot_angles_inv * rot_angles_inv * (1.0 - rot_angles.cos())
-    skews = hat(log_rot)
-    skews_square = torch.bmm(skews, skews)
+  nrms = (log_rot * log_rot).sum(1)
+  # phis ... rotation angles
+  rot_angles = torch.clamp(nrms, eps).sqrt()
+  rot_angles_inv = 1.0 / rot_angles
+  fac1 = rot_angles_inv * rot_angles.sin()
+  fac2 = rot_angles_inv * rot_angles_inv * (1.0 - rot_angles.cos())
+  skews = hat(log_rot)
+  skews_square = torch.bmm(skews, skews)
 
-    R = (
-        # pyre-fixme[16]: `float` has no attribute `__getitem__`.
-        fac1[:, None, None] * skews
-        + fac2[:, None, None] * skews_square
-        + torch.eye(3, dtype=log_rot.dtype, device=log_rot.device)[None]
-    )
+  R = (
+      # pyre-fixme[16]: `float` has no attribute `__getitem__`.
+      fac1[:, None, None] * skews + fac2[:, None, None] * skews_square +
+      torch.eye(3, dtype=log_rot.dtype, device=log_rot.device)[None])
 
-    return R, rot_angles, skews, skews_square
+  return R, rot_angles, skews, skews_square
 
 
 def so3_log_map(R, eps: float = 0.0001):
-    """
+  """
     Convert a batch of 3x3 rotation matrices `R`
     to a batch of 3-dimensional matrix logarithms of rotation matrices
     The conversion has a singularity around `(R=I)` which is handled
@@ -164,24 +162,27 @@ def so3_log_map(R, eps: float = 0.0001):
         ValueError if `R` has an unexpected trace.
     """
 
-    N, dim1, dim2 = R.shape
-    if dim1 != 3 or dim2 != 3:
-        raise ValueError("Input has to be a batch of 3x3 Tensors.")
+  N, dim1, dim2 = R.shape
+  if dim1 != 3 or dim2 != 3:
+    raise ValueError("Input has to be a batch of 3x3 Tensors.")
 
-    phi = so3_rotation_angle(R)
+  phi = so3_rotation_angle(R)
 
-    phi_sin = phi.sin()
+  phi_sin = phi.sin()
 
-    phi_denom = torch.clamp(phi_sin.abs(), eps) * phi_sin.sign() + (phi_sin == 0).type_as(phi) * eps
+  phi_denom = (
+      torch.clamp(phi_sin.abs(), eps) * phi_sin.sign() +
+      (phi_sin == 0).type_as(phi) * eps)
 
-    log_rot_hat = (phi / (2.0 * phi_denom))[:, None, None] * (R - R.permute(0, 2, 1))
-    log_rot = hat_inv(log_rot_hat)
+  log_rot_hat = (phi / (2.0 * phi_denom))[:, None, None] * (
+      R - R.permute(0, 2, 1))
+  log_rot = hat_inv(log_rot_hat)
 
-    return log_rot
+  return log_rot
 
 
 def hat_inv(h):
-    """
+  """
     Compute the inverse Hat operator [1] of a batch of 3x3 matrices.
 
     Args:
@@ -197,25 +198,25 @@ def hat_inv(h):
     [1] https://en.wikipedia.org/wiki/Hat_operator
     """
 
-    N, dim1, dim2 = h.shape
-    if dim1 != 3 or dim2 != 3:
-        raise ValueError("Input has to be a batch of 3x3 Tensors.")
+  N, dim1, dim2 = h.shape
+  if dim1 != 3 or dim2 != 3:
+    raise ValueError("Input has to be a batch of 3x3 Tensors.")
 
-    ss_diff = (h + h.permute(0, 2, 1)).abs().max()
-    if float(ss_diff) > HAT_INV_SKEW_SYMMETRIC_TOL:
-        raise ValueError("One of input matrices not skew-symmetric.")
+  ss_diff = (h + h.permute(0, 2, 1)).abs().max()
+  if float(ss_diff) > HAT_INV_SKEW_SYMMETRIC_TOL:
+    raise ValueError("One of input matrices not skew-symmetric.")
 
-    x = h[:, 2, 1]
-    y = h[:, 0, 2]
-    z = h[:, 1, 0]
+  x = h[:, 2, 1]
+  y = h[:, 0, 2]
+  z = h[:, 1, 0]
 
-    v = torch.stack((x, y, z), dim=1)
+  v = torch.stack((x, y, z), dim=1)
 
-    return v
+  return v
 
 
 def hat(v):
-    """
+  """
     Compute the Hat operator [1] of a batch of 3D vectors.
 
     Args:
@@ -234,19 +235,19 @@ def hat(v):
     [1] https://en.wikipedia.org/wiki/Hat_operator
     """
 
-    N, dim = v.shape
-    if dim != 3:
-        raise ValueError("Input vectors have to be 3-dimensional.")
+  N, dim = v.shape
+  if dim != 3:
+    raise ValueError("Input vectors have to be 3-dimensional.")
 
-    h = v.new_zeros(N, 3, 3)
+  h = v.new_zeros(N, 3, 3)
 
-    x, y, z = v.unbind(1)
+  x, y, z = v.unbind(1)
 
-    h[:, 0, 1] = -z
-    h[:, 0, 2] = y
-    h[:, 1, 0] = z
-    h[:, 1, 2] = -x
-    h[:, 2, 0] = -y
-    h[:, 2, 1] = x
+  h[:, 0, 1] = -z
+  h[:, 0, 2] = y
+  h[:, 1, 0] = z
+  h[:, 1, 2] = -x
+  h[:, 2, 0] = -y
+  h[:, 2, 1] = x
 
-    return h
+  return h

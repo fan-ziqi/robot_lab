@@ -10,7 +10,7 @@ from pyquaternion import Quaternion
 
 from amp_utils.kinematics.urdf import build_serial_chain_from_urdf
 
-from rsl_rl_extension.datasets.pose3d import QuaternionRotatePoint
+from rsl_rl_extension.datasets import pose3d
 from pybullet_utils import transformations
 import pybullet
 import pybullet_data as pd
@@ -239,8 +239,8 @@ def process_ref_joint_pos_data(joint_pos):
 
     for i in range(num_pos):
         curr_pos = proc_pos[i]
-        curr_pos = QuaternionRotatePoint(curr_pos, REF_COORD_ROT)
-        curr_pos = QuaternionRotatePoint(curr_pos, REF_ROOT_ROT)
+        curr_pos = pose3d.QuaternionRotatePoint(curr_pos, REF_COORD_ROT)
+        curr_pos = pose3d.QuaternionRotatePoint(curr_pos, REF_ROOT_ROT)
         curr_pos = curr_pos * config.REF_POS_SCALE + REF_POS_OFFSET
         proc_pos[i] = curr_pos
 
@@ -324,7 +324,7 @@ def retarget_pose(robot, default_pose, ref_joint_pos):
         )
         sim_hip_pos = np.array(hip_link_state[4])
 
-        toe_offset_world = QuaternionRotatePoint(toe_offset_local, heading_rot)
+        toe_offset_world = pose3d.QuaternionRotatePoint(toe_offset_local, heading_rot)
 
         ref_hip_toe_delta = ref_toe_pos - ref_hip_pos
         sim_tar_toe_pos = sim_hip_pos + ref_hip_toe_delta
