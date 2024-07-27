@@ -133,7 +133,9 @@ class AMPLoader:
         transposed_array = np.transpose(reshaped_array, (0, 2, 1))
         # Flatten the array back to 1 dimension
         rearranged_array = transposed_array.reshape(-1, 12)
-        return rearranged_array
+        # Convert to torch tensor
+        rearranged_tensor = torch.tensor(rearranged_array)
+        return rearranged_tensor
 
     def reorder_from_isaacgym_to_isaacgym(self, motion_data):
         """Convert from PyBullet ordering to Isaac ordering.
