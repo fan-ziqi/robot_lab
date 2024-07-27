@@ -270,7 +270,7 @@ class AMPPPO:
             nn.utils.clip_grad_norm_(self.actor_critic.parameters(), self.max_grad_norm)
             self.optimizer.step()
 
-            # self.actor_critic.std.data = self.actor_critic.std.data.clamp(min=self.min_std) # TODO min_std
+            self.actor_critic.std.data = self.actor_critic.std.data.clamp(min=self.min_std)
             if self.amp_normalizer is not None:
                 self.amp_normalizer.update(policy_state_unnorm.cpu().numpy())
                 self.amp_normalizer.update(expert_state_unnorm.cpu().numpy())

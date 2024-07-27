@@ -66,3 +66,13 @@ class JointVelocityActionCfg(JointActionCfg):
 
     This overrides the settings from :attr:`offset` if set to True.
     """
+
+
+@configclass
+class JointEffortActionCfg(JointActionCfg):
+    """Configuration for the joint effort action term.
+
+    See :class:`JointEffortAction` for more details.
+    """
+
+    class_type: type[ActionTerm] = joint_actions.JointEffortAction

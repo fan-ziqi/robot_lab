@@ -12,6 +12,7 @@ from rsl_rl.env import VecEnv
 from rsl_rl.modules import ActorCritic, ActorCriticRecurrent, EmpiricalNormalization
 from rsl_rl_extension.algorithms import AMPPPO
 from rsl_rl_extension.algorithms.amp_discriminator import AMPDiscriminator
+from rsl_rl_extension.datasets.motion_loader import AMPLoader
 from rsl_rl_extension.utils import store_code_state
 from rsl_rl_extension.utils.amp_utils import Normalizer
 
@@ -36,10 +37,16 @@ class AmpOnPolicyRunner:
             num_obs, num_critic_obs, self.env.unwrapped.num_actions, **self.policy_cfg
         ).to(self.device)
         self.alg_cfg["amp_replay_buffer_size"] = self.env.unwrapped.cfg.amp_replay_buffer_size
-        amp_loader = self.env.unwrapped.amp_loader
-        amp_normalizer = Normalizer(amp_loader.observation_dim)
+        amp_data = AMPLoader(
+            device=self.device,
+            motion_files=self.env.unwrapped.cfg.amp_motion_files,
+            time_between_frames=self.env.unwrapped.cfg.sim.dt,
+            preload_transitions=True,
+            num_preload_transitions=self.env.unwrapped.cfg.amp_num_preload_transitions,
+        )
+        amp_normalizer = Normalizer(amp_data.observation_dim)
         discriminator = AMPDiscriminator(
-            amp_loader.observation_dim * 2,
+            amp_data.observation_dim * 2,
             self.cfg["amp_reward_coef"],
             self.cfg["amp_discr_hidden_dims"],
             device,
@@ -47,14 +54,13 @@ class AmpOnPolicyRunner:
         ).to(self.device)
         min_std = torch.tensor(self.cfg["min_normalized_std"], device=self.device) * (
             torch.abs(
-                self.env.unwrapped.robot.data.soft_joint_pos_limits[..., 1]
-                - self.env.unwrapped.robot.data.soft_joint_pos_limits[..., 0]
+                self.env.unwrapped.robot.data.soft_joint_pos_limits[0, :, 1]
+                - self.env.unwrapped.robot.data.soft_joint_pos_limits[0, :, 0]
             )
         )
         alg_class = eval(self.alg_cfg.pop("class_name"))  # PPO
-        # self.alg: PPO = alg_class(actor_critic, device=self.device, **self.alg_cfg)
         self.alg: AMPPPO = alg_class(
-            actor_critic, discriminator, amp_loader, amp_normalizer, min_std, device=self.device, **self.alg_cfg
+            actor_critic, discriminator, amp_data, amp_normalizer, min_std, device=self.device, **self.alg_cfg
         )
         self.num_steps_per_env = self.cfg["num_steps_per_env"]
         self.save_interval = self.cfg["save_interval"]

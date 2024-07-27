@@ -54,7 +54,7 @@ UNITREE_A1_CFG = ArticulationCfg(
             effort_limit=33.5,
             saturation_effort=33.5,
             velocity_limit=21.0,
-            stiffness=25.0,
+            stiffness=20.0,
             damping=0.5,
             friction=0.0,
         ),

@@ -19,17 +19,16 @@ def reset_root_state_amp(
 
     frames = env.unwrapped.amp_loader.get_full_frame_batch(len(env_ids))
     # base position
-    positions = env.unwrapped.amp_loader.get_root_pos_batch(frames)
-    positions[:, :2] = positions[:, :2] + env.scene.env_origins[env_ids, :2]
-    orientations = env.unwrapped.amp_loader.get_root_rot_batch(frames)
+    root_pos = env.unwrapped.amp_loader.get_root_pos_batch(frames)
+    root_pos[:, :2] = root_pos[:, :2] + env.scene.env_origins[env_ids, :2]
+    root_orn = env.unwrapped.amp_loader.get_root_rot_batch(frames)
     # base velocities
-    lin_vel = quat_rotate(orientations, env.unwrapped.amp_loader.get_linear_vel_batch(frames))
-    ang_vel = quat_rotate(orientations, env.unwrapped.amp_loader.get_angular_vel_batch(frames))
-    velocities = torch.cat([lin_vel, ang_vel], dim=-1)
+    lin_vel = quat_rotate(root_orn, env.unwrapped.amp_loader.get_linear_vel_batch(frames))
+    ang_vel = quat_rotate(root_orn, env.unwrapped.amp_loader.get_angular_vel_batch(frames))
 
     # set into the physics simulation
-    asset.write_root_pose_to_sim(torch.cat([positions, orientations], dim=-1), env_ids=env_ids)
-    asset.write_root_velocity_to_sim(velocities, env_ids=env_ids)
+    asset.write_root_pose_to_sim(torch.cat([root_pos, root_orn], dim=-1), env_ids=env_ids)
+    asset.write_root_velocity_to_sim(torch.cat([lin_vel, ang_vel], dim=-1), env_ids=env_ids)
 
 
 def reset_joints_amp(

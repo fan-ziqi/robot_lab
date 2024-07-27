@@ -37,8 +37,6 @@ class ManagerBasedRLAmpEnv(ManagerBasedRLEnv, gym.Env):
                 device=self.device,
                 motion_files=self.cfg.amp_motion_files,
                 time_between_frames=self.cfg.sim.dt,
-                preload_transitions=True,
-                num_preload_transitions=self.cfg.amp_num_preload_transitions,
             )
 
         self.num_actions = self.action_manager.total_action_dim
