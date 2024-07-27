@@ -1,6 +1,5 @@
 import torch
 import torch.nn as nn
-import torch.utils.data
 from torch import autograd
 
 
@@ -16,7 +15,7 @@ class AMPDiscriminator(nn.Module):
         curr_in_dim = input_dim
         for hidden_dim in hidden_layer_sizes:
             amp_layers.append(nn.Linear(curr_in_dim, hidden_dim))
-            amp_layers.append(nn.ReLU())
+            amp_layers.append(nn.LeakyReLU())
             curr_in_dim = hidden_dim
         self.trunk = nn.Sequential(*amp_layers).to(device)
         self.amp_linear = nn.Linear(hidden_layer_sizes[-1], 1).to(device)

@@ -62,7 +62,7 @@ def main():
     env_cfg.events.push_robot = None
 
     env_cfg.amp_num_preload_transitions = 1
-    # env_cfg.algorithm.amp_replay_buffer_size = 2
+    env_cfg.amp_replay_buffer_size = 2
 
     # create isaac environment
     env = gym.make(args_cli.task, cfg=env_cfg)
@@ -78,18 +78,16 @@ def main():
             env_ids = torch.tensor([0], device=env.unwrapped.device)
             t = 0.0
             traj_idx = 0
-            while traj_idx < len(env.unwrapped.amp_loader.trajectory_lens):
+            while traj_idx < len(env.unwrapped.amp_loader.trajectory_lens) - 1:
                 actions = torch.zeros((env_cfg.scene.num_envs, env.unwrapped.num_actions), device=env.unwrapped.device)
 
                 if (
-                    t + env.unwrapped.amp_loader.time_between_frames + env_cfg.sim.dt
+                    t + env.unwrapped.amp_loader.time_between_frames + env_cfg.sim.dt * env_cfg.sim.render_interval
                 ) >= env.unwrapped.amp_loader.trajectory_lens[traj_idx]:
-                    print(f"finish traj {traj_idx}")
                     traj_idx += 1
                     t = 0
                 else:
-                    t += env_cfg.sim.dt
-
+                    t += env_cfg.sim.dt * env_cfg.sim.render_interval
                 frames = env.unwrapped.amp_loader.get_full_frame_at_time_batch(np.array([traj_idx]), np.array([t]))
                 positions = env.unwrapped.amp_loader.get_root_pos_batch(frames)
                 orientations = env.unwrapped.amp_loader.get_root_rot_batch(frames)

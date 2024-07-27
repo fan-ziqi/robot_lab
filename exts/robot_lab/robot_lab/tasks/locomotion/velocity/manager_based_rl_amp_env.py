@@ -36,7 +36,7 @@ class ManagerBasedRLAmpEnv(ManagerBasedRLEnv, gym.Env):
             self.amp_loader = AMPLoader(
                 device=self.device,
                 motion_files=self.cfg.amp_motion_files,
-                time_between_frames=self.cfg.sim.dt,
+                time_between_frames=self.cfg.sim.dt * self.cfg.sim.render_interval,
             )
 
         self.num_actions = self.action_manager.total_action_dim

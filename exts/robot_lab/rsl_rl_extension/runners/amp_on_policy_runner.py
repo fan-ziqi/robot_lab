@@ -40,7 +40,7 @@ class AmpOnPolicyRunner:
         amp_data = AMPLoader(
             device=self.device,
             motion_files=self.env.unwrapped.cfg.amp_motion_files,
-            time_between_frames=self.env.unwrapped.cfg.sim.dt,
+            time_between_frames=self.env.unwrapped.cfg.sim.dt * self.env.unwrapped.cfg.sim.render_interval,
             preload_transitions=True,
             num_preload_transitions=self.env.unwrapped.cfg.amp_num_preload_transitions,
         )
