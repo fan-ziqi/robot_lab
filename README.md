@@ -82,3 +82,16 @@ For example, to generate A1 usd file:
 ```
 
 Check [import_new_asset](https://docs.robotsfan.com/isaaclab/source/how-to/import_new_asset.html) for detail
+
+## Citation
+
+Please cite the following if you use this code or parts of it:
+
+```
+@software{fan-ziqi2024robot_lab,
+  author = {fan-ziqi},
+  title = {{robot_lab: An extension project based on the IsaacLab framework.}},
+  url = {https://github.com/fan-ziqi/robot_lab},
+  year = {2024}
+}
+```
