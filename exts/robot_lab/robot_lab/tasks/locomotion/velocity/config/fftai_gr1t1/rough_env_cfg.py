@@ -29,7 +29,7 @@ class FFTAIGR1T1RoughEnvCfg(LocomotionVelocityRoughEnvCfg):
 
         # ------------------------------Actions------------------------------
         # reduce action scale
-        self.actions.joint_pos.scale = 1.0
+        # self.actions.joint_pos.scale = 1.0
 
         # ------------------------------Events------------------------------
         self.events.reset_base_amp = None

@@ -13,7 +13,7 @@ class FFTAIGR1T1FlatEnvCfg(FFTAIGR1T1RoughEnvCfg):
 
         # override rewards
         self.rewards.feet_air_time.weight = 1.0
-        self.rewards.feet_air_time.params["threshold"] = 0.5
+        self.rewards.feet_air_time.params["threshold"] = 0.8
         # change terrain to flat
         self.scene.terrain.terrain_type = "plane"
         self.scene.terrain.terrain_generator = None
