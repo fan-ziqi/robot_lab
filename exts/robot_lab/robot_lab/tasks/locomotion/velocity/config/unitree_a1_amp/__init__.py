@@ -12,7 +12,7 @@ gym.register(
     disable_env_checker=True,
     kwargs={
         "env_cfg_entry_point": flat_env_cfg.UnitreeA1AmpFlatEnvCfg,
-        "rsl_rl_cfg_entry_point": agents.rsl_rl_cfg.UnitreeA1AmpFlatPPORunnerCfg,
+        "rsl_rl_cfg_entry_point": f"{agents.__name__}.rsl_rl_ppo_cfg:UnitreeA1AmpFlatPPORunnerCfg",
     },
 )
 
@@ -22,6 +22,6 @@ gym.register(
     disable_env_checker=True,
     kwargs={
         "env_cfg_entry_point": rough_env_cfg.UnitreeA1AmpRoughEnvCfg,
-        "rsl_rl_cfg_entry_point": agents.rsl_rl_cfg.UnitreeA1AmpRoughPPORunnerCfg,
+        "rsl_rl_cfg_entry_point": f"{agents.__name__}.rsl_rl_ppo_cfg:UnitreeA1AmpRoughPPORunnerCfg",
     },
 )

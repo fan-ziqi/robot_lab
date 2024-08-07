@@ -11,7 +11,9 @@ import cli_args  # isort: skip
 
 # add argparse arguments
 parser = argparse.ArgumentParser(description="Train an RL agent with RSL-RL.")
-parser.add_argument("--cpu", action="store_true", default=False, help="Use CPU pipeline.")
+parser.add_argument(
+    "--disable_fabric", action="store_true", default=False, help="Disable fabric and use USD I/O operations."
+)
 parser.add_argument("--num_envs", type=int, default=None, help="Number of environments to simulate.")
 parser.add_argument("--task", type=str, default=None, help="Name of the task.")
 parser.add_argument("--seed", type=int, default=None, help="Seed used for the environment")
@@ -32,7 +34,6 @@ import gymnasium as gym
 import numpy as np
 import torch
 
-# Import extensions to set up environment tasks
 import robot_lab.tasks  # noqa: F401
 
 from omni.isaac.lab.utils.math import quat_rotate
@@ -43,7 +44,9 @@ from omni.isaac.lab_tasks.utils.wrappers.rsl_rl import RslRlVecEnvWrapper
 def main():
     """Play with RSL-RL agent."""
     # parse configuration
-    env_cfg = parse_env_cfg(args_cli.task, use_gpu=not args_cli.cpu, num_envs=args_cli.num_envs)
+    env_cfg = parse_env_cfg(
+        args_cli.task, device=args_cli.device, num_envs=args_cli.num_envs, use_fabric=not args_cli.disable_fabric
+    )
 
     # make a smaller scene for play
     env_cfg.scene.num_envs = 1

@@ -24,6 +24,7 @@ class AnymalDRoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         # ------------------------------Observations------------------------------
         self.observations.policy.base_lin_vel = None
         self.observations.policy.height_scan = None
+        self.observations.AMP = None
 
         # ------------------------------Actions------------------------------
         # reduce action scale

@@ -1,6 +1,6 @@
 # robot_lab
 
-robot_lab is an extension project based on the IsaacLab framework. It has a clear code framework and you can quickly migrate to your own robot.
+robot_lab is an extension project based on Isaac Lab. It allows you to develop in an isolated environment, outside of the core Isaac Lab repository.
 
 [Click to discuss on Discord](https://discord.gg/vmVjkhVugU)
 
@@ -56,6 +56,13 @@ python scripts/rsl_rl/play.py --task RobotLab-Isaac-Velocity-Flat-Unitree-H1-v0
 
 The above configs are flat, you can change Flat to Rough
 
+**Note**
+
+* Record video of a trained agent (requires installing `ffmpeg`), add `--video --video_length 200`
+* Play/Train with 32 environments, add `--num_envs 32`
+* Play on specific folder or checkpoint, add `--load_run run_folder_name --checkpoint model.pt`
+* Resume training from folder or checkpoint, add `--resume --load_run run_folder_name --checkpoint model.pt`
+
 ## AMP training
 
 Unitree A1
@@ -83,6 +90,22 @@ For example, to generate A1 usd file:
 
 Check [import_new_asset](https://docs.robotsfan.com/isaaclab/source/how-to/import_new_asset.html) for detail
 
+## Code formatting
+
+A pre-commit template is given to automatically format the code.
+
+To install pre-commit:
+
+```bash
+pip install pre-commit
+```
+
+Then you can run pre-commit with:
+
+```bash
+pre-commit run --all-files
+```
+
 ## Citation
 
 Please cite the following if you use this code or parts of it:
@@ -90,7 +113,7 @@ Please cite the following if you use this code or parts of it:
 ```
 @software{fan-ziqi2024robot_lab,
   author = {fan-ziqi},
-  title = {{robot_lab: An extension project based on the IsaacLab framework.}},
+  title = {{robot_lab: An extension project based on Isaac Lab.}},
   url = {https://github.com/fan-ziqi/robot_lab},
   year = {2024}
 }

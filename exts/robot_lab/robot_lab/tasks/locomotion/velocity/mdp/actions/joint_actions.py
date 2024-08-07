@@ -58,7 +58,9 @@ class JointAction(ActionTerm):
         super().__init__(cfg, env)
 
         # resolve the joints over which the action term is applied
-        self._joint_ids, self._joint_names = self._asset.find_joints(self.cfg.joint_names)
+        self._joint_ids, self._joint_names = self._asset.find_joints(
+            self.cfg.joint_names, preserve_order=self.cfg.preserve_order
+        )
         # print(self._joint_ids, self._joint_names)
         self._num_joints = len(self._joint_ids)
         # log the resolved joint names for debugging
