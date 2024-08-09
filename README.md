@@ -2,6 +2,13 @@
 
 robot_lab is an extension project based on Isaac Lab. It allows you to develop in an isolated environment, outside of the core Isaac Lab repository.
 
+Todo:
+
+- [ ] AMP training
+- [ ] VAE training code
+- [ ] Sim to Sim transfer(Gazebo)
+- [ ] Sim to Real transfer(Unitree A1)
+
 [Click to discuss on Discord](https://discord.gg/vmVjkhVugU)
 
 ## Get Ready
