@@ -1,5 +1,4 @@
 import omni.ext
-import omni.ui as ui
 
 
 # Functions and vars are available to other extension as usual in python: `example.python_ext.some_public_function(x)`
@@ -19,10 +18,10 @@ class ExampleExtension(omni.ext.IExt):
 
         self._count = 0
 
-        self._window = ui.Window("My Window", width=300, height=300)
+        self._window = omni.ui.Window("My Window", width=300, height=300)
         with self._window.frame:
-            with ui.VStack():
-                label = ui.Label("")
+            with omni.ui.VStack():
+                label = omni.ui.Label("")
 
                 def on_click():
                     self._count += 1
@@ -34,9 +33,9 @@ class ExampleExtension(omni.ext.IExt):
 
                 on_reset()
 
-                with ui.HStack():
-                    ui.Button("Add", clicked_fn=on_click)
-                    ui.Button("Reset", clicked_fn=on_reset)
+                with omni.ui.HStack():
+                    omni.ui.Button("Add", clicked_fn=on_click)
+                    omni.ui.Button("Reset", clicked_fn=on_reset)
 
     def on_shutdown(self):
         print("[robot_lab] shutdown")
