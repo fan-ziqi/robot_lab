@@ -7,7 +7,7 @@ from omni.isaac.lab_tasks.utils.wrappers.rsl_rl import (
 
 
 @configclass
-class OpenLoong_RoughPPORunnerCfg(RslRlOnPolicyRunnerCfg):
+class OpenLoongOpenLoongRoughPPORunnerCfg(RslRlOnPolicyRunnerCfg):
     num_steps_per_env = 24
     max_iterations = 3000
     save_interval = 50
@@ -36,7 +36,7 @@ class OpenLoong_RoughPPORunnerCfg(RslRlOnPolicyRunnerCfg):
 
 
 @configclass
-class OpenLoong_FlatPPORunnerCfg(OpenLoong_RoughPPORunnerCfg):
+class OpenLoongOpenLoongFlatPPORunnerCfg(OpenLoongOpenLoongRoughPPORunnerCfg):
     def __post_init__(self):
         super().__post_init__()
 
