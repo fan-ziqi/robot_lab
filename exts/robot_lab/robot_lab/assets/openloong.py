@@ -1,10 +1,10 @@
-"""Configuration for FFTAI robots.
+"""Configuration for OPENLOONG robots.
 
 The following configurations are available:
 
-* :obj:`FFTAI_GR1T1_CFG`: FFTAI GR1T1 humanoid robot
+* :obj:`OPENLOONG_OPENLOONG_CFG`: OPENLOONG OPENLOONG humanoid robot
 
-Reference: https://github.com/FFTAI
+Reference: https://www.openloong.org.cn/cn
 """
 
 from robot_lab.assets import ISAACLAB_ASSETS_DATA_DIR
@@ -18,9 +18,9 @@ from omni.isaac.lab.assets.articulation import ArticulationCfg
 ##
 
 
-OPENLOONG_CFG = ArticulationCfg(
+OPENLOONG_OPENLOONG_CFG = ArticulationCfg(
     spawn=sim_utils.UsdFileCfg(
-        usd_path=f"{ISAACLAB_ASSETS_DATA_DIR}/Robots/openloong/openloong_12.usd",
+        usd_path=f"{ISAACLAB_ASSETS_DATA_DIR}/Robots/OpenLoong/OpenLoong.usd",
         activate_contact_sensors=True,
         rigid_props=sim_utils.RigidBodyPropertiesCfg(
             disable_gravity=False,
@@ -60,38 +60,22 @@ OPENLOONG_CFG = ArticulationCfg(
         "actuators": ImplicitActuatorCfg(
             joint_names_expr=[".*"],
             stiffness={
-                        '.*_hip_roll': 251.625,'.*_hip_pitch': 200,'.*_hip_yaw': 362.5214,
-                        '.*_knee_pitch': 200, '.*_ankle_pitch': 10.9805,'.*_ankle_roll': 10.9805,
-                      },
+                '.*_hip_roll': 251.625,
+                '.*_hip_pitch': 200,
+                '.*_hip_yaw': 362.5214,
+                '.*_knee_pitch': 200,
+                '.*_ankle_pitch': 10.9805,
+                '.*_ankle_roll': 10.9805,
+            },
             damping={
-                        '.*_hip_roll': 10,'.*_hip_pitch': 10,'.*_hip_yaw': 10,
-                        '.*_knee_pitch':10, '.*_ankle_pitch': 10,'.*_ankle_roll': 10,                   
+                '.*_hip_roll': 10,
+                '.*_hip_pitch': 10,
+                '.*_hip_yaw': 10,
+                '.*_knee_pitch':10,
+                '.*_ankle_pitch': 10,
+                '.*_ankle_roll': 10,                   
             },
         ),
     },
 )
-"""Configuration for the FFTAI GR1T1 Humanoid robot."""
-
-
-# FFTAI_GR1T1_LOWER_LIMB_CFG = FFTAI_GR1T1_CFG.copy()
-# FFTAI_GR1T1_LOWER_LIMB_CFG.spawn.usd_path = f"{ISAACLAB_ASSETS_DATA_DIR}/Robots/FFTAI/GR1T1/GR1T1_lower_limb.usd"
-# FFTAI_GR1T1_LOWER_LIMB_CFG.actuators={
-#     "actuators": ImplicitActuatorCfg(
-#         joint_names_expr=[".*"],
-#         stiffness = {
-#             '.*_hip_roll': 114,
-#             '.*_hip_yaw': 86,
-#             '.*_hip_pitch': 229,
-#             '.*_knee_pitch': 229,
-#             '.*_ankle_pitch': 30.5,
-#         },
-#         damping = {
-#             '.*_hip_roll': 114 / 15,
-#             '.*_hip_yaw': 86 / 15,
-#             '.*_hip_pitch': 229 / 15,
-#             '.*_knee_pitch': 229 / 15,
-#             '.*_ankle_pitch': 30.5 / 15,
-#         },
-#     ),
-# },
-"""Configuration for the FFTAI GR1T1 Humanoid robot with fixed upper limb."""
+"""Configuration for the OPENLOONG OPENLOONG Humanoid robot."""

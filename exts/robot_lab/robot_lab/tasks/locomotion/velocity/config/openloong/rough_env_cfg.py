@@ -7,19 +7,20 @@ from omni.isaac.lab.utils import configclass
 # Pre-defined configs
 ##
 # use local assets
-from robot_lab.assets.openloong_12 import OPENLOONG_CFG # isort: skip
+from robot_lab.assets.openloong import OPENLOONG_OPENLOONG_CFG # isort: skip
 
 
 @configclass
-class openloong_12_RoughEnvCfg(LocomotionVelocityRoughEnvCfg):
+class OpenLoongOpenLoongRoughEnvCfg(LocomotionVelocityRoughEnvCfg):
     _run_disable_zero_weight_rewards = True
+
     def __post_init__(self):
         # post init of parent
         super().__post_init__()
 
         # ------------------------------Sence------------------------------
         # switch robot to fftai-GR1T1
-        self.scene.robot = OPENLOONG_CFG.replace(prim_path="{ENV_REGEX_NS}/Robot")
+        self.scene.robot = OPENLOONG_OPENLOONG_CFG.replace(prim_path="{ENV_REGEX_NS}/Robot")
         self.scene.height_scanner.prim_path = "{ENV_REGEX_NS}/Robot/base_link"
 
         # ------------------------------Observations------------------------------
@@ -27,6 +28,8 @@ class openloong_12_RoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         # self.observations.policy.height_scan = None
         self.observations.AMP = None
         # ------------------------------Actions------------------------------
+        # reduce action scale
+        # self.actions.joint_pos.scale = 1.0
 
         # ------------------------------Events------------------------------
         self.events.reset_base_amp = None
@@ -66,9 +69,9 @@ class openloong_12_RoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         # UNUESD self.rewards.joint_vel_l1.weight = 0.0
         self.rewards.joint_vel_l2.weight = 0
         self.rewards.joint_acc_l2.weight = -1.25e-7
-        self.rewards.create_joint_deviation_l1_rewterm("joint_deviation_other_l1", -1.0, [
-                                                                                           ".*_hip_yaw", ".*_hip_roll",                                                                                    
-                                                                                           ])
+        self.rewards.create_joint_deviation_l1_rewterm(
+            "joint_deviation_other_l1", -1.0, [".*_hip_yaw", ".*_hip_roll"]
+        )
         self.rewards.create_joint_deviation_l1_rewterm("joint_deviation_knee_l1", -0.1, ['.*_knee_pitch'])
         self.rewards.joint_pos_limits.weight = -1.0
         self.rewards.joint_pos_limits.params["asset_cfg"].joint_names = [".*_ankle_pitch",".*_ankle_roll"]
@@ -104,40 +107,22 @@ class openloong_12_RoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         self.rewards.joint_power.weight = 0
         self.rewards.stand_still_when_zero_command.weight = 0
 
+        # If the weight of rewards is 0, set rewards to None
         if self._run_disable_zero_weight_rewards:
             self.disable_zero_weight_rewards()
 
         # ------------------------------Terminations------------------------------
-        self.terminations.illegal_contact.params["sensor_cfg"].body_names = ["base_link",".*_waist_.*",".*_head_.*",".*_arm_r_.*",".*_arm_l_.*",".*_hip_r_.*",".*_hip_l_.*"]
+        self.terminations.illegal_contact.params["sensor_cfg"].body_names = [
+            "base_link",
+            ".*_waist_.*",
+            ".*_head_.*",
+            ".*_arm_r_.*",
+            ".*_arm_l_.*",
+            ".*_hip_r_.*",
+            ".*_hip_l_.*"
+        ]
+
         # ------------------------------Commands------------------------------
         self.commands.base_velocity.ranges.lin_vel_x = (0.0, 1.0)
         self.commands.base_velocity.ranges.lin_vel_y = (0.0, 0.0)
         self.commands.base_velocity.ranges.ang_vel_z = (-1.0, 1.0)
-
-
-@configclass
-class openloong_12_RoughEnvCfg_PLAY(openloong_12_RoughEnvCfg):
-    def __post_init__(self):
-        # post init of parent
-        super().__post_init__()
-
-        # make a smaller scene for play
-        self.scene.num_envs = 50
-        # spawn the robot randomly in the grid (instead of their terrain levels)
-        self.scene.terrain.max_init_terrain_level = None
-        # reduce the number of terrains to save memory
-        if self.scene.terrain.terrain_generator is not None:
-            self.scene.terrain.terrain_generator.num_rows = 5
-            self.scene.terrain.terrain_generator.num_cols = 5
-            self.scene.terrain.terrain_generator.curriculum = False
-
-        # disable randomization for play
-        self.observations.policy.enable_corruption = False
-        # remove random pushing
-        self.events.base_external_force_torque = None
-        self.events.push_robot = None
-
-        self.commands.base_velocity.ranges.lin_vel_x = (1.0, 1.0)
-        self.commands.base_velocity.ranges.lin_vel_y = (0.0, 0.0)
-        self.commands.base_velocity.ranges.ang_vel_z = (-1.0, 1.0)
-        self.commands.base_velocity.ranges.heading = (0.0, 0.0) 

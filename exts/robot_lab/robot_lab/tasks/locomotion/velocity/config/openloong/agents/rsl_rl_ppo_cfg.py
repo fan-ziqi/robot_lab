@@ -5,12 +5,13 @@ from omni.isaac.lab_tasks.utils.wrappers.rsl_rl import (
     RslRlPpoAlgorithmCfg,
 )
 
+
 @configclass
-class openloong_12_RoughPPORunnerCfg(RslRlOnPolicyRunnerCfg):
+class OpenLoong_RoughPPORunnerCfg(RslRlOnPolicyRunnerCfg):
     num_steps_per_env = 24
     max_iterations = 3000
     save_interval = 50
-    experiment_name = "openloong_12_rough"
+    experiment_name = "openloong_rough"
     empirical_normalization = False
     policy = RslRlPpoActorCriticCfg(
         init_noise_std=1.0,
@@ -35,11 +36,11 @@ class openloong_12_RoughPPORunnerCfg(RslRlOnPolicyRunnerCfg):
 
 
 @configclass
-class openloong_12_FlatPPORunnerCfg(openloong_12_RoughPPORunnerCfg):
+class OpenLoong_FlatPPORunnerCfg(OpenLoong_RoughPPORunnerCfg):
     def __post_init__(self):
         super().__post_init__()
 
         self.max_iterations = 1000
-        self.experiment_name = "openloong_12"
+        self.experiment_name = "openloong_flat"
         self.policy.actor_hidden_dims = [128, 128, 128]
         self.policy.critic_hidden_dims = [128, 128, 128]
