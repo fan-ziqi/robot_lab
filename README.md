@@ -63,6 +63,15 @@ python scripts/rsl_rl/train.py --task RobotLab-Isaac-Velocity-Flat-Unitree-H1-v0
 python scripts/rsl_rl/play.py --task RobotLab-Isaac-Velocity-Flat-Unitree-H1-v0
 ```
 
+OpenLoong OpenLoong
+
+```bash
+# Train
+python scripts/rsl_rl/train.py --task RobotLab-Isaac-Velocity-Flat-OpenLoong-OpenLoong-v0 --headless
+# Play
+python scripts/rsl_rl/play.py --task RobotLab-Isaac-Velocity-Flat-OpenLoong-OpenLoong-v0
+```
+
 The above configs are flat, you can change Flat to Rough
 
 **Note**
