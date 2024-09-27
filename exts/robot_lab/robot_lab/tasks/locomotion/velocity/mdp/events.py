@@ -4,7 +4,7 @@ import torch
 
 from robot_lab.tasks.locomotion.velocity.manager_based_rl_amp_env import ManagerBasedRLAmpEnv
 
-from omni.isaac.lab.assets import Articulation, RigidObject
+from omni.isaac.lab.assets import Articulation, DeformableObject, RigidObject
 from omni.isaac.lab.managers import SceneEntityCfg
 from omni.isaac.lab.utils.math import quat_rotate
 

@@ -54,6 +54,15 @@ python scripts/rsl_rl/train.py --task RobotLab-Isaac-Velocity-Flat-Unitree-A1-v0
 python scripts/rsl_rl/play.py --task RobotLab-Isaac-Velocity-Flat-Unitree-A1-v0
 ```
 
+Unitree Go2W (Unvalible for now)
+
+```bash
+# Train
+python scripts/rsl_rl/train.py --task RobotLab-Isaac-Velocity-Flat-Unitree-Go2W-v0 --headless
+# Play
+python scripts/rsl_rl/play.py --task RobotLab-Isaac-Velocity-Flat-Unitree-Go2W-v0
+```
+
 Unitree H1
 
 ```bash
@@ -89,15 +98,21 @@ python scripts/rsl_rl/replay_amp_data.py --task RobotLab-Isaac-Velocity-Flat-Amp
 
 ## Add your own robot
 
-To convert urdf, you need to run `convert_urdf.py` of dir `IsaacLab`
-
-For example, to generate A1 usd file:
+For example, to generate Unitree A1 usd file:
 
 ```bash
-./isaaclab.sh -p source/standalone/tools/convert_urdf.py <YOUR_ROBOT>.urdf source/extensions/omni.isaac.lab_assets/data/Robots/<YOUR_ROBOT>/<YOUR_ROBOT>.usd --merge-join
+python scripts/tools/convert_urdf.py a1.urdf exts/robot_lab/data/Robots/Unitree/A1/a1.usd  --merge-join
 ```
 
 Check [import_new_asset](https://docs.robotsfan.com/isaaclab/source/how-to/import_new_asset.html) for detail
+
+## Tensorboard
+
+To view tensorboard, run:
+
+```bash
+tensorboard --logdir=logs
+```
 
 ## Code formatting
 
