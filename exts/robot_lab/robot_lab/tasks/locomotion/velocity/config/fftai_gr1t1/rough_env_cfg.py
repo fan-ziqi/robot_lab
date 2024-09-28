@@ -33,8 +33,7 @@ class FFTAIGR1T1RoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         # self.actions.joint_pos.scale = 1.0
 
         # ------------------------------Events------------------------------
-        self.events.reset_base_amp = None
-        self.events.reset_robot_joints_amp = None
+        self.events.reset_amp = None
         self.events.base_external_force_torque.params["asset_cfg"].body_names = ["base"]
         self.events.reset_robot_joints.params["position_range"] = (1.0, 1.0)
         self.events.reset_base.params = {

@@ -41,8 +41,7 @@ class UnitreeGo2WRoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         self.actions.joint_pos.clip = {".*": (-100, 100)}
 
         # ------------------------------Events------------------------------
-        self.events.reset_base_amp = None
-        self.events.reset_robot_joints_amp = None
+        self.events.reset_amp = None
         self.events.add_base_mass.params["mass_distribution_params"] = (-1.0, 3.0)
         self.events.add_base_mass.params["asset_cfg"].body_names = ["base"]
         self.events.base_external_force_torque.params["asset_cfg"].body_names = ["base"]

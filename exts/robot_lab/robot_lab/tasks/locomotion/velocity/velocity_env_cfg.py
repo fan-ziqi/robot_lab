@@ -253,13 +253,8 @@ class EventCfg:
         },
     )
 
-    reset_base_amp = EventTerm(
-        func=mdp.reset_root_state_amp,
-        mode="reset",
-    )
-
-    reset_robot_joints_amp = EventTerm(
-        func=mdp.reset_joints_amp,
+    reset_amp = EventTerm(
+        func=mdp.reset_amp,
         mode="reset",
     )
 
@@ -484,7 +479,6 @@ class LocomotionVelocityRoughEnvCfg(ManagerBasedRLEnvCfg):
 
     def disable_zero_weight_rewards(self):
         """If the weight of rewards is 0, set rewards to None"""
-        # If the weight of rewards is 0, set rewards to None
         for attr in dir(self.rewards):
             if not attr.startswith("__"):
                 reward_attr = getattr(self.rewards, attr)
