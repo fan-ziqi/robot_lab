@@ -92,7 +92,9 @@ def main():
                     t += env_cfg.sim.dt * env_cfg.sim.render_interval
                 frames = env.unwrapped.amp_loader.get_full_frame_at_time_batch(np.array([traj_idx]), np.array([t]))
                 positions = env.unwrapped.amp_loader.get_root_pos_batch(frames)
-                orientations = env.unwrapped.amp_loader.get_root_rot_batch(frames)
+                orientations = env.unwrapped.amp_loader.get_root_rot_batch(frames)  # xyzw
+                # Func quat_rotate() and Isaacsim/IsaacLab all need wxyz
+                orientations = torch.cat((orientations[:, -1].unsqueeze(1), orientations[:, :-1]), dim=1)
                 lin_vel = quat_rotate(orientations, env.unwrapped.amp_loader.get_linear_vel_batch(frames))
                 ang_vel = quat_rotate(orientations, env.unwrapped.amp_loader.get_angular_vel_batch(frames))
                 velocities = torch.cat([lin_vel, ang_vel], dim=-1)
@@ -102,6 +104,9 @@ def main():
                 env.unwrapped.robot.write_root_velocity_to_sim(velocities, env_ids=env_ids)
                 joint_pos = env.unwrapped.amp_loader.get_joint_pose_batch(frames)
                 joint_vel = env.unwrapped.amp_loader.get_joint_vel_batch(frames)
+                # Isaac Sim uses breadth-first joint ordering, while Isaac Gym uses depth-first joint ordering
+                joint_pos = env.unwrapped.amp_loader.reorder_from_isaacgym_to_isaacsim_tool(joint_pos)
+                joint_vel = env.unwrapped.amp_loader.reorder_from_isaacgym_to_isaacsim_tool(joint_vel)
                 joint_pos_limits = env.unwrapped.robot.data.soft_joint_pos_limits[env_ids]
                 joint_pos = joint_pos.clamp_(joint_pos_limits[..., 0], joint_pos_limits[..., 1])
                 joint_vel_limits = env.unwrapped.robot.data.soft_joint_vel_limits[env_ids]

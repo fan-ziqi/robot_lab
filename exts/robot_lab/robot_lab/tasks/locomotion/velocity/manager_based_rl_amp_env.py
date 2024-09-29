@@ -71,7 +71,11 @@ class ManagerBasedRLAmpEnv(ManagerBasedRLEnv, gym.Env):
             # add value to list
             group_obs[name] = obs
 
+        # Isaac Sim uses breadth-first joint ordering, while Isaac Gym uses depth-first joint ordering
         joint_pos = group_obs["joint_pos"]
+        joint_vel = group_obs["joint_vel"]
+        joint_pos = self.amp_loader.reorder_from_isaacsim_to_isaacgym_tool(joint_pos)
+        joint_vel = self.amp_loader.reorder_from_isaacsim_to_isaacgym_tool(joint_vel)
         foot_pos = []
         with torch.no_grad():
             for i, chain_ee in enumerate(self.chain_ee):
@@ -79,8 +83,8 @@ class ManagerBasedRLAmpEnv(ManagerBasedRLEnv, gym.Env):
         foot_pos = torch.cat(foot_pos, dim=-1)
         base_lin_vel = group_obs["base_lin_vel"]
         base_ang_vel = group_obs["base_ang_vel"]
-        joint_vel = group_obs["joint_vel"]
         z_pos = group_obs["base_pos_z"]
+        # joint_pos(0-11) foot_pos(12-23) base_lin_vel(24-26) base_ang_vel(27-29) joint_vel(30-41) z_pos(42)
         return torch.cat((joint_pos, foot_pos, base_lin_vel, base_ang_vel, joint_vel, z_pos), dim=-1)
 
     """

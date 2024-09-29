@@ -76,7 +76,6 @@ class AMPLoader:
                 motion_json = json.load(f)
                 motion_data = np.array(motion_json["Frames"])
                 # motion_data = self.reorder_from_pybullet_to_isaac(motion_data)
-                motion_data = self.reorder_from_isaacgym_to_isaacgym(motion_data)
 
                 # Normalize and standardize quaternions.
                 for f_i in range(motion_data.shape[0]):
@@ -126,43 +125,23 @@ class AMPLoader:
 
         self.all_trajectories_full = torch.vstack(self.trajectories_full)
 
-    def reorder_from_isaacgym_to_isaacgym_tool(self, joint_tensor):
-        # Convert numpy array to a 4x3 array
-        reshaped_array = joint_tensor.reshape(-1, 4, 3)
-        # Transpose the array
-        transposed_array = np.transpose(reshaped_array, (0, 2, 1))
-        # Flatten the array back to 1 dimension
-        rearranged_array = transposed_array.reshape(-1, 12)
-        # Convert to torch tensor
-        rearranged_tensor = torch.tensor(rearranged_array)
+    def reorder_from_isaacgym_to_isaacsim_tool(self, joint_tensor):
+        # Convert to a 4x3 tensor
+        reshaped_tensor = torch.reshape(joint_tensor, (-1, 4, 3))
+        # Transpose the tensor
+        transposed_tensor = torch.transpose(reshaped_tensor, 1, 2)
+        # Flatten the tensor to 1 dimension
+        rearranged_tensor = torch.reshape(transposed_tensor, (-1, 12))
         return rearranged_tensor
 
-    def reorder_from_isaacgym_to_isaacgym(self, motion_data):
-        """Convert from PyBullet ordering to Isaac ordering.
-
-        Rearranges leg and joint order from PyBullet [FR, FL, RR, RL] to
-        IsaacGym order [FL, FR, RL, RR].
-        """
-        root_pos = AMPLoader.get_root_pos_batch(motion_data)
-        root_rot = AMPLoader.get_root_rot_batch(motion_data)
-        root_rot = np.concatenate((root_rot[:, 3].reshape(-1, 1), root_rot[:, 0:3]), axis=1)
-
-        joint_pos = AMPLoader.get_joint_pose_batch(motion_data)
-        joint_pos = self.reorder_from_isaacgym_to_isaacgym_tool(joint_pos)
-
-        foot_pos = AMPLoader.get_tar_toe_pos_local_batch(motion_data)
-        foot_pos = self.reorder_from_isaacgym_to_isaacgym_tool(foot_pos)
-
-        lin_vel = AMPLoader.get_linear_vel_batch(motion_data)
-        ang_vel = AMPLoader.get_angular_vel_batch(motion_data)
-
-        joint_vel = AMPLoader.get_joint_vel_batch(motion_data)
-        joint_vel = self.reorder_from_isaacgym_to_isaacgym_tool(joint_vel)
-
-        foot_vel = AMPLoader.get_tar_toe_vel_local_batch(motion_data)
-        foot_vel = self.reorder_from_isaacgym_to_isaacgym_tool(foot_vel)
-
-        return np.hstack([root_pos, root_rot, joint_pos, foot_pos, lin_vel, ang_vel, joint_vel, foot_vel])
+    def reorder_from_isaacsim_to_isaacgym_tool(self, joint_tensor):
+        # Convert to a 3x4 tensor
+        reshaped_tensor = torch.reshape(joint_tensor, (-1, 3, 4))
+        # Transpose the tensor
+        transposed_tensor = torch.transpose(reshaped_tensor, 1, 2)
+        # Flatten the tensor to 1 dimension
+        rearranged_tensor = torch.reshape(transposed_tensor, (-1, 12))
+        return rearranged_tensor
 
     def reorder_from_pybullet_to_isaac(self, motion_data):
         """Convert from PyBullet ordering to Isaac ordering.

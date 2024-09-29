@@ -6,7 +6,7 @@ If you want to run policy in gazebo or real robot, please use [rl_sar](https://g
 
 Todo:
 
-- [ ] AMP training
+- [x] AMP training
 - [ ] VAE training code
 - [x] Sim to Sim transfer(Gazebo)
 - [ ] Sim to Real transfer(Unitree A1)
@@ -83,17 +83,19 @@ The above configs are flat, you can change Flat to Rough
 
 ## AMP training
 
+The code for AMP training refers to [AMP_for_hardware](https://github.com/Alescontrela/AMP_for_hardware)
+
 Unitree A1
 
 ```bash
 # Retarget motion files
 python exts/robot_lab/amp_utils/scripts/retarget_kp_motions.py
+# Replay AMP data
+python scripts/rsl_rl/replay_amp_data.py --task RobotLab-Isaac-Velocity-Flat-Amp-Unitree-A1-v0
 # Train
 python scripts/rsl_rl/train_amp.py --task RobotLab-Isaac-Velocity-Flat-Amp-Unitree-A1-v0 --headless
 # Play
 python scripts/rsl_rl/play_amp.py --task RobotLab-Isaac-Velocity-Flat-Amp-Unitree-A1-v0
-# Replay AMP data
-python scripts/rsl_rl/replay_amp_data.py --task RobotLab-Isaac-Velocity-Flat-Amp-Unitree-A1-v0
 ```
 
 ## Add your own robot

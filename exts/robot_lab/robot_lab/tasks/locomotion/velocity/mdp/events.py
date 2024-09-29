@@ -23,7 +23,9 @@ def reset_amp(
     # base position
     root_pos = env.unwrapped.amp_loader.get_root_pos_batch(frames)
     root_pos[:, :2] = root_pos[:, :2] + env.scene.env_origins[env_ids, :2]
-    root_orn = env.unwrapped.amp_loader.get_root_rot_batch(frames)
+    root_orn = env.unwrapped.amp_loader.get_root_rot_batch(frames)  # xyzw
+    # Func quat_rotate() and Isaacsim/IsaacLab all need wxyz
+    root_orn = torch.cat((root_orn[:, -1].unsqueeze(1), root_orn[:, :-1]), dim=1)
     # base velocities
     lin_vel = quat_rotate(root_orn, env.unwrapped.amp_loader.get_linear_vel_batch(frames))
     ang_vel = quat_rotate(root_orn, env.unwrapped.amp_loader.get_angular_vel_batch(frames))
@@ -34,6 +36,9 @@ def reset_amp(
     # Step2: reset_joints
     joint_pos = env.unwrapped.amp_loader.get_joint_pose_batch(frames)
     joint_vel = env.unwrapped.amp_loader.get_joint_vel_batch(frames)
+    # Isaac Sim uses breadth-first joint ordering, while Isaac Gym uses depth-first joint ordering
+    joint_pos = env.unwrapped.amp_loader.reorder_from_isaacgym_to_isaacsim_tool(joint_pos)
+    joint_vel = env.unwrapped.amp_loader.reorder_from_isaacgym_to_isaacsim_tool(joint_vel)
     # clamp joint pos to limits
     joint_pos_limits = asset.data.soft_joint_pos_limits[env_ids]
     joint_pos = joint_pos.clamp_(joint_pos_limits[..., 0], joint_pos_limits[..., 1])
