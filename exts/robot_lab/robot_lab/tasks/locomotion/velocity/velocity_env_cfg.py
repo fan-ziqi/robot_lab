@@ -1,8 +1,6 @@
 import math
 from dataclasses import MISSING
 
-import robot_lab.tasks.locomotion.velocity.mdp as mdp
-
 import omni.isaac.lab.sim as sim_utils
 from omni.isaac.lab.assets import ArticulationCfg, AssetBaseCfg
 from omni.isaac.lab.envs import ManagerBasedRLEnvCfg
@@ -18,6 +16,8 @@ from omni.isaac.lab.sensors import ContactSensorCfg, RayCasterCfg, patterns
 from omni.isaac.lab.terrains import TerrainImporterCfg
 from omni.isaac.lab.utils import configclass
 from omni.isaac.lab.utils.noise import AdditiveUniformNoiseCfg as Unoise
+
+import robot_lab.tasks.locomotion.velocity.mdp as mdp
 
 ##
 # Pre-defined configs

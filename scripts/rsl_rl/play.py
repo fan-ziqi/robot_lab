@@ -33,14 +33,11 @@ simulation_app = app_launcher.app
 
 """Rest everything follows."""
 
-
 import gymnasium as gym
 import os
 import torch
 
 from rsl_rl.runners import OnPolicyRunner
-
-import robot_lab.tasks  # noqa: F401
 
 from omni.isaac.lab.envs import DirectMARLEnv, multi_agent_to_single_agent
 from omni.isaac.lab.utils.dict import print_dict
@@ -51,6 +48,9 @@ from omni.isaac.lab_tasks.utils.wrappers.rsl_rl import (
     export_policy_as_jit,
     export_policy_as_onnx,
 )
+
+# Import extensions to set up environment tasks
+import robot_lab.tasks  # noqa: F401
 
 
 def main():
@@ -118,7 +118,7 @@ def main():
     # obtain the trained policy for inference
     policy = ppo_runner.get_inference_policy(device=env.unwrapped.device)
 
-    # export policy to onnx
+    # export policy to onnx/jit
     export_model_dir = os.path.join(os.path.dirname(resume_path), "exported")
     export_policy_as_onnx(
         actor_critic=ppo_runner.alg.actor_critic,
@@ -155,7 +155,7 @@ def main():
 
 
 if __name__ == "__main__":
-    # run the main execution
+    # run the main function
     main()
     # close sim app
     simulation_app.close()

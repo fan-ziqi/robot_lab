@@ -28,16 +28,16 @@ simulation_app = app_launcher.app
 
 """Rest everything follows."""
 
-
 import gymnasium as gym
 import numpy as np
 import torch
 
-import robot_lab.tasks  # noqa: F401
-
 from omni.isaac.lab.utils.math import quat_rotate
 from omni.isaac.lab_tasks.utils import parse_env_cfg
 from omni.isaac.lab_tasks.utils.wrappers.rsl_rl import RslRlVecEnvWrapper
+
+# Import extensions to set up environment tasks
+import robot_lab.tasks  # noqa: F401
 
 
 def main():
@@ -134,7 +134,7 @@ def main():
 
 
 if __name__ == "__main__":
-    # run the main execution
+    # run the main function
     main()
     # close sim app
     simulation_app.close()

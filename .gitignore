@@ -1,8 +1,36 @@
-**/__pycache__/
-*.egg-info
-logs/
-outputs/
+# Omniverse
+**/*.dmp
+**/.thumbs
 
-*.usda
-.asset_hash
-config.yaml
+# Python
+.DS_Store
+**/*.egg-info/
+**/__pycache__/
+**/.pytest_cache/
+**/*.pyc
+**/*.pb
+
+# IDE
+**/.idea/
+**/.vscode/
+# Don't ignore the top-level .vscode directory as it is
+# used to configure VS Code settings
+!.vscode
+
+# Outputs
+**/runs/*
+**/logs/*
+**/recordings/*
+**/output/*
+**/outputs/*
+**/videos/*
+**/wandb/*
+**/.neptune/*
+docker/artifacts/
+*.tmp
+
+# Isaac-Sim packman
+_isaac_sim*
+_repo
+_build
+.lastformat

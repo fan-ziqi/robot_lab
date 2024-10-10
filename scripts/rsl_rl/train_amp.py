@@ -10,6 +10,7 @@ from omni.isaac.lab.app import AppLauncher
 # local imports
 import cli_args  # isort: skip
 
+
 # add argparse arguments
 parser = argparse.ArgumentParser(description="Train an RL agent with RSL-RL.")
 parser.add_argument("--video", action="store_true", default=False, help="Record videos during training.")
@@ -45,8 +46,6 @@ from datetime import datetime
 
 from rsl_rl_extension.runners import AmpOnPolicyRunner
 
-import robot_lab.tasks  # noqa: F401
-
 from omni.isaac.lab.envs import (
     DirectMARLEnv,
     DirectMARLEnvCfg,
@@ -59,6 +58,9 @@ from omni.isaac.lab.utils.io import dump_pickle, dump_yaml
 from omni.isaac.lab_tasks.utils import get_checkpoint_path
 from omni.isaac.lab_tasks.utils.hydra import hydra_task_config
 from omni.isaac.lab_tasks.utils.wrappers.rsl_rl import RslRlOnPolicyRunnerCfg, RslRlVecEnvWrapper
+
+# Import extensions to set up environment tasks
+import robot_lab.tasks  # noqa: F401
 
 torch.backends.cuda.matmul.allow_tf32 = True
 torch.backends.cudnn.allow_tf32 = True
@@ -138,7 +140,7 @@ def main(env_cfg: ManagerBasedRLEnvCfg | DirectRLEnvCfg | DirectMARLEnvCfg, agen
 
 
 if __name__ == "__main__":
-    # run the main execution
+    # run the main function
     main()
     # close sim app
     simulation_app.close()

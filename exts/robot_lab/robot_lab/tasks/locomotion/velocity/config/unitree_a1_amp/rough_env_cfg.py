@@ -2,9 +2,9 @@ import glob
 
 from amp_utils import AMP_UTILS_DIR
 
-from robot_lab.tasks.locomotion.velocity.velocity_env_cfg import LocomotionVelocityRoughEnvCfg
-
 from omni.isaac.lab.utils import configclass
+
+from robot_lab.tasks.locomotion.velocity.velocity_env_cfg import LocomotionVelocityRoughEnvCfg
 
 ##
 # Pre-defined configs

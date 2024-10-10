@@ -1,7 +1,7 @@
 import robot_lab.tasks.locomotion.velocity.mdp as mdp
-from robot_lab.tasks.locomotion.velocity.velocity_env_cfg import LocomotionVelocityRoughEnvCfg
-
 from omni.isaac.lab.utils import configclass
+
+from robot_lab.tasks.locomotion.velocity.velocity_env_cfg import LocomotionVelocityRoughEnvCfg
 
 ##
 # Pre-defined configs
