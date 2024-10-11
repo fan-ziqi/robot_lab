@@ -30,7 +30,7 @@ Todo:
 - Clone the repository separately from the Isaac Lab installation (i.e. outside the `IsaacLab` directory):
 
   ```bash
-  git clone https://github.com/isaac-sim/IsaacLabExtensionTemplate.git
+  git clone https://github.com/fan-ziqi/robot_lab.git
   ```
 
 - Using a python interpreter that has Isaac Lab installed, install the library
