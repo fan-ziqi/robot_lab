@@ -23,31 +23,27 @@ Todo:
 
 [Click to discuss on Discord](https://discord.gg/vmVjkhVugU)
 
-## Get Ready
-
-You need to install `Isaac Lab`.
-
 ## Installation
 
 - Install Isaac Lab by following the [installation guide](https://isaac-sim.github.io/IsaacLab/source/setup/installation/index.html). We recommend using the conda installation as it simplifies calling Python scripts from the terminal.
 
 - Clone the repository separately from the Isaac Lab installation (i.e. outside the `IsaacLab` directory):
 
-```bash
-git clone https://github.com/isaac-sim/IsaacLabExtensionTemplate.git
-```
+  ```bash
+  git clone https://github.com/isaac-sim/IsaacLabExtensionTemplate.git
+  ```
 
 - Using a python interpreter that has Isaac Lab installed, install the library
 
-```bash
-python -m pip install -e ./exts/robot_lab
-```
+  ```bash
+  python -m pip install -e ./exts/robot_lab
+  ```
 
 - Verify that the extension is correctly installed by running the following command to print all the available environments in the extension:
 
-```bash
-python scripts/tools/list_envs.py
-```
+  ```bash
+  python scripts/tools/list_envs.py
+  ```
 
 <details>
 
