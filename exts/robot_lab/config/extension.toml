@@ -1,16 +1,16 @@
 [package]
 
 # Semantic Versioning is used: https://semver.org/
-version = "0.4.0"
+version = "1.0"
 
 # Description
 category = "isaaclab"
 readme  = "README.md"
 
-title = "Real Robot Extension"
+title = "A generic robot RL library based on IsaacLab"
 author = "Ziqi Fan"
 maintainer = "Ziqi Fan"
-description="Real Robot Training for Isaac Lab"
+description="A generic robot RL library based on IsaacLab"
 repository = "https://github.com/fan-ziqi/robot_lab.git"
 keywords = ["extension", "robot_lab", "isaaclab"]
 

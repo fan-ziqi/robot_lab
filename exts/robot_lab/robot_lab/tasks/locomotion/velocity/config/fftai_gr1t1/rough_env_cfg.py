@@ -1,6 +1,6 @@
-import robot_lab.tasks.locomotion.velocity.mdp as mdp
 from omni.isaac.lab.utils import configclass
 
+import robot_lab.tasks.locomotion.velocity.mdp as mdp
 from robot_lab.tasks.locomotion.velocity.velocity_env_cfg import LocomotionVelocityRoughEnvCfg
 
 ##
@@ -26,14 +26,12 @@ class FFTAIGR1T1RoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         # ------------------------------Observations------------------------------
         # self.observations.policy.base_lin_vel = None
         # self.observations.policy.height_scan = None
-        self.observations.AMP = None
 
         # ------------------------------Actions------------------------------
         # reduce action scale
         # self.actions.joint_pos.scale = 1.0
 
         # ------------------------------Events------------------------------
-        self.events.reset_amp = None
         self.events.base_external_force_torque.params["asset_cfg"].body_names = ["base"]
         self.events.reset_robot_joints.params["position_range"] = (1.0, 1.0)
         self.events.reset_base.params = {

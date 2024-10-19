@@ -14,13 +14,6 @@
 
 If you want to run policy in gazebo or real robot, please use [rl_sar](https://github.com/fan-ziqi/rl_sar) project.
 
-Todo:
-
-- [x] AMP training
-- [ ] VAE training code
-- [x] Sim to Sim transfer(Gazebo)
-- [ ] Sim to Real transfer(Unitree A1)
-
 [Click to discuss on Discord](https://discord.gg/vmVjkhVugU)
 
 ## Installation
@@ -84,45 +77,45 @@ FFTAI GR1T1
 
 ```bash
 # Train
-python scripts/rsl_rl/train.py --task RobotLab-Isaac-Velocity-Flat-FFTAI-GR1T1-v0 --headless
+python scripts/rsl_rl/base/train.py --task RobotLab-Isaac-Velocity-Flat-FFTAI-GR1T1-v0 --headless
 # Play
-python scripts/rsl_rl/play.py --task RobotLab-Isaac-Velocity-Flat-FFTAI-GR1T1-v0
+python scripts/rsl_rl/base/play.py --task RobotLab-Isaac-Velocity-Flat-FFTAI-GR1T1-v0
 ```
 
 Anymal D
 
 ```bash
 # Train
-python scripts/rsl_rl/train.py --task RobotLab-Isaac-Velocity-Flat-Anymal-D-v0 --headless
+python scripts/rsl_rl/base/train.py --task RobotLab-Isaac-Velocity-Flat-Anymal-D-v0 --headless
 # Play
-python scripts/rsl_rl/play.py --task RobotLab-Isaac-Velocity-Flat-Anymal-D-v0
+python scripts/rsl_rl/base/play.py --task RobotLab-Isaac-Velocity-Flat-Anymal-D-v0
 ```
 
 Unitree A1
 
 ```bash
 # Train
-python scripts/rsl_rl/train.py --task RobotLab-Isaac-Velocity-Flat-Unitree-A1-v0 --headless
+python scripts/rsl_rl/base/train.py --task RobotLab-Isaac-Velocity-Flat-Unitree-A1-v0 --headless
 # Play
-python scripts/rsl_rl/play.py --task RobotLab-Isaac-Velocity-Flat-Unitree-A1-v0
+python scripts/rsl_rl/base/play.py --task RobotLab-Isaac-Velocity-Flat-Unitree-A1-v0
 ```
 
 Unitree Go2W (Unvalible for now)
 
 ```bash
 # Train
-python scripts/rsl_rl/train.py --task RobotLab-Isaac-Velocity-Flat-Unitree-Go2W-v0 --headless
+python scripts/rsl_rl/base/train.py --task RobotLab-Isaac-Velocity-Flat-Unitree-Go2W-v0 --headless
 # Play
-python scripts/rsl_rl/play.py --task RobotLab-Isaac-Velocity-Flat-Unitree-Go2W-v0
+python scripts/rsl_rl/base/play.py --task RobotLab-Isaac-Velocity-Flat-Unitree-Go2W-v0
 ```
 
 Unitree H1
 
 ```bash
 # Train
-python scripts/rsl_rl/train.py --task RobotLab-Isaac-Velocity-Flat-Unitree-H1-v0 --headless
+python scripts/rsl_rl/base/train.py --task RobotLab-Isaac-Velocity-Flat-Unitree-H1-v0 --headless
 # Play
-python scripts/rsl_rl/play.py --task RobotLab-Isaac-Velocity-Flat-Unitree-H1-v0
+python scripts/rsl_rl/base/play.py --task RobotLab-Isaac-Velocity-Flat-Unitree-H1-v0
 ```
 
 The above configs are flat, you can change Flat to Rough
@@ -142,13 +135,13 @@ Unitree A1
 
 ```bash
 # Retarget motion files
-python exts/robot_lab/amp_utils/scripts/retarget_kp_motions.py
+python exts/robot_lab/robot_lab/third_party/amp_utils/scripts/retarget_kp_motions.py
 # Replay AMP data
-python scripts/rsl_rl/replay_amp_data.py --task RobotLab-Isaac-Velocity-Flat-Amp-Unitree-A1-v0
+python scripts/rsl_rl/amp/replay_amp_data.py --task RobotLab-Isaac-Velocity-Flat-Amp-Unitree-A1-v0
 # Train
-python scripts/rsl_rl/train_amp.py --task RobotLab-Isaac-Velocity-Flat-Amp-Unitree-A1-v0 --headless
+python scripts/rsl_rl/amp/train.py --task RobotLab-Isaac-Velocity-Flat-Amp-Unitree-A1-v0 --headless
 # Play
-python scripts/rsl_rl/play_amp.py --task RobotLab-Isaac-Velocity-Flat-Amp-Unitree-A1-v0
+python scripts/rsl_rl/amp/play.py --task RobotLab-Isaac-Velocity-Flat-Amp-Unitree-A1-v0
 ```
 
 ## Add your own robot

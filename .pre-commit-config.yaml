@@ -47,4 +47,4 @@ repos:
       - id: rst-backticks
       - id: rst-directive-colons
       - id: rst-inline-touching-normal
-exclude: ^(exts/robot_lab/amp_utils/|.vscode/)
+exclude: ^(exts/robot_lab/robot_lab/third_party/|.vscode/)

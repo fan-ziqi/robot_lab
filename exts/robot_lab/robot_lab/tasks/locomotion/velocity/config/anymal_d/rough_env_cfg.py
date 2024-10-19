@@ -24,14 +24,12 @@ class AnymalDRoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         # ------------------------------Observations------------------------------
         self.observations.policy.base_lin_vel = None
         self.observations.policy.height_scan = None
-        self.observations.AMP = None
 
         # ------------------------------Actions------------------------------
         # reduce action scale
         self.actions.joint_pos.scale = 0.5
 
         # ------------------------------Events------------------------------
-        self.events.reset_amp = None
         self.events.add_base_mass.params["mass_distribution_params"] = (-5.0, 5.0)
         self.events.add_base_mass.params["asset_cfg"].body_names = ["base"]
         self.events.base_external_force_torque.params["asset_cfg"].body_names = ["base"]

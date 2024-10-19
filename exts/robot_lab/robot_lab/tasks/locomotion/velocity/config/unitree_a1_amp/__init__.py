@@ -8,7 +8,7 @@ from . import agents, flat_env_cfg, rough_env_cfg
 
 gym.register(
     id="RobotLab-Isaac-Velocity-Flat-Amp-Unitree-A1-v0",
-    entry_point="robot_lab.tasks.locomotion.velocity.manager_based_rl_amp_env:ManagerBasedRLAmpEnv",
+    entry_point="robot_lab.tasks.locomotion.velocity.config.unitree_a1_amp.env.manager_based_rl_amp_env:ManagerBasedRLAmpEnv",
     disable_env_checker=True,
     kwargs={
         "env_cfg_entry_point": flat_env_cfg.UnitreeA1AmpFlatEnvCfg,
@@ -18,7 +18,7 @@ gym.register(
 
 gym.register(
     id="RobotLab-Isaac-Velocity-Rough-Amp-Unitree-A1-v0",
-    entry_point="robot_lab.tasks.locomotion.velocity.manager_based_rl_amp_env:ManagerBasedRLAmpEnv",
+    entry_point="robot_lab.tasks.locomotion.velocity.config.unitree_a1_amp.env.manager_based_rl_amp_env:ManagerBasedRLAmpEnv",
     disable_env_checker=True,
     kwargs={
         "env_cfg_entry_point": rough_env_cfg.UnitreeA1AmpRoughEnvCfg,

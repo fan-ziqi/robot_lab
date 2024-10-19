@@ -1,10 +1,13 @@
 import glob
 
-from amp_utils import AMP_UTILS_DIR
-
+from omni.isaac.lab.managers import EventTermCfg as EventTerm
+from omni.isaac.lab.managers import ObservationTermCfg as ObsTerm
 from omni.isaac.lab.utils import configclass
 
-from robot_lab.tasks.locomotion.velocity.velocity_env_cfg import LocomotionVelocityRoughEnvCfg
+import robot_lab.tasks.locomotion.velocity.mdp as mdp
+from robot_lab.tasks.locomotion.velocity.config.unitree_a1_amp.env.events import reset_amp
+from robot_lab.tasks.locomotion.velocity.velocity_env_cfg import LocomotionVelocityRoughEnvCfg, create_obsgroup_class
+from robot_lab.third_party.amp_utils import AMP_UTILS_DIR
 
 ##
 # Pre-defined configs
@@ -40,6 +43,14 @@ class UnitreeA1AmpRoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         self.observations.policy.base_lin_vel = None
         self.observations.policy.base_ang_vel = None
         self.observations.policy.height_scan = None
+        self.observations.AMP = create_obsgroup_class('AMPCfg',{
+            'base_pos_z': ObsTerm(func=mdp.base_pos_z),
+            'base_lin_vel': ObsTerm(func=mdp.base_lin_vel),
+            'base_ang_vel': ObsTerm(func=mdp.base_ang_vel),
+            'joint_pos': ObsTerm(func=mdp.joint_pos),
+            'joint_vel': ObsTerm(func=mdp.joint_vel),
+        }, enable_corruption=True, concatenate_terms=True)()
+
 
         # ------------------------------Actions------------------------------
         # reduce action scale
@@ -55,6 +66,7 @@ class UnitreeA1AmpRoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         self.events.randomize_actuator_gains = None
         self.events.randomize_joint_parameters = None
         self.events.push_robot = None
+        self.events.reset_amp = EventTerm(func=reset_amp, mode="reset")
 
         # ------------------------------Rewards------------------------------
         # General

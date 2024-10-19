@@ -33,7 +33,6 @@ class UnitreeGo2WRoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         self.observations.policy.joint_vel.scale = 0.05
         self.observations.policy.base_lin_vel = None
         self.observations.policy.height_scan = None
-        self.observations.AMP = None
 
         # ------------------------------Actions------------------------------
         # reduce action scale
@@ -41,7 +40,6 @@ class UnitreeGo2WRoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         self.actions.joint_pos.clip = {".*": (-100, 100)}
 
         # ------------------------------Events------------------------------
-        self.events.reset_amp = None
         self.events.add_base_mass.params["mass_distribution_params"] = (-1.0, 3.0)
         self.events.add_base_mass.params["asset_cfg"].body_names = ["base"]
         self.events.base_external_force_torque.params["asset_cfg"].body_names = ["base"]

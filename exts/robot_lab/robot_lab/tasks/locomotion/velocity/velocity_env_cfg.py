@@ -1,4 +1,6 @@
+import inspect
 import math
+import sys
 from dataclasses import MISSING
 
 import omni.isaac.lab.sim as sim_utils
@@ -23,6 +25,53 @@ import robot_lab.tasks.locomotion.velocity.mdp as mdp
 # Pre-defined configs
 ##
 from omni.isaac.lab.terrains.config.rough import ROUGH_TERRAINS_CFG  # isort: skip
+
+
+def create_obsgroup_class(class_name, terms, enable_corruption=False, concatenate_terms=True):
+    """
+    Dynamically create and register a ObsGroup class based on the given configuration terms.
+
+    :param class_name: Name of the configuration class.
+    :param terms: Configuration terms, a dictionary where keys are term names and values are term content.
+    :param enable_corruption: Whether to enable corruption for the observation group. Defaults to False.
+    :param concatenate_terms: Whether to concatenate the observation terms in the group. Defaults to True.
+    :return: The dynamically created class.
+    """
+    # Dynamically determine the module name
+    module_name = inspect.getmodule(inspect.currentframe()).__name__
+
+    # Define the post-init function
+    def post_init_wrapper(self):
+        setattr(self, "enable_corruption", enable_corruption)
+        setattr(self, "concatenate_terms", concatenate_terms)
+
+    # Dynamically create the class using ObsGroup as the base class
+    terms["__post_init__"] = post_init_wrapper
+    dynamic_class = configclass(type(class_name, (ObsGroup,), terms))
+
+    # Custom serialization and deserialization
+    def __getstate__(self):
+        state = self.__dict__.copy()
+        return state
+
+    def __setstate__(self, state):
+        self.__dict__.update(state)
+
+    # Add custom serialization methods to the class
+    dynamic_class.__getstate__ = __getstate__
+    dynamic_class.__setstate__ = __setstate__
+
+    # Place the class in the global namespace for accessibility
+    globals()[class_name] = dynamic_class
+
+    # Register the dynamic class in the module's dictionary
+    if module_name in sys.modules:
+        sys.modules[module_name].__dict__[class_name] = dynamic_class
+    else:
+        raise ImportError(f"Module {module_name} not found.")
+
+    # Return the class for external instantiation
+    return dynamic_class
 
 
 ##
@@ -173,20 +222,6 @@ class ObservationsCfg:
     # observation groups
     policy: PolicyCfg = PolicyCfg()
 
-    @configclass
-    class AMPCfg(ObsGroup):
-        base_pos_z = ObsTerm(func=mdp.base_pos_z)
-        base_lin_vel = ObsTerm(func=mdp.base_lin_vel)
-        base_ang_vel = ObsTerm(func=mdp.base_ang_vel)
-        joint_pos = ObsTerm(func=mdp.joint_pos)
-        joint_vel = ObsTerm(func=mdp.joint_vel)
-
-        def __post_init__(self):
-            self.enable_corruption = True
-            self.concatenate_terms = True
-
-    AMP: AMPCfg = AMPCfg()
-
 
 @configclass
 class EventCfg:
@@ -249,11 +284,6 @@ class EventCfg:
             "position_range": (0.5, 1.5),
             "velocity_range": (0.0, 0.0),
         },
-    )
-
-    reset_amp = EventTerm(
-        func=mdp.reset_amp,
-        mode="reset",
     )
 
     randomize_actuator_gains = EventTerm(
