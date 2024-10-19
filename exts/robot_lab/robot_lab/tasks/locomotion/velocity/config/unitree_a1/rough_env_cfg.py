@@ -86,8 +86,6 @@ class UnitreeA1RoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         self.rewards.joint_vel_limits.weight = 0
 
         # Action penalties
-        self.rewards.applied_torque_limits.weight = 0
-        self.rewards.applied_torque_limits.params["asset_cfg"].body_names = ["trunk"]
         self.rewards.action_rate_l2.weight = -0.01
         # UNUESD self.rewards.action_l2.weight = 0.0
 
