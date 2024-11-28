@@ -9,7 +9,7 @@ import torch
 from collections.abc import Sequence
 from typing import TYPE_CHECKING
 
-import carb
+import omni.log
 
 import omni.isaac.lab.utils.string as string_utils
 from omni.isaac.lab.assets.articulation import Articulation
@@ -64,7 +64,7 @@ class JointAction(ActionTerm):
         # print(self._joint_ids, self._joint_names)
         self._num_joints = len(self._joint_ids)
         # log the resolved joint names for debugging
-        carb.log_info(
+        omni.log.info(
             f"Resolved joint names for the action term {self.__class__.__name__}:"
             f" {self._joint_names} [{self._joint_ids}]"
         )
@@ -77,12 +77,6 @@ class JointAction(ActionTerm):
         self._raw_actions = torch.zeros(self.num_envs, self.action_dim, device=self.device)
         self._processed_actions = torch.zeros_like(self.raw_actions)
 
-        # parse clip
-        if cfg.clip is not None:
-            if isinstance(cfg.clip, dict):
-                self._clip = cfg.clip
-            else:
-                raise ValueError(f"Unsupported scale type: {type(cfg.scale)}. Supported types are dict.")
         # parse scale
         if isinstance(cfg.scale, (float, int)):
             self._scale = float(cfg.scale)
@@ -103,6 +97,12 @@ class JointAction(ActionTerm):
             self._offset[:, index_list] = torch.tensor(value_list, device=self.device)
         else:
             raise ValueError(f"Unsupported offset type: {type(cfg.offset)}. Supported types are float and dict.")
+        # parse clip
+        if cfg.clip is not None:
+            if isinstance(cfg.clip, dict):
+                self._clip = cfg.clip
+            else:
+                raise ValueError(f"Unsupported clip type: {type(cfg.scale)}. Supported types are dict.")
 
     """
     Properties.
@@ -127,15 +127,15 @@ class JointAction(ActionTerm):
     def process_actions(self, actions: torch.Tensor):
         # store the raw actions
         self._raw_actions[:] = actions
+        # apply the affine transformations
+        self._processed_actions = self._raw_actions * self._scale + self._offset
         # clip actions
         if self._clip is not None:
             # resolve the dictionary config
             index_list, _, value_list = string_utils.resolve_matching_names_values(self._clip, self._joint_names)
             for index in range(len(index_list)):
                 min_value, max_value = value_list[index]
-                self._raw_actions[:, index_list[index]].clip_(min_value, max_value)
-        # apply the affine transformations
-        self._processed_actions = self._raw_actions * self._scale + self._offset
+                self._processed_actions[:, index_list[index]].clip_(min_value, max_value)
 
     def reset(self, env_ids: Sequence[int] | None = None) -> None:
         self._raw_actions[env_ids] = 0.0

@@ -29,10 +29,10 @@ class JointActionCfg(ActionTermCfg):
     """Scale factor for the action (float or dict of regex expressions). Defaults to 1.0."""
     offset: float | dict[str, float] = 0.0
     """Offset factor for the action (float or dict of regex expressions). Defaults to 0.0."""
+    clip: dict[str, tuple] | None = None
+    """Clip range for the action (dict of regex expressions). Defaults to None."""
     preserve_order: bool = False
     """Whether to preserve the order of the joint names in the action output. Defaults to False."""
-    clip: dict[str, tuple] | None = None
-    """The clipping range for action. Defaults to None, in which case no clipping is applied."""
 
 
 @configclass
