@@ -12,8 +12,6 @@ from robot_lab.assets.fftai import FFTAI_GR1T1_CFG  # isort: skip
 
 @configclass
 class FFTAIGR1T1RoughEnvCfg(LocomotionVelocityRoughEnvCfg):
-    _run_disable_zero_weight_rewards = True
-
     def __post_init__(self):
         # post init of parent
         super().__post_init__()
@@ -107,7 +105,7 @@ class FFTAIGR1T1RoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         self.rewards.stand_still_when_zero_command.weight = 0
 
         # If the weight of rewards is 0, set rewards to None
-        if self._run_disable_zero_weight_rewards:
+        if self.__class__.__name__ == "FFTAIGR1T1RoughEnvCfg":
             self.disable_zero_weight_rewards()
 
         # ------------------------------Terminations------------------------------

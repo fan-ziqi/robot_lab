@@ -6,8 +6,6 @@ from .rough_env_cfg import AnymalDRoughEnvCfg
 @configclass
 class AnymalDFlatEnvCfg(AnymalDRoughEnvCfg):
     def __post_init__(self):
-        # Temporarily not run disable_zerow_eight_rewards() in parent class to override rewards
-        self._run_disable_zero_weight_rewards = False
         # post init of parent
         super().__post_init__()
 
@@ -26,7 +24,6 @@ class AnymalDFlatEnvCfg(AnymalDRoughEnvCfg):
         # no terrain curriculum
         self.curriculum.terrain_levels = None
 
-        # Now executing disable_zerow_eight_rewards()
-        self._run_disable_zero_weight_rewards = True
-        if self._run_disable_zero_weight_rewards:
+        # If the weight of rewards is 0, set rewards to None
+        if self.__class__.__name__ == "AnymalDFlatEnvCfg":
             self.disable_zero_weight_rewards()

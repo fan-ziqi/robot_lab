@@ -11,8 +11,6 @@ from robot_lab.assets.unitree import UNITREE_GO2W_CFG  # isort: skip
 
 @configclass
 class UnitreeGo2WRoughEnvCfg(LocomotionVelocityRoughEnvCfg):
-    _run_disable_zero_weight_rewards = True
-
     def __post_init__(self):
         # post init of parent
         super().__post_init__()
@@ -110,7 +108,7 @@ class UnitreeGo2WRoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         self.rewards.stand_still_when_zero_command.weight = -0.5
 
         # If the weight of rewards is 0, set rewards to None
-        if self._run_disable_zero_weight_rewards:
+        if self.__class__.__name__ == "UnitreeGo2WRoughEnvCfg":
             self.disable_zero_weight_rewards()
 
         # ------------------------------Terminations------------------------------
