@@ -20,8 +20,8 @@ class AnymalDRoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         self.scene.height_scanner.prim_path = "{ENV_REGEX_NS}/Robot/base"
 
         # ------------------------------Observations------------------------------
-        self.observations.policy.base_lin_vel = None
-        self.observations.policy.height_scan = None
+        # self.observations.policy.base_lin_vel = None
+        # self.observations.policy.height_scan = None
 
         # ------------------------------Actions------------------------------
         # reduce action scale
