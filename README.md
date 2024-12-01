@@ -154,6 +154,57 @@ python scripts/tools/convert_urdf.py a1.urdf exts/robot_lab/data/Robots/Unitree/
 
 Check [import_new_asset](https://docs.robotsfan.com/isaaclab/source/how-to/import_new_asset.html) for detail
 
+Using the core framework developed as part of Isaac Lab, we provide various learning environments for robotics research.
+These environments follow the `gym.Env` API from OpenAI Gym version `0.21.0`. The environments are registered using
+the Gym registry.
+
+Each environment's name is composed of `Isaac-<Task>-<Robot>-v<X>`, where `<Task>` indicates the skill to learn
+in the environment, `<Robot>` indicates the embodiment of the acting agent, and `<X>` represents the version of
+the environment (which can be used to suggest different observation or action spaces).
+
+The environments are configured using either Python classes (wrapped using `configclass` decorator) or through
+YAML files. The template structure of the environment is always put at the same level as the environment file
+itself. However, its various instances are included in directories within the environment directory itself.
+This looks like as follows:
+
+```tree
+exts/robot_lab/tasks/locomotion/
+├── __init__.py
+└── velocity
+    ├── config
+    │   └── unitree_a1
+    │       ├── agent  # <- this is where we store the learning agent configurations
+    │       ├── __init__.py  # <- this is where we register the environment and configurations to gym registry
+    │       ├── flat_env_cfg.py
+    │       └── rough_env_cfg.py
+    ├── __init__.py
+    └── velocity_env_cfg.py  # <- this is the base task configuration
+```
+
+The environments are then registered in the `exts/robot_lab/tasks/locomotion/velocity/config/unitree_a1/__init__.py`:
+
+```python
+gym.register(
+    id="RobotLab-Isaac-Velocity-Flat-Unitree-A1-v0",
+    entry_point="omni.isaac.lab.envs:ManagerBasedRLEnv",
+    disable_env_checker=True,
+    kwargs={
+        "env_cfg_entry_point": f"{__name__}.flat_env_cfg:UnitreeA1FlatEnvCfg",
+        "rsl_rl_cfg_entry_point": f"{agents.__name__}.rsl_rl_ppo_cfg:UnitreeA1FlatPPORunnerCfg",
+    },
+)
+
+gym.register(
+    id="RobotLab-Isaac-Velocity-Rough-Unitree-A1-v0",
+    entry_point="omni.isaac.lab.envs:ManagerBasedRLEnv",
+    disable_env_checker=True,
+    kwargs={
+        "env_cfg_entry_point": f"{__name__}.rough_env_cfg:UnitreeA1RoughEnvCfg",
+        "rsl_rl_cfg_entry_point": f"{agents.__name__}.rsl_rl_ppo_cfg:UnitreeA1RoughPPORunnerCfg",
+    },
+)
+```
+
 ## Tensorboard
 
 To view tensorboard, run:
