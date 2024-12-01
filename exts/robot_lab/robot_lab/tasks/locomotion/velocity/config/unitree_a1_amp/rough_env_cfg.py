@@ -41,14 +41,18 @@ class UnitreeA1AmpRoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         self.observations.policy.base_lin_vel = None
         self.observations.policy.base_ang_vel = None
         self.observations.policy.height_scan = None
-        self.observations.AMP = create_obsgroup_class('AMPCfg',{
-            'base_pos_z': ObsTerm(func=mdp.base_pos_z),
-            'base_lin_vel': ObsTerm(func=mdp.base_lin_vel),
-            'base_ang_vel': ObsTerm(func=mdp.base_ang_vel),
-            'joint_pos': ObsTerm(func=mdp.joint_pos),
-            'joint_vel': ObsTerm(func=mdp.joint_vel),
-        }, enable_corruption=True, concatenate_terms=True)()
-
+        self.observations.AMP = create_obsgroup_class(
+            "AMPCfg",
+            {
+                "base_pos_z": ObsTerm(func=mdp.base_pos_z),
+                "base_lin_vel": ObsTerm(func=mdp.base_lin_vel),
+                "base_ang_vel": ObsTerm(func=mdp.base_ang_vel),
+                "joint_pos": ObsTerm(func=mdp.joint_pos),
+                "joint_vel": ObsTerm(func=mdp.joint_vel),
+            },
+            enable_corruption=True,
+            concatenate_terms=True,
+        )()
 
         # ------------------------------Actions------------------------------
         # reduce action scale
