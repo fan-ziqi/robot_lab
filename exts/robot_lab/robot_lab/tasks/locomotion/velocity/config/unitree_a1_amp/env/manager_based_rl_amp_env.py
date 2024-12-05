@@ -50,11 +50,11 @@ class ManagerBasedRLAmpEnv(ManagerBasedRLEnv, gym.Env):
     def get_amp_observations(self):
         obs_manager = self.observation_manager
         # iterate over all the terms in each group
-        group_term_names = obs_manager._group_obs_term_names["AMP"]
+        group_term_names = obs_manager._group_obs_term_names["amp"]
         # buffer to store obs per group
         group_obs = dict.fromkeys(group_term_names, None)
         # read attributes for each term
-        obs_terms = zip(group_term_names, obs_manager._group_obs_term_cfgs["AMP"])
+        obs_terms = zip(group_term_names, obs_manager._group_obs_term_cfgs["amp"])
         # evaluate terms: compute, add noise, clip, scale.
         for name, term_cfg in obs_terms:
             # compute term's value

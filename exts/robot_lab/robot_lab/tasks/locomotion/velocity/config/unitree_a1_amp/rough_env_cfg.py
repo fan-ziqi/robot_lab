@@ -1,12 +1,13 @@
 import glob
 
 from omni.isaac.lab.managers import EventTermCfg as EventTerm
+from omni.isaac.lab.managers import ObservationGroupCfg as ObsGroup
 from omni.isaac.lab.managers import ObservationTermCfg as ObsTerm
 from omni.isaac.lab.utils import configclass
 
 import robot_lab.tasks.locomotion.velocity.mdp as mdp
 from robot_lab.tasks.locomotion.velocity.config.unitree_a1_amp.env.events import reset_amp
-from robot_lab.tasks.locomotion.velocity.velocity_env_cfg import LocomotionVelocityRoughEnvCfg, create_obsgroup_class
+from robot_lab.tasks.locomotion.velocity.velocity_env_cfg import LocomotionVelocityRoughEnvCfg, ObservationsCfg
 from robot_lab.third_party.amp_utils import AMP_UTILS_DIR
 
 ##
@@ -19,7 +20,31 @@ from robot_lab.assets.unitree import UNITREE_A1_CFG  # isort: skip
 
 
 @configclass
+class UnitreeA1AmpObservationsCfg(ObservationsCfg):
+    """Observation specifications for the MDP."""
+
+    @configclass
+    class AmpCfg(ObsGroup):
+        """Observations for Amp group."""
+
+        base_pos_z = ObsTerm(func=mdp.base_pos_z)
+        base_lin_vel = ObsTerm(func=mdp.base_lin_vel)
+        base_ang_vel = ObsTerm(func=mdp.base_ang_vel)
+        joint_pos = ObsTerm(func=mdp.joint_pos)
+        joint_vel = ObsTerm(func=mdp.joint_vel)
+
+        def __post_init__(self):
+            self.enable_corruption = True
+            self.concatenate_terms = True
+
+    # observation groups
+    amp: AmpCfg = AmpCfg()
+
+
+@configclass
 class UnitreeA1AmpRoughEnvCfg(LocomotionVelocityRoughEnvCfg):
+    observations: UnitreeA1AmpObservationsCfg = UnitreeA1AmpObservationsCfg()
+
     def __post_init__(self):
         # post init of parent
         super().__post_init__()
@@ -41,18 +66,6 @@ class UnitreeA1AmpRoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         self.observations.policy.base_lin_vel = None
         self.observations.policy.base_ang_vel = None
         self.observations.policy.height_scan = None
-        self.observations.AMP = create_obsgroup_class(
-            "AMPCfg",
-            {
-                "base_pos_z": ObsTerm(func=mdp.base_pos_z),
-                "base_lin_vel": ObsTerm(func=mdp.base_lin_vel),
-                "base_ang_vel": ObsTerm(func=mdp.base_ang_vel),
-                "joint_pos": ObsTerm(func=mdp.joint_pos),
-                "joint_vel": ObsTerm(func=mdp.joint_vel),
-            },
-            enable_corruption=True,
-            concatenate_terms=True,
-        )()
 
         # ------------------------------Actions------------------------------
         # reduce action scale
