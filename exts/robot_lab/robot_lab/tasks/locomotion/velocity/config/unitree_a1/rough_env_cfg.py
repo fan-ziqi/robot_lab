@@ -100,7 +100,7 @@ class UnitreeA1RoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         self.rewards.feet_air_time.params["sensor_cfg"].body_names = [".*_foot"]
         self.rewards.foot_contact.weight = 0
         self.rewards.foot_contact.params["sensor_cfg"].body_names = [".*_foot"]
-        self.rewards.base_height_rough_l2.weight = 0
+        self.rewards.base_height_rough_l2.weight = -2
         self.rewards.base_height_rough_l2.params["target_height"] = 0.35
         self.rewards.base_height_rough_l2.params["asset_cfg"].body_names = ["trunk"]
         self.rewards.feet_slide.weight = 0
