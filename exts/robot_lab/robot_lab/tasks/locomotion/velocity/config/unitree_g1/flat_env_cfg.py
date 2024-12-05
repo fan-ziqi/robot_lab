@@ -1,11 +1,11 @@
 from omni.isaac.lab.managers import SceneEntityCfg
 from omni.isaac.lab.utils import configclass
 
-from .rough_env_cfg import G1RoughEnvCfg
+from .rough_env_cfg import UnitreeG1RoughEnvCfg
 
 
 @configclass
-class G1FlatEnvCfg(G1RoughEnvCfg):
+class UnitreeG1FlatEnvCfg(UnitreeG1RoughEnvCfg):
     def __post_init__(self):
         # post init of parent
         super().__post_init__()

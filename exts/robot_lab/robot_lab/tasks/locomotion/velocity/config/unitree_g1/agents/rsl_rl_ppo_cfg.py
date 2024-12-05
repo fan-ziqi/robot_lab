@@ -7,7 +7,7 @@ from omni.isaac.lab_tasks.utils.wrappers.rsl_rl import (
 
 
 @configclass
-class G1RoughPPORunnerCfg(RslRlOnPolicyRunnerCfg):
+class UnitreeG1RoughPPORunnerCfg(RslRlOnPolicyRunnerCfg):
     num_steps_per_env = 24
     max_iterations = 3000
     save_interval = 50
@@ -36,7 +36,7 @@ class G1RoughPPORunnerCfg(RslRlOnPolicyRunnerCfg):
 
 
 @configclass
-class G1FlatPPORunnerCfg(G1RoughPPORunnerCfg):
+class UnitreeG1FlatPPORunnerCfg(UnitreeG1RoughPPORunnerCfg):
     def __post_init__(self):
         super().__post_init__()
 

@@ -14,7 +14,7 @@ from omni.isaac.lab_assets import G1_MINIMAL_CFG  # isort: skip
 
 
 @configclass
-class G1Rewards(RewardsCfg):
+class UnitreeG1RewardsCfg(RewardsCfg):
     """Reward terms for the MDP."""
 
     termination_penalty = RewTerm(func=mdp.is_terminated, weight=-200.0)
@@ -98,8 +98,8 @@ class G1Rewards(RewardsCfg):
 
 
 @configclass
-class G1RoughEnvCfg(LocomotionVelocityRoughEnvCfg):
-    rewards: G1Rewards = G1Rewards()
+class UnitreeG1RoughEnvCfg(LocomotionVelocityRoughEnvCfg):
+    rewards: UnitreeG1RewardsCfg = UnitreeG1RewardsCfg()
 
     def __post_init__(self):
         # post init of parent
