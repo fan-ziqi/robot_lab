@@ -48,28 +48,7 @@ class ManagerBasedRLAmpEnv(ManagerBasedRLEnv, gym.Env):
     """
 
     def get_amp_observations(self):
-        obs_manager = self.observation_manager
-        # iterate over all the terms in each group
-        group_term_names = obs_manager._group_obs_term_names["amp"]
-        # buffer to store obs per group
-        group_obs = dict.fromkeys(group_term_names, None)
-        # read attributes for each term
-        obs_terms = zip(group_term_names, obs_manager._group_obs_term_cfgs["amp"])
-        # evaluate terms: compute, add noise, clip, scale.
-        for name, term_cfg in obs_terms:
-            # compute term's value
-            obs: torch.Tensor = term_cfg.func(obs_manager._env, **term_cfg.params).clone()
-            # apply post-processing
-            if term_cfg.noise:
-                obs = term_cfg.noise.func(obs, term_cfg.noise)
-            if term_cfg.clip:
-                obs = obs.clip_(min=term_cfg.clip[0], max=term_cfg.clip[1])
-            if term_cfg.scale:
-                obs = obs.mul_(term_cfg.scale)
-            # TODO: Introduce delay and filtering models.
-            # Ref: https://robosuite.ai/docs/modules/sensors.html#observables
-            # add value to list
-            group_obs[name] = obs
+        group_obs = self.observation_manager.compute_group("amp")
 
         # Isaac Sim uses breadth-first joint ordering, while Isaac Gym uses depth-first joint ordering
         joint_pos = group_obs["joint_pos"]
