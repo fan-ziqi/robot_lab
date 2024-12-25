@@ -70,7 +70,7 @@ class UnitreeA1AmpRoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         # ------------------------------Actions------------------------------
         # reduce action scale
         self.actions.joint_pos.scale = 0.25
-        self.actions.joint_pos.clip = {".*": (-100, 100)}
+        self.actions.joint_pos.clip = {".*": (-100.0, 100.0)}
 
         # ------------------------------Events------------------------------
         self.events.physics_material = None

@@ -37,7 +37,7 @@ class UnitreeA1RoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         # ------------------------------Actions------------------------------
         # reduce action scale
         self.actions.joint_pos.scale = 0.25
-        self.actions.joint_pos.clip = {".*": (-100, 100)}
+        self.actions.joint_pos.clip = {".*": (-100.0, 100.0)}
 
         # ------------------------------Events------------------------------
         self.events.add_base_mass.params["mass_distribution_params"] = (-1.0, 3.0)
