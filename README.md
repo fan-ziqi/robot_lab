@@ -153,6 +153,8 @@ This stops and removes the containers, but keeps the images.
 
 ## Try examples
 
+### Base Locomotion
+
 FFTAI GR1T1
 
 ```bash
@@ -216,7 +218,7 @@ The above configs are flat, you can change `Flat` to `Rough`
 * Play on specific folder or checkpoint, add `--load_run run_folder_name --checkpoint model.pt`
 * Resume training from folder or checkpoint, add `--resume --load_run run_folder_name --checkpoint model.pt`
 
-## AMP training
+### AMP Locomotion
 
 The code for AMP training refers to [AMP_for_hardware](https://github.com/Alescontrela/AMP_for_hardware)
 
@@ -231,6 +233,19 @@ python scripts/rsl_rl/amp/replay_amp_data.py --task RobotLab-Isaac-Velocity-Flat
 python scripts/rsl_rl/amp/train.py --task RobotLab-Isaac-Velocity-Flat-Amp-Unitree-A1-v0 --headless
 # Play
 python scripts/rsl_rl/amp/play.py --task RobotLab-Isaac-Velocity-Flat-Amp-Unitree-A1-v0
+```
+
+### HandStand
+
+Supports four directions of handstand, use `handstand_type` in the configuration file to switch.
+
+Unitree A1
+
+```bash
+# Train
+python scripts/rsl_rl/base/train.py --task RobotLab-Isaac-Velocity-Flat-HandStand-Unitree-A1-v0 --headless
+# Play
+python scripts/rsl_rl/base/play.py --task RobotLab-Isaac-Velocity-Flat-HandStand-Unitree-A1-v0
 ```
 
 ## Add your own robot
