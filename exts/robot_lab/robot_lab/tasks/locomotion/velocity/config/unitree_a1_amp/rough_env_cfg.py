@@ -45,6 +45,9 @@ class UnitreeA1AmpObservationsCfg(ObservationsCfg):
 class UnitreeA1AmpRoughEnvCfg(LocomotionVelocityRoughEnvCfg):
     observations: UnitreeA1AmpObservationsCfg = UnitreeA1AmpObservationsCfg()
 
+    base_link_name = "trunk"
+    foot_link_name = ".*_foot"
+
     def __post_init__(self):
         # post init of parent
         super().__post_init__()
@@ -52,7 +55,7 @@ class UnitreeA1AmpRoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         # ------------------------------Sence------------------------------
         # switch robot to unitree-a1
         self.scene.robot = UNITREE_A1_CFG.replace(prim_path="{ENV_REGEX_NS}/Robot")
-        self.scene.height_scanner.prim_path = "{ENV_REGEX_NS}/Robot/trunk"
+        self.scene.height_scanner.prim_path = "{ENV_REGEX_NS}/Robot/" + self.base_link_name
         # scale down the terrains because the robot is small
         self.scene.terrain.terrain_generator.sub_terrains["boxes"].grid_height_range = (0.025, 0.1)
         self.scene.terrain.terrain_generator.sub_terrains["random_rough"].noise_range = (0.01, 0.06)
@@ -128,7 +131,7 @@ class UnitreeA1AmpRoughEnvCfg(LocomotionVelocityRoughEnvCfg):
             self.disable_zero_weight_rewards()
 
         # ------------------------------Terminations------------------------------
-        self.terminations.illegal_contact.params["sensor_cfg"].body_names = ["trunk"]
+        self.terminations.illegal_contact.params["sensor_cfg"].body_names = [self.base_link_name]
 
         # ------------------------------Commands------------------------------
         self.commands.base_velocity.ranges.lin_vel_x = (-1.0, 2.0)
@@ -138,7 +141,7 @@ class UnitreeA1AmpRoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         # ------------------------------AMP------------------------------
         self.urdf_path = f"{AMP_UTILS_DIR}/models/a1/urdf/a1.urdf"
         self.ee_names = ["FL_foot", "FR_foot", "RL_foot", "RR_foot"]
-        self.base_name = "trunk"
+        self.base_name = self.base_link_name
         self.reference_state_initialization = True
         self.amp_motion_files = glob.glob(f"{AMP_UTILS_DIR}/motion_files/mocap_motions_a1/*")
         self.amp_num_preload_transitions = 2000000
