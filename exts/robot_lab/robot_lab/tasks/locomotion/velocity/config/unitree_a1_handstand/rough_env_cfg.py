@@ -1,15 +1,18 @@
-from omni.isaac.lab.utils import configclass
+import math
+
 from omni.isaac.lab.managers import RewardTermCfg as RewTerm
 from omni.isaac.lab.managers import SceneEntityCfg
+from omni.isaac.lab.utils import configclass
+
 from robot_lab.tasks.locomotion.velocity.config.unitree_a1_handstand.env import rewards
 from robot_lab.tasks.locomotion.velocity.velocity_env_cfg import LocomotionVelocityRoughEnvCfg, RewardsCfg
-import math
 
 ##
 # Pre-defined configs
 ##
 # use cloud assets
 from omni.isaac.lab_assets.unitree import UNITREE_A1_CFG  # isort: skip
+
 # use local assets
 # from robot_lab.assets.unitree import UNITREE_A1_CFG  # isort: skip
 
@@ -21,11 +24,7 @@ class UnitreeA1HandStandRewardsCfg(RewardsCfg):
     handstand_feet_height_exp = RewTerm(
         func=rewards.handstand_feet_height_exp,
         weight=0.0,
-        params={
-            "asset_cfg": SceneEntityCfg("robot"),
-            "target_height": 0.0,
-            "std": math.sqrt(0.25)
-        },
+        params={"asset_cfg": SceneEntityCfg("robot"), "target_height": 0.0, "std": math.sqrt(0.25)},
     )
 
     handstand_feet_on_air = RewTerm(
@@ -150,9 +149,6 @@ class UnitreeA1HandStandRoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         self.rewards.feet_air_time.params["sensor_cfg"].body_names = [".*_foot"]
         self.rewards.foot_contact.weight = 0
         self.rewards.foot_contact.params["sensor_cfg"].body_names = [self.foot_link_name]
-        self.rewards.base_height_rough_l2.weight = 0
-        self.rewards.base_height_rough_l2.params["target_height"] = 0.35
-        self.rewards.base_height_rough_l2.params["asset_cfg"].body_names = [self.base_link_name]
         self.rewards.feet_slide.weight = 0
         self.rewards.feet_slide.params["sensor_cfg"].body_names = [self.foot_link_name]
         self.rewards.feet_slide.params["asset_cfg"].body_names = [self.foot_link_name]
@@ -193,7 +189,12 @@ class UnitreeA1HandStandRoughEnvCfg(LocomotionVelocityRoughEnvCfg):
             self.disable_zero_weight_rewards()
 
         # ------------------------------Terminations------------------------------
-        self.terminations.illegal_contact.params["sensor_cfg"].body_names = [self.base_link_name, ".*_hip", ".*_thigh", ".*_calf"]
+        self.terminations.illegal_contact.params["sensor_cfg"].body_names = [
+            self.base_link_name,
+            ".*_hip",
+            ".*_thigh",
+            ".*_calf",
+        ]
 
         # ------------------------------Commands------------------------------
         self.commands.base_velocity.ranges.lin_vel_x = (0.0, 0.0)

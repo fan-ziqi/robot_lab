@@ -9,6 +9,8 @@ class UnitreeA1HandStandFlatEnvCfg(UnitreeA1HandStandRoughEnvCfg):
         # post init of parent
         super().__post_init__()
 
+        # override rewards
+        self.rewards.base_height_l2.params["sensor_cfg"] = None
         # change terrain to flat
         self.scene.terrain.terrain_type = "plane"
         self.scene.terrain.terrain_generator = None

@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING
 
 from omni.isaac.lab.assets import Articulation, RigidObject
 from omni.isaac.lab.managers import SceneEntityCfg
-from omni.isaac.lab.sensors import ContactSensor, RayCaster
+from omni.isaac.lab.sensors import ContactSensor
 from omni.isaac.lab.utils.math import quat_rotate_inverse, yaw_quat
 
 if TYPE_CHECKING:
@@ -109,22 +109,6 @@ def foot_contact(
     # no reward for zero command
     reward *= torch.norm(env.command_manager.get_command(command_name)[:, :2], dim=1) > 0.1
     return reward
-
-
-def base_height_rough_l2(
-    env: ManagerBasedRLEnv,
-    target_height: float,
-    sensor_cfg: SceneEntityCfg,
-    asset_cfg: SceneEntityCfg = SceneEntityCfg("robot"),
-) -> torch.Tensor:
-    """Penalize asset height from its target using L2-kernel."""
-    # extract the used quantities (to enable type-hinting)
-    asset: RigidObject = env.scene[asset_cfg.name]
-    # extract the used quantities (to enable type-hinting)
-    sensor: RayCaster = env.scene.sensors[sensor_cfg.name]
-    # compute the reward
-    base_height = torch.mean(asset.data.root_pos_w[:, 2].unsqueeze(1) - sensor.data.ray_hits_w[..., 2], dim=1)
-    return torch.square(base_height - target_height)
 
 
 # def foot_slip(
