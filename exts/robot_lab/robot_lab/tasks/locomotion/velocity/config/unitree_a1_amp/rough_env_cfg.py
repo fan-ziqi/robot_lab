@@ -10,7 +10,11 @@ from omni.isaac.lab.utils import configclass
 
 import robot_lab.tasks.locomotion.velocity.mdp as mdp
 from robot_lab.tasks.locomotion.velocity.config.unitree_a1_amp.env.events import reset_amp
-from robot_lab.tasks.locomotion.velocity.velocity_env_cfg import LocomotionVelocityRoughEnvCfg, ObservationsCfg
+from robot_lab.tasks.locomotion.velocity.velocity_env_cfg import (
+    EventCfg,
+    LocomotionVelocityRoughEnvCfg,
+    ObservationsCfg,
+)
 from robot_lab.third_party.amp_utils import AMP_UTILS_DIR
 
 ##
@@ -30,23 +34,31 @@ class UnitreeA1AmpObservationsCfg(ObservationsCfg):
     class AmpCfg(ObsGroup):
         """Observations for Amp group."""
 
-        base_pos_z = ObsTerm(func=mdp.base_pos_z)
-        base_lin_vel = ObsTerm(func=mdp.base_lin_vel)
-        base_ang_vel = ObsTerm(func=mdp.base_ang_vel)
-        joint_pos = ObsTerm(func=mdp.joint_pos)
-        joint_vel = ObsTerm(func=mdp.joint_vel)
+        base_pos_z = ObsTerm(func=mdp.base_pos_z, scale=1.0, clip=(-100.0, 100.0))
+        base_lin_vel = ObsTerm(func=mdp.base_lin_vel, scale=1.0, clip=(-100.0, 100.0))
+        base_ang_vel = ObsTerm(func=mdp.base_ang_vel, scale=1.0, clip=(-100.0, 100.0))
+        joint_pos = ObsTerm(func=mdp.joint_pos, scale=1.0, clip=(-100.0, 100.0))
+        joint_vel = ObsTerm(func=mdp.joint_vel, scale=1.0, clip=(-100.0, 100.0))
 
         def __post_init__(self):
-            self.enable_corruption = True
-            self.concatenate_terms = True
+            self.enable_corruption = False
+            self.concatenate_terms = False
 
     # observation groups
     amp: AmpCfg = AmpCfg()
 
 
 @configclass
+class UnitreeA1AmpEventCfg(EventCfg):
+    """Configuration for events."""
+
+    reset_amp = EventTerm(func=reset_amp, mode="reset")
+
+
+@configclass
 class UnitreeA1AmpRoughEnvCfg(LocomotionVelocityRoughEnvCfg):
     observations: UnitreeA1AmpObservationsCfg = UnitreeA1AmpObservationsCfg()
+    events: UnitreeA1AmpEventCfg = UnitreeA1AmpEventCfg()
 
     base_link_name = "trunk"
     foot_link_name = ".*_foot"
@@ -72,6 +84,7 @@ class UnitreeA1AmpRoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         self.observations.policy.base_lin_vel = None
         self.observations.policy.base_ang_vel = None
         self.observations.policy.height_scan = None
+        self.observations.critic = None
 
         # ------------------------------Actions------------------------------
         # reduce action scale
@@ -79,15 +92,9 @@ class UnitreeA1AmpRoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         self.actions.joint_pos.clip = {".*": (-100.0, 100.0)}
 
         # ------------------------------Events------------------------------
-        self.events.physics_material = None
-        self.events.add_base_mass = None
-        self.events.base_external_force_torque = None
-        self.events.reset_base = None
-        self.events.reset_robot_joints = None
-        self.events.randomize_actuator_gains = None
-        self.events.randomize_joint_parameters = None
-        self.events.push_robot = None
-        self.events.reset_amp = EventTerm(func=reset_amp, mode="reset")
+        self.events.randomize_rigid_body_mass.params["asset_cfg"].body_names = [self.base_link_name]
+        self.events.randomize_com_positions.params["asset_cfg"].body_names = [self.base_link_name]
+        self.events.randomize_apply_external_force_torque.params["asset_cfg"].body_names = [self.base_link_name]
 
         # ------------------------------Rewards------------------------------
         # General
@@ -123,7 +130,7 @@ class UnitreeA1AmpRoughEnvCfg(LocomotionVelocityRoughEnvCfg):
 
         # Others
         self.rewards.feet_air_time.weight = 0
-        self.rewards.foot_contact.weight = 0
+        self.rewards.feet_contact.weight = 0
         self.rewards.feet_slide.weight = 0
         self.rewards.joint_power.weight = 0
         self.rewards.stand_still_when_zero_command.weight = 0

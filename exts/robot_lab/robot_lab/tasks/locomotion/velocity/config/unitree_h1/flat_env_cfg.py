@@ -13,8 +13,6 @@ class UnitreeH1FlatEnvCfg(UnitreeH1RoughEnvCfg):
         super().__post_init__()
 
         # override rewards
-        self.rewards.feet_air_time.weight = 1.0
-        self.rewards.feet_air_time.params["threshold"] = 0.6
         self.rewards.base_height_l2.params["sensor_cfg"] = None
         # change terrain to flat
         self.scene.terrain.terrain_type = "plane"

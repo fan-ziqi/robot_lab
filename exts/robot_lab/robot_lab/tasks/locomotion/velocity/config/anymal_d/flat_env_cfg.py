@@ -13,9 +13,6 @@ class AnymalDFlatEnvCfg(AnymalDRoughEnvCfg):
         super().__post_init__()
 
         # override rewards
-        self.rewards.flat_orientation_l2.weight = -5.0
-        self.rewards.joint_torques_l2.weight = -2.5e-5
-        self.rewards.feet_air_time.weight = 0.5
         self.rewards.base_height_l2.params["sensor_cfg"] = None
         # change terrain to flat
         self.scene.terrain.terrain_type = "plane"
@@ -23,6 +20,7 @@ class AnymalDFlatEnvCfg(AnymalDRoughEnvCfg):
         # no height scan
         self.scene.height_scanner = None
         self.observations.policy.height_scan = None
+        self.observations.critic.height_scan = None
         # no terrain curriculum
         self.curriculum.terrain_levels = None
 

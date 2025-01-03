@@ -105,7 +105,7 @@ class CommandsCfg:
         heading_control_stiffness=0.5,
         debug_vis=True,
         ranges=mdp.UniformVelocityCommandCfg.Ranges(
-            lin_vel_x=(-1.0, 1.0), lin_vel_y=(-1.0, 1.0), ang_vel_z=(-1.0, 1.0), heading=(-math.pi, math.pi)
+            lin_vel_x=(-1.5, 1.5), lin_vel_y=(-1.5, 1.5), ang_vel_z=(-1.5, 1.5), heading=(-math.pi, math.pi)
         ),
     )
 
@@ -183,8 +183,41 @@ class ObservationsCfg:
             self.enable_corruption = True
             self.concatenate_terms = True
 
+    @configclass
+    class CriticCfg(ObsGroup):
+        """Observations for critic group."""
+
+        # observation terms (order preserved)
+        base_lin_vel = ObsTerm(func=mdp.base_lin_vel, scale=1.0, clip=(-100.0, 100.0))
+        base_ang_vel = ObsTerm(func=mdp.base_ang_vel, scale=1.0, clip=(-100.0, 100.0))
+        projected_gravity = ObsTerm(func=mdp.projected_gravity, scale=1.0, clip=(-100.0, 100.0))
+        velocity_commands = ObsTerm(
+            func=mdp.generated_commands, params={"command_name": "base_velocity"}, scale=1.0, clip=(-100.0, 100.0)
+        )
+        joint_pos = ObsTerm(
+            func=mdp.joint_pos_rel,
+            params={"asset_cfg": SceneEntityCfg("robot", joint_names=".*")},
+            scale=1.0,
+            clip=(-100.0, 100.0),
+        )
+        joint_vel = ObsTerm(
+            func=mdp.joint_vel_rel,
+            params={"asset_cfg": SceneEntityCfg("robot", joint_names=".*")},
+            scale=1.0,
+            clip=(-100.0, 100.0),
+        )
+        actions = ObsTerm(func=mdp.last_action, scale=1.0, clip=(-100.0, 100.0))
+        height_scan = ObsTerm(
+            func=mdp.height_scan, params={"sensor_cfg": SceneEntityCfg("height_scanner")}, scale=1.0, clip=(-1.0, 1.0)
+        )
+
+        def __post_init__(self):
+            self.enable_corruption = False
+            self.concatenate_terms = True
+
     # observation groups
     policy: PolicyCfg = PolicyCfg()
+    critic: CriticCfg = CriticCfg()
 
 
 @configclass
@@ -192,7 +225,7 @@ class EventCfg:
     """Configuration for events."""
 
     # startup
-    physics_material = EventTerm(
+    randomize_rigid_body_material = EventTerm(
         func=mdp.randomize_rigid_body_material,
         mode="startup",
         params={
@@ -204,45 +237,50 @@ class EventCfg:
         },
     )
 
-    add_base_mass = EventTerm(
+    randomize_rigid_body_mass = EventTerm(
         func=mdp.randomize_rigid_body_mass,
         mode="startup",
         params={
             "asset_cfg": SceneEntityCfg("robot", body_names=""),
-            "mass_distribution_params": (-5.0, 5.0),
+            "mass_distribution_params": (-3.0, 3.0),
+            "operation": "add",
+        },
+    )
+
+    randomize_rigid_body_inertia = EventTerm(
+        func=mdp.randomize_rigid_body_inertia,
+        mode="startup",
+        params={
+            "asset_cfg": SceneEntityCfg("robot", body_names=".*"),
+            "inertia_distribution_params": (0.5, 1.5),
+            "operation": "scale",
+        },
+    )
+
+    randomize_com_positions = EventTerm(
+        func=mdp.randomize_com_positions,
+        mode="startup",
+        params={
+            "asset_cfg": SceneEntityCfg("robot", body_names=""),
+            "com_distribution_params": (-0.1, 0.1),
             "operation": "add",
         },
     )
 
     # reset
-    base_external_force_torque = EventTerm(
+    randomize_apply_external_force_torque = EventTerm(
         func=mdp.apply_external_force_torque,
         mode="reset",
         params={
             "asset_cfg": SceneEntityCfg("robot", body_names=""),
-            "force_range": (0.0, 0.0),
-            "torque_range": (-0.0, 0.0),
+            "force_range": (-10.0, 10.0),
+            "torque_range": (-10.0, 10.0),
         },
     )
 
-    reset_base = EventTerm(
-        func=mdp.reset_root_state_uniform,
-        mode="reset",
-        params={
-            "pose_range": {"x": (-0.5, 0.5), "y": (-0.5, 0.5), "yaw": (-3.14, 3.14)},
-            "velocity_range": {
-                "x": (-0.5, 0.5),
-                "y": (-0.5, 0.5),
-                "z": (-0.5, 0.5),
-                "roll": (-0.5, 0.5),
-                "pitch": (-0.5, 0.5),
-                "yaw": (-0.5, 0.5),
-            },
-        },
-    )
-
-    reset_robot_joints = EventTerm(
-        func=mdp.reset_joints_by_scale,  # reset_joints_by_offset
+    randomize_reset_joints = EventTerm(
+        func=mdp.reset_joints_by_scale,
+        # func=mdp.reset_joints_by_offset,
         mode="reset",
         params={
             "position_range": (0.5, 1.5),
@@ -262,22 +300,36 @@ class EventCfg:
         },
     )
 
-    randomize_joint_parameters = EventTerm(
-        func=mdp.randomize_joint_parameters,
+    # randomize_joint_limits = EventTerm(
+    #     func=mdp.randomize_joint_parameters,
+    #     mode="reset",
+    #     params={
+    #         "asset_cfg": SceneEntityCfg("robot", joint_names=".*"),
+    #         "lower_limit_distribution_params": (0.00, 0.01),
+    #         "upper_limit_distribution_params": (0.00, 0.01),
+    #         "operation": "add",
+    #         "distribution": "gaussian",
+    #     },
+    # )
+
+    randomize_reset_base = EventTerm(
+        func=mdp.reset_root_state_uniform,
         mode="reset",
         params={
-            "asset_cfg": SceneEntityCfg("robot", joint_names=".*"),
-            "friction_distribution_params": (0.75, 1.25),
-            "armature_distribution_params": (0.75, 1.25),
-            "lower_limit_distribution_params": (0.75, 1.25),
-            "upper_limit_distribution_params": (0.75, 1.25),
-            "operation": "scale",
-            "distribution": "log_uniform",
+            "pose_range": {"x": (-0.5, 0.5), "y": (-0.5, 0.5), "yaw": (-3.14, 3.14)},
+            "velocity_range": {
+                "x": (-0.5, 0.5),
+                "y": (-0.5, 0.5),
+                "z": (-0.5, 0.5),
+                "roll": (-0.5, 0.5),
+                "pitch": (-0.5, 0.5),
+                "yaw": (-0.5, 0.5),
+            },
         },
     )
 
     # interval
-    push_robot = EventTerm(
+    randomize_push_robot = EventTerm(
         func=mdp.push_by_setting_velocity,
         mode="interval",
         interval_range_s=(10.0, 15.0),
@@ -379,8 +431,8 @@ class RewardsCfg:
         },
     )
 
-    foot_contact = RewTerm(
-        func=mdp.foot_contact,
+    feet_contact = RewTerm(
+        func=mdp.feet_contact,
         weight=0.0,
         params={
             "sensor_cfg": SceneEntityCfg("contact_forces", body_names=""),
@@ -398,13 +450,51 @@ class RewardsCfg:
         },
     )
 
+    feet_height_exp = RewTerm(
+        func=mdp.feet_height_exp,
+        weight=0.0,
+        params={
+            "std": math.sqrt(0.25),
+            "tanh_mult": 2.0,
+            "target_height": float,
+            "asset_cfg": SceneEntityCfg("robot", body_names=""),
+        },
+    )
+
+    feet_distance_y_exp = RewTerm(
+        func=mdp.feet_distance_y_exp,
+        weight=0.0,
+        params={
+            "std": math.sqrt(0.25),
+            "asset_cfg": SceneEntityCfg("robot", body_names=""),
+            "stance_width": float,
+        },
+    )
+
     joint_power = RewTerm(func=mdp.joint_power, weight=0.0)
+
+    smoothness_1 = RewTerm(func=mdp.smoothness_1, weight=0.0)
+    # smoothness_2 = RewTerm(func=mdp.smoothness_2, weight=-0.01)
 
     stand_still_when_zero_command = RewTerm(
         func=mdp.stand_still_when_zero_command,
         weight=0.0,
-        params={"command_name": "base_velocity"},
+        params={
+            "command_name": "base_velocity",
+            "asset_cfg": SceneEntityCfg("robot", joint_names=".*"),
+        },
     )
+
+    wheel_spin_in_air_penalty = RewTerm(
+        func=mdp.wheel_spin_in_air_penalty,
+        weight=0.0,
+        params={
+            "asset_cfg": SceneEntityCfg("robot", joint_names=""),
+            "sensor_cfg": SceneEntityCfg("contact_forces", body_names=""),
+        },
+    )
+
+    upward = RewTerm(func=mdp.upward, weight=0.0)
 
 
 @configclass

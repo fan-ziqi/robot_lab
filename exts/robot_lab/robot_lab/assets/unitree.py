@@ -86,7 +86,7 @@ UNITREE_GO2W_CFG = ArticulationCfg(
         ),
     ),
     init_state=ArticulationCfg.InitialStateCfg(
-        pos=(0.0, 0.0, 0.50),
+        pos=(0.0, 0.0, 0.42),
         joint_pos={
             ".*L_hip_joint": 0.1,
             ".*R_hip_joint": -0.1,
@@ -106,7 +106,7 @@ UNITREE_GO2W_CFG = ArticulationCfg(
                 ".*_hip_joint": 23.7,
                 ".*_thigh_joint": 23.7,
                 ".*_calf_joint": 35.55,
-                ".*_foot_joint": 23.7,
+                ".*_foot_joint": 7.0,
             },
             velocity_limit={
                 ".*_hip_joint": 30.1,

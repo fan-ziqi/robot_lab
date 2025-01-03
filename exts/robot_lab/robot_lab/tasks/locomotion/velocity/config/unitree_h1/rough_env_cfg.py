@@ -34,23 +34,9 @@ class UnitreeH1RoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         # ------------------------------Actions------------------------------
 
         # ------------------------------Events------------------------------
-        self.events.base_external_force_torque.params["asset_cfg"].body_names = [self.base_link_name]
-        self.events.reset_robot_joints.params["position_range"] = (1.0, 1.0)
-        self.events.reset_base.params = {
-            "pose_range": {"x": (-0.5, 0.5), "y": (-0.5, 0.5), "yaw": (-3.14, 3.14)},
-            "velocity_range": {
-                "x": (0.0, 0.0),
-                "y": (0.0, 0.0),
-                "z": (0.0, 0.0),
-                "roll": (0.0, 0.0),
-                "pitch": (0.0, 0.0),
-                "yaw": (0.0, 0.0),
-            },
-        }
-        self.events.push_robot = None
-        self.events.add_base_mass = None
-        self.events.randomize_actuator_gains = None
-        self.events.randomize_joint_parameters = None
+        self.events.randomize_rigid_body_mass.params["asset_cfg"].body_names = [self.base_link_name]
+        self.events.randomize_com_positions.params["asset_cfg"].body_names = [self.base_link_name]
+        self.events.randomize_apply_external_force_torque.params["asset_cfg"].body_names = [self.base_link_name]
 
         # ------------------------------Rewards------------------------------
         # General
@@ -94,11 +80,11 @@ class UnitreeH1RoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         self.rewards.track_ang_vel_z_exp.params["std"] = 0.5
 
         # Others
-        self.rewards.feet_air_time.weight = 0.25
+        self.rewards.feet_air_time.weight = 1.0
         self.rewards.feet_air_time.func = mdp.feet_air_time_positive_biped
         self.rewards.feet_air_time.params["sensor_cfg"].body_names = [self.foot_link_name]
-        self.rewards.feet_air_time.params["threshold"] = 0.4
-        self.rewards.foot_contact.weight = 0
+        self.rewards.feet_air_time.params["threshold"] = 0.6
+        self.rewards.feet_contact.weight = 0
         self.rewards.feet_slide.weight = -0.25
         self.rewards.feet_slide.params["sensor_cfg"].body_names = [self.foot_link_name]
         self.rewards.feet_slide.params["asset_cfg"].body_names = [self.foot_link_name]
