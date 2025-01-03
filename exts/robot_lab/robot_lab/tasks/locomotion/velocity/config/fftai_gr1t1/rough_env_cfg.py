@@ -1,3 +1,6 @@
+# Copyright (c) 2024-2025 Ziqi Fan
+# SPDX-License-Identifier: Apache-2.0
+
 from omni.isaac.lab.utils import configclass
 
 import robot_lab.tasks.locomotion.velocity.mdp as mdp

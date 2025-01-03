@@ -1,3 +1,6 @@
+# Copyright (c) 2024-2025 Ziqi Fan
+# SPDX-License-Identifier: Apache-2.0
+
 import glob
 
 from omni.isaac.lab.managers import EventTermCfg as EventTerm
