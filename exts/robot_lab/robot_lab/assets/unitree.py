@@ -52,8 +52,8 @@ UNITREE_A1_CFG = ArticulationCfg(
     ),
     soft_joint_pos_limit_factor=0.9,
     actuators={
-        "base_legs": DCMotorCfg(
-            joint_names_expr=[".*_hip_joint", ".*_thigh_joint", ".*_calf_joint"],
+        "legs": DCMotorCfg(
+            joint_names_expr=[".*_joint"],
             effort_limit=33.5,
             saturation_effort=33.5,
             velocity_limit=21.0,
@@ -99,33 +99,22 @@ UNITREE_GO2W_CFG = ArticulationCfg(
     ),
     soft_joint_pos_limit_factor=0.9,
     actuators={
-        "base_legs": DCMotorCfg(
-            saturation_effort=30,
-            joint_names_expr=[".*_hip_joint", ".*_thigh_joint", ".*_calf_joint", ".*_foot_joint"],
-            effort_limit={
-                ".*_hip_joint": 23.7,
-                ".*_thigh_joint": 23.7,
-                ".*_calf_joint": 35.55,
-                ".*_foot_joint": 7.0,
-            },
-            velocity_limit={
-                ".*_hip_joint": 30.1,
-                ".*_thigh_joint": 30.1,
-                ".*_calf_joint": 20.07,
-                ".*_foot_joint": 30.1,
-            },
-            stiffness={
-                ".*_hip_joint": 20.0,
-                ".*_thigh_joint": 20.0,
-                ".*_calf_joint": 20.0,
-                ".*_foot_joint": 0.0,
-            },
-            damping={
-                ".*_hip_joint": 0.5,
-                ".*_thigh_joint": 0.5,
-                ".*_calf_joint": 0.5,
-                ".*_foot_joint": 0.5,
-            },
+        "legs": DCMotorCfg(
+            joint_names_expr=["^(?!.*_foot_joint).*"],
+            effort_limit=33.5,
+            saturation_effort=33.5,
+            velocity_limit=21.0,
+            stiffness=20.0,
+            damping=0.5,
+            friction=0.0,
+        ),
+        "wheels": DCMotorCfg(
+            joint_names_expr=[".*_foot_joint"],
+            effort_limit=10.0,
+            saturation_effort=10.0,
+            velocity_limit=38.0,
+            stiffness=0.0,
+            damping=0.5,
             friction=0.0,
         ),
     },
