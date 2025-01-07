@@ -6,10 +6,9 @@ from __future__ import annotations
 import torch
 from typing import TYPE_CHECKING
 
-from omni.isaac.lab.assets import Articulation, RigidObject
+from omni.isaac.lab.assets import RigidObject
 from omni.isaac.lab.managers import SceneEntityCfg
-from omni.isaac.lab.sensors import ContactSensor, RayCaster
-from omni.isaac.lab.utils.math import quat_rotate_inverse, yaw_quat
+from omni.isaac.lab.sensors import ContactSensor
 
 if TYPE_CHECKING:
     from omni.isaac.lab.envs import ManagerBasedRLEnv

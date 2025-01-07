@@ -293,8 +293,8 @@ class EventCfg:
         mode="reset",
         params={
             "asset_cfg": SceneEntityCfg("robot", joint_names=".*"),
-            "stiffness_distribution_params": (0.8, 1.2),
-            "damping_distribution_params": (0.8, 1.2),
+            "stiffness_distribution_params": (0.5, 2.0),
+            "damping_distribution_params": (0.5, 2.0),
             "operation": "scale",
             "distribution": "log_uniform",
         },
@@ -400,6 +400,8 @@ class RewardsCfg:
         params={"asset_cfg": SceneEntityCfg("robot", joint_names=".*")},
     )
     action_rate_l2 = RewTerm(func=mdp.action_rate_l2, weight=0.0)
+    # smoothness_1 = RewTerm(func=mdp.smoothness_1, weight=0.0)
+    # smoothness_2 = RewTerm(func=mdp.smoothness_2, weight=0.0)
     # UNUESD action_l2
 
     # Contact sensor
@@ -423,13 +425,38 @@ class RewardsCfg:
     )
 
     # Others
+    # feet_air_time = RewTerm(
+    #     func=mdp.feet_air_time,
+    #     weight=0.0,
+    #     params={
+    #         "command_name": "base_velocity",
+    #         "sensor_cfg": SceneEntityCfg("contact_forces", body_names=""),
+    #         "threshold": 0.5,
+    #     },
+    # )
+
     feet_air_time = RewTerm(
         func=mdp.feet_air_time,
         weight=0.0,
         params={
             "command_name": "base_velocity",
+            "mode_time": 0.3,
+            "velocity_threshold": 0.5,
+            "asset_cfg": SceneEntityCfg("robot"),
             "sensor_cfg": SceneEntityCfg("contact_forces", body_names=""),
-            "threshold": 0.5,
+        },
+    )
+
+    feet_gait = RewTerm(
+        func=mdp.GaitReward,
+        weight=0.0,
+        params={
+            "std": 0.1,
+            "max_err": 0.2,
+            "velocity_threshold": 0.5,
+            "synced_feet_pair_names": (("", ""), ("", "")),
+            "asset_cfg": SceneEntityCfg("robot"),
+            "sensor_cfg": SceneEntityCfg("contact_forces"),
         },
     )
 
@@ -475,15 +502,23 @@ class RewardsCfg:
 
     joint_power = RewTerm(func=mdp.joint_power, weight=0.0)
 
-    smoothness_1 = RewTerm(func=mdp.smoothness_1, weight=0.0)
-    # smoothness_2 = RewTerm(func=mdp.smoothness_2, weight=-0.01)
-
     stand_still_when_zero_command = RewTerm(
         func=mdp.stand_still_when_zero_command,
         weight=0.0,
         params={
             "command_name": "base_velocity",
             "asset_cfg": SceneEntityCfg("robot", joint_names=".*"),
+        },
+    )
+
+    joint_position_penalty = RewTerm(
+        func=mdp.joint_position_penalty,
+        weight=0.0,
+        params={
+            "command_name": "base_velocity",
+            "asset_cfg": SceneEntityCfg("robot", joint_names=".*"),
+            "stand_still_scale": 1.0,
+            "velocity_threshold": 0.1,
         },
     )
 
