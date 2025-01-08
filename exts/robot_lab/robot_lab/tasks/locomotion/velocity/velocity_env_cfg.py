@@ -440,8 +440,8 @@ class RewardsCfg:
         weight=0.0,
         params={
             "command_name": "base_velocity",
-            "mode_time": 0.3,
-            "velocity_threshold": 0.5,
+            "mode_time": 0.5,
+            "velocity_threshold": 0.1,
             "asset_cfg": SceneEntityCfg("robot"),
             "sensor_cfg": SceneEntityCfg("contact_forces", body_names=""),
         },
@@ -453,7 +453,7 @@ class RewardsCfg:
         params={
             "std": 0.1,
             "max_err": 0.2,
-            "velocity_threshold": 0.5,
+            "velocity_threshold": 0.1,
             "synced_feet_pair_names": (("", ""), ("", "")),
             "asset_cfg": SceneEntityCfg("robot"),
             "sensor_cfg": SceneEntityCfg("contact_forces"),
@@ -500,7 +500,24 @@ class RewardsCfg:
         },
     )
 
-    joint_power = RewTerm(func=mdp.joint_power, weight=0.0)
+    # feet_distance_xy_exp = RewTerm(
+    #     func=mdp.feet_distance_xy_exp,
+    #     weight=0.0,
+    #     params={
+    #         "std": math.sqrt(0.25),
+    #         "asset_cfg": SceneEntityCfg("robot", body_names=""),
+    #         "stance_length": float,
+    #         "stance_width": float,
+    #     },
+    # )
+
+    joint_power = RewTerm(
+        func=mdp.joint_power,
+        weight=0.0,
+        params={
+            "asset_cfg": SceneEntityCfg("robot", joint_names=".*"),
+        },
+    )
 
     stand_still_when_zero_command = RewTerm(
         func=mdp.stand_still_when_zero_command,
@@ -517,7 +534,7 @@ class RewardsCfg:
         params={
             "command_name": "base_velocity",
             "asset_cfg": SceneEntityCfg("robot", joint_names=".*"),
-            "stand_still_scale": 1.0,
+            "stand_still_scale": 5.0,
             "velocity_threshold": 0.1,
         },
     )

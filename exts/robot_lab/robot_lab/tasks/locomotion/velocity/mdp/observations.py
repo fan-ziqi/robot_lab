@@ -10,7 +10,7 @@ from omni.isaac.lab.assets import Articulation
 from omni.isaac.lab.managers import SceneEntityCfg
 
 if TYPE_CHECKING:
-    from omni.isaac.lab.envs import ManagerBasedEnv
+    from omni.isaac.lab.envs import ManagerBasedEnv, ManagerBasedRLEnv
 
 
 def joint_pos_rel_without_wheel(
@@ -24,3 +24,11 @@ def joint_pos_rel_without_wheel(
     joint_pos_rel = asset.data.joint_pos[:, asset_cfg.joint_ids] - asset.data.default_joint_pos[:, asset_cfg.joint_ids]
     joint_pos_rel[:, wheel_asset_cfg.joint_ids] = 0
     return joint_pos_rel
+
+
+def phase(env: ManagerBasedRLEnv, cycle_time: float) -> torch.Tensor:
+    if not hasattr(env, "episode_length_buf") or env.episode_length_buf is None:
+        env.episode_length_buf = torch.zeros(env.num_envs, device=env.device, dtype=torch.long)
+    phase = env.episode_length_buf[:, None] * env.step_dt / cycle_time
+    phase_tensor = torch.cat([torch.sin(2 * torch.pi * phase), torch.cos(2 * torch.pi * phase)], dim=-1)
+    return phase_tensor

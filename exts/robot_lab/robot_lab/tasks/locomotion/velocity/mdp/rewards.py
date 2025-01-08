@@ -54,7 +54,7 @@ def joint_position_penalty(
     cmd = torch.linalg.norm(env.command_manager.get_command(command_name), dim=1)
     body_vel = torch.linalg.norm(asset.data.root_com_lin_vel_b[:, :2], dim=1)
     reward = torch.linalg.norm((asset.data.joint_pos - asset.data.default_joint_pos), dim=1)
-    return torch.where(torch.logical_or(cmd > 0.0, body_vel > velocity_threshold), reward, stand_still_scale * reward)
+    return torch.where(torch.logical_or(cmd > 0.1, body_vel > velocity_threshold), reward, stand_still_scale * reward)
 
 
 class GaitReward(ManagerTermBase):
@@ -124,7 +124,7 @@ class GaitReward(ManagerTermBase):
         cmd = torch.norm(env.command_manager.get_command("base_velocity"), dim=1)
         body_vel = torch.linalg.norm(self.asset.data.root_com_lin_vel_b[:, :2], dim=1)
         return torch.where(
-            torch.logical_or(cmd > 0.0, body_vel > self.velocity_threshold), sync_reward * async_reward, 0.0
+            torch.logical_or(cmd > 0.1, body_vel > self.velocity_threshold), sync_reward * async_reward, 0.0
         )
 
     """
@@ -214,6 +214,44 @@ def feet_distance_y_exp(
         [stance_width_tensor / 2, -stance_width_tensor / 2, stance_width_tensor / 2, -stance_width_tensor / 2], dim=1
     )
     stance_diff = torch.square(desired_ys - footsteps_in_body_frame[:, :, 1])
+    return torch.exp(-torch.sum(stance_diff, dim=1) / std)
+
+
+def feet_distance_xy_exp(
+    env: ManagerBasedRLEnv, stance_width: float, stance_length: float, std: float, asset_cfg: SceneEntityCfg = SceneEntityCfg("robot")
+) -> torch.Tensor:
+    asset: RigidObject = env.scene[asset_cfg.name]
+
+    # Compute the current footstep positions relative to the root
+    cur_footsteps_translated = asset.data.body_link_pos_w[:, asset_cfg.body_ids, :] - asset.data.root_link_pos_w[
+        :, :
+    ].unsqueeze(1)
+
+    footsteps_in_body_frame = torch.zeros(env.num_envs, 4, 3, device=env.device)
+    for i in range(4):
+        footsteps_in_body_frame[:, i, :] = math_utils.quat_apply(
+            math_utils.quat_conjugate(asset.data.root_link_quat_w), cur_footsteps_translated[:, i, :]
+        )
+
+    # Desired x and y positions for each foot
+    stance_width_tensor = stance_width * torch.ones([env.num_envs, 1], device=env.device)
+    stance_length_tensor = stance_length * torch.ones([env.num_envs, 1], device=env.device)
+
+    desired_xs = torch.cat(
+        [stance_length_tensor / 2, stance_length_tensor / 2, -stance_length_tensor / 2, -stance_length_tensor / 2], dim=1
+    )
+    desired_ys = torch.cat(
+        [stance_width_tensor / 2, -stance_width_tensor / 2, stance_width_tensor / 2, -stance_width_tensor / 2], dim=1
+    )
+
+    # Compute differences in x and y
+    stance_diff_x = torch.square(desired_xs - footsteps_in_body_frame[:, :, 0])
+    stance_diff_y = torch.square(desired_ys - footsteps_in_body_frame[:, :, 1])
+    # print(footsteps_in_body_frame[0, 0, 0], footsteps_in_body_frame[0, 1, 0], footsteps_in_body_frame[0, 2, 0], footsteps_in_body_frame[0, 3, 0])
+    print(footsteps_in_body_frame[0, 0, 1], footsteps_in_body_frame[0, 1, 1], footsteps_in_body_frame[0, 2, 1], footsteps_in_body_frame[0, 3, 1])
+
+    # Combine x and y differences and compute the exponential penalty
+    stance_diff = stance_diff_x + stance_diff_y
     return torch.exp(-torch.sum(stance_diff, dim=1) / std)
 
 
