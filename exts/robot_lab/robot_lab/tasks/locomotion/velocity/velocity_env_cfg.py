@@ -441,7 +441,7 @@ class RewardsCfg:
         params={
             "command_name": "base_velocity",
             "mode_time": 0.5,
-            "velocity_threshold": 0.1,
+            "velocity_threshold": 0.2,
             "asset_cfg": SceneEntityCfg("robot"),
             "sensor_cfg": SceneEntityCfg("contact_forces", body_names=""),
         },
@@ -453,7 +453,7 @@ class RewardsCfg:
         params={
             "std": 0.1,
             "max_err": 0.2,
-            "velocity_threshold": 0.1,
+            "velocity_threshold": 0.2,
             "synced_feet_pair_names": (("", ""), ("", "")),
             "asset_cfg": SceneEntityCfg("robot"),
             "sensor_cfg": SceneEntityCfg("contact_forces"),
@@ -534,8 +534,8 @@ class RewardsCfg:
         params={
             "command_name": "base_velocity",
             "asset_cfg": SceneEntityCfg("robot", joint_names=".*"),
-            "stand_still_scale": 5.0,
-            "velocity_threshold": 0.1,
+            "stand_still_scale": 10.0,
+            "velocity_threshold": 0.2,
         },
     )
 
