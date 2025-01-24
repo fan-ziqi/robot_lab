@@ -1,7 +1,7 @@
 # robot_lab
 
-[![IsaacSim](https://img.shields.io/badge/IsaacSim-4.2.0-silver.svg)](https://docs.omniverse.nvidia.com/isaacsim/latest/overview.html)
-[![Isaac Lab](https://img.shields.io/badge/IsaacLab-1.2.0-silver)](https://isaac-sim.github.io/IsaacLab)
+[![IsaacSim](https://img.shields.io/badge/IsaacSim-4.3.0-silver.svg)](https://docs.omniverse.nvidia.com/isaacsim/latest/overview.html)
+[![Isaac Lab](https://img.shields.io/badge/IsaacLab-1.3.0-silver)](https://isaac-sim.github.io/IsaacLab)
 [![Python](https://img.shields.io/badge/python-3.10-blue.svg)](https://docs.python.org/3/whatsnew/3.10.html)
 [![Linux platform](https://img.shields.io/badge/platform-linux--64-orange.svg)](https://releases.ubuntu.com/20.04/)
 [![Windows platform](https://img.shields.io/badge/platform-windows--64-orange.svg)](https://www.microsoft.com/en-us/)
@@ -182,7 +182,7 @@ python scripts/rsl_rl/base/train.py --task RobotLab-Isaac-Velocity-Flat-Unitree-
 python scripts/rsl_rl/base/play.py --task RobotLab-Isaac-Velocity-Flat-Unitree-A1-v0
 ```
 
-Unitree Go2W (Unvalible for now)
+Unitree Go2W
 
 ```bash
 # Train
@@ -369,7 +369,7 @@ Please cite the following if you use this code or parts of it:
 ```
 @software{fan-ziqi2024robot_lab,
   author = {fan-ziqi},
-  title = {{robot_lab: An extension project based on Isaac Lab.}},
+  title = {robot_lab: An extension project based on Isaac Lab.},
   url = {https://github.com/fan-ziqi/robot_lab},
   year = {2024}
 }
