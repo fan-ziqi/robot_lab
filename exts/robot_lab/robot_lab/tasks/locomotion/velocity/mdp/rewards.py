@@ -38,7 +38,9 @@ def stand_still_when_zero_command(
     # compute out of limits constraints
     diff_angle = asset.data.joint_pos[:, asset_cfg.joint_ids] - asset.data.default_joint_pos[:, asset_cfg.joint_ids]
     command = torch.norm(env.command_manager.get_command(command_name)[:, :2], dim=1) < 0.1
-    return torch.sum(torch.abs(diff_angle), dim=1) * command# * torch.clamp(-asset.data.projected_gravity_b[:, 2], 0, 1)
+    return (
+        torch.sum(torch.abs(diff_angle), dim=1) * command  # * torch.clamp(-asset.data.projected_gravity_b[:, 2], 0, 1)
+    )
 
 
 def joint_position_penalty(
@@ -54,7 +56,9 @@ def joint_position_penalty(
     cmd = torch.linalg.norm(env.command_manager.get_command(command_name), dim=1)
     body_vel = torch.linalg.norm(asset.data.root_com_lin_vel_b[:, :2], dim=1)
     reward = torch.linalg.norm((asset.data.joint_pos - asset.data.default_joint_pos), dim=1)
-    return torch.where(torch.logical_or(cmd > 0.1, body_vel > velocity_threshold), reward, stand_still_scale * reward)# * torch.clamp(-asset.data.projected_gravity_b[:, 2], 0, 1)
+    return torch.where(
+        torch.logical_or(cmd > 0.1, body_vel > velocity_threshold), reward, stand_still_scale * reward
+    )  # * torch.clamp(-asset.data.projected_gravity_b[:, 2], 0, 1)
 
 
 class GaitReward(ManagerTermBase):
@@ -218,7 +222,11 @@ def feet_distance_y_exp(
 
 
 def feet_distance_xy_exp(
-    env: ManagerBasedRLEnv, stance_width: float, stance_length: float, std: float, asset_cfg: SceneEntityCfg = SceneEntityCfg("robot")
+    env: ManagerBasedRLEnv,
+    stance_width: float,
+    stance_length: float,
+    std: float,
+    asset_cfg: SceneEntityCfg = SceneEntityCfg("robot"),
 ) -> torch.Tensor:
     asset: RigidObject = env.scene[asset_cfg.name]
 
@@ -238,7 +246,8 @@ def feet_distance_xy_exp(
     stance_length_tensor = stance_length * torch.ones([env.num_envs, 1], device=env.device)
 
     desired_xs = torch.cat(
-        [stance_length_tensor / 2, stance_length_tensor / 2, -stance_length_tensor / 2, -stance_length_tensor / 2], dim=1
+        [stance_length_tensor / 2, stance_length_tensor / 2, -stance_length_tensor / 2, -stance_length_tensor / 2],
+        dim=1,
     )
     desired_ys = torch.cat(
         [stance_width_tensor / 2, -stance_width_tensor / 2, stance_width_tensor / 2, -stance_width_tensor / 2], dim=1
@@ -248,7 +257,12 @@ def feet_distance_xy_exp(
     stance_diff_x = torch.square(desired_xs - footsteps_in_body_frame[:, :, 0])
     stance_diff_y = torch.square(desired_ys - footsteps_in_body_frame[:, :, 1])
     # print(footsteps_in_body_frame[0, 0, 0], footsteps_in_body_frame[0, 1, 0], footsteps_in_body_frame[0, 2, 0], footsteps_in_body_frame[0, 3, 0])
-    print(footsteps_in_body_frame[0, 0, 1], footsteps_in_body_frame[0, 1, 1], footsteps_in_body_frame[0, 2, 1], footsteps_in_body_frame[0, 3, 1])
+    print(
+        footsteps_in_body_frame[0, 0, 1],
+        footsteps_in_body_frame[0, 1, 1],
+        footsteps_in_body_frame[0, 2, 1],
+        footsteps_in_body_frame[0, 3, 1],
+    )
 
     # Combine x and y differences and compute the exponential penalty
     stance_diff = stance_diff_x + stance_diff_y
@@ -256,7 +270,12 @@ def feet_distance_xy_exp(
 
 
 def feet_height_exp(
-    env: ManagerBasedRLEnv, command_name: str, asset_cfg: SceneEntityCfg, target_height: float, std: float, tanh_mult: float
+    env: ManagerBasedRLEnv,
+    command_name: str,
+    asset_cfg: SceneEntityCfg,
+    target_height: float,
+    std: float,
+    tanh_mult: float,
 ) -> torch.Tensor:
     """Reward the swinging feet for clearing a specified height off the ground"""
     asset: RigidObject = env.scene[asset_cfg.name]

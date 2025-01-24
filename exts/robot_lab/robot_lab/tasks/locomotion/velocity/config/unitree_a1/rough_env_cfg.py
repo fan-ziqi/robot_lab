@@ -19,7 +19,7 @@ class UnitreeA1RoughEnvCfg(LocomotionVelocityRoughEnvCfg):
     base_link_name = "trunk"
     foot_link_name = ".*_foot"
 
-    recover_mode = False
+    recover_mode = False  # Unvalible now
 
     def __post_init__(self):
         # post init of parent
