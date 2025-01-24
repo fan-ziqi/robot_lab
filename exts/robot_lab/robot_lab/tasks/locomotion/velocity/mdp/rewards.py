@@ -38,7 +38,7 @@ def stand_still_when_zero_command(
     # compute out of limits constraints
     diff_angle = asset.data.joint_pos[:, asset_cfg.joint_ids] - asset.data.default_joint_pos[:, asset_cfg.joint_ids]
     command = torch.norm(env.command_manager.get_command(command_name)[:, :2], dim=1) < 0.1
-    return torch.sum(torch.abs(diff_angle), dim=1) * command
+    return torch.sum(torch.abs(diff_angle), dim=1) * command# * torch.clamp(-asset.data.projected_gravity_b[:, 2], 0, 1)
 
 
 def joint_position_penalty(
@@ -54,7 +54,7 @@ def joint_position_penalty(
     cmd = torch.linalg.norm(env.command_manager.get_command(command_name), dim=1)
     body_vel = torch.linalg.norm(asset.data.root_com_lin_vel_b[:, :2], dim=1)
     reward = torch.linalg.norm((asset.data.joint_pos - asset.data.default_joint_pos), dim=1)
-    return torch.where(torch.logical_or(cmd > 0.1, body_vel > velocity_threshold), reward, stand_still_scale * reward)
+    return torch.where(torch.logical_or(cmd > 0.1, body_vel > velocity_threshold), reward, stand_still_scale * reward)# * torch.clamp(-asset.data.projected_gravity_b[:, 2], 0, 1)
 
 
 class GaitReward(ManagerTermBase):
@@ -256,14 +256,16 @@ def feet_distance_xy_exp(
 
 
 def feet_height_exp(
-    env: ManagerBasedRLEnv, asset_cfg: SceneEntityCfg, target_height: float, std: float, tanh_mult: float
+    env: ManagerBasedRLEnv, command_name: str, asset_cfg: SceneEntityCfg, target_height: float, std: float, tanh_mult: float
 ) -> torch.Tensor:
     """Reward the swinging feet for clearing a specified height off the ground"""
     asset: RigidObject = env.scene[asset_cfg.name]
     foot_z_target_error = torch.square(asset.data.body_pos_w[:, asset_cfg.body_ids, 2] - target_height)
     foot_velocity_tanh = torch.tanh(tanh_mult * torch.norm(asset.data.body_lin_vel_w[:, asset_cfg.body_ids, :2], dim=2))
-    reward = foot_z_target_error * foot_velocity_tanh
-    return torch.exp(-torch.sum(reward, dim=1) / std)
+    reward = torch.sum(foot_z_target_error * foot_velocity_tanh, dim=1)
+    # no reward for zero command
+    reward *= torch.norm(env.command_manager.get_command(command_name)[:, :2], dim=1) > 0.1
+    return torch.exp(-reward / std)
 
 
 # def smoothness_1(env: ManagerBasedRLEnv) -> torch.Tensor:
@@ -294,11 +296,12 @@ def wheel_spin_in_air_penalty(
     return reward
 
 
-def upward(env: ManagerBasedRLEnv, asset_cfg: SceneEntityCfg = SceneEntityCfg("robot")) -> torch.Tensor:
+def upward(env: ManagerBasedRLEnv, std: float, asset_cfg: SceneEntityCfg = SceneEntityCfg("robot")) -> torch.Tensor:
     """Penalize z-axis base linear velocity using L2 squared kernel."""
     # extract the used quantities (to enable type-hinting)
     asset: RigidObject = env.scene[asset_cfg.name]
-    return 1 - asset.data.projected_gravity_b[:, 2]
+    gravity_error = asset.data.projected_gravity_b[:, 2] - 1
+    return torch.exp(-gravity_error / std**2)
 
 
 def track_lin_vel_world_xy_exp(

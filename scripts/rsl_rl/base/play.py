@@ -81,9 +81,10 @@ def main():
     # disable randomization for play
     env_cfg.observations.policy.enable_corruption = False
     # remove random pushing
-    env_cfg.events.base_external_force_torque = None
+    env_cfg.events.randomize_apply_external_force_torque = None
     env_cfg.events.push_robot = None
 
+    env_cfg.commands.base_velocity.rel_standing_envs = 0.0
     env_cfg.commands.base_velocity.ranges.lin_vel_x = (0.5, 1.5)
     env_cfg.commands.base_velocity.ranges.lin_vel_y = (0.0, 0.0)
     env_cfg.commands.base_velocity.ranges.ang_vel_z = (0.0, 0.0)

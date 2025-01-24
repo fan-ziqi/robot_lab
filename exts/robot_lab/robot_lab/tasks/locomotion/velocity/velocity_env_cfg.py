@@ -76,6 +76,14 @@ class MySceneCfg(InteractiveSceneCfg):
         debug_vis=False,
         mesh_prim_paths=["/World/ground"],
     )
+    height_scanner_base = RayCasterCfg(
+        prim_path="{ENV_REGEX_NS}/Robot/base",
+        offset=RayCasterCfg.OffsetCfg(pos=(0.0, 0.0, 20.0)),
+        attach_yaw_only=True,
+        pattern_cfg=patterns.GridPatternCfg(resolution=0.05, size=(0.1, 0.1)),
+        debug_vis=False,
+        mesh_prim_paths=["/World/ground"],
+    )
     contact_forces = ContactSensorCfg(prim_path="{ENV_REGEX_NS}/Robot/.*", history_length=3, track_air_time=True)
     # lights
     sky_light = AssetBaseCfg(
@@ -99,13 +107,13 @@ class CommandsCfg:
     base_velocity = mdp.UniformVelocityCommandCfg(
         asset_name="robot",
         resampling_time_range=(10.0, 10.0),
-        rel_standing_envs=0.02,
+        rel_standing_envs=0.1,
         rel_heading_envs=1.0,
         heading_command=True,
         heading_control_stiffness=0.5,
         debug_vis=True,
         ranges=mdp.UniformVelocityCommandCfg.Ranges(
-            lin_vel_x=(-1.5, 1.5), lin_vel_y=(-1.5, 1.5), ang_vel_z=(-1.5, 1.5), heading=(-math.pi, math.pi)
+            lin_vel_x=(-1.0, 1.0), lin_vel_y=(-1.0, 1.0), ang_vel_z=(-1.0, 1.0), heading=(-math.pi, math.pi)
         ),
     )
 
@@ -354,7 +362,7 @@ class RewardsCfg:
         weight=0.0,
         params={
             "asset_cfg": SceneEntityCfg("robot", body_names=""),
-            "sensor_cfg": SceneEntityCfg("height_scanner"),
+            "sensor_cfg": SceneEntityCfg("height_scanner_base"),
             "target_height": 0.0,
         },
     )
@@ -440,8 +448,8 @@ class RewardsCfg:
         weight=0.0,
         params={
             "command_name": "base_velocity",
-            "mode_time": 0.5,
-            "velocity_threshold": 0.2,
+            "mode_time": 0.3,
+            "velocity_threshold": 0.5,
             "asset_cfg": SceneEntityCfg("robot"),
             "sensor_cfg": SceneEntityCfg("contact_forces", body_names=""),
         },
@@ -451,9 +459,9 @@ class RewardsCfg:
         func=mdp.GaitReward,
         weight=0.0,
         params={
-            "std": 0.1,
+            "std": math.sqrt(0.25),
             "max_err": 0.2,
-            "velocity_threshold": 0.2,
+            "velocity_threshold": 0.5,
             "synced_feet_pair_names": (("", ""), ("", "")),
             "asset_cfg": SceneEntityCfg("robot"),
             "sensor_cfg": SceneEntityCfg("contact_forces"),
@@ -486,6 +494,7 @@ class RewardsCfg:
             "std": math.sqrt(0.25),
             "tanh_mult": 2.0,
             "target_height": float,
+            "command_name": "base_velocity",
             "asset_cfg": SceneEntityCfg("robot", body_names=""),
         },
     )
@@ -534,8 +543,8 @@ class RewardsCfg:
         params={
             "command_name": "base_velocity",
             "asset_cfg": SceneEntityCfg("robot", joint_names=".*"),
-            "stand_still_scale": 10.0,
-            "velocity_threshold": 0.2,
+            "stand_still_scale": 5.0,
+            "velocity_threshold": 0.5,
         },
     )
 
@@ -548,7 +557,13 @@ class RewardsCfg:
         },
     )
 
-    upward = RewTerm(func=mdp.upward, weight=0.0)
+    upward = RewTerm(
+        func=mdp.upward,
+        weight=0.0,
+        params={
+            "std": math.sqrt(0.25),
+        },
+    )
 
 
 @configclass

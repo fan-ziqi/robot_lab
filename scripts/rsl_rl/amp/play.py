@@ -81,8 +81,10 @@ def main():
     # disable randomization for play
     env_cfg.observations.policy.enable_corruption = False
     # remove random pushing
-    env_cfg.events.base_external_force_torque = None
+    env_cfg.events.randomize_apply_external_force_torque = None
     env_cfg.events.push_robot = None
+
+    env_cfg.commands.base_velocity.rel_standing_envs = 0.0
 
     # specify directory for logging experiments
     log_root_path = os.path.join("logs", "rsl_rl", agent_cfg.experiment_name)

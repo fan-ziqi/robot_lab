@@ -11,7 +11,6 @@ from robot_lab.tasks.locomotion.velocity.velocity_env_cfg import ActionsCfg, Loc
 ##
 # Pre-defined configs
 ##
-# use local assets
 from robot_lab.assets.unitree import UNITREE_GO2W_CFG  # isort: skip
 
 
@@ -59,9 +58,10 @@ class UnitreeGo2WRoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         super().__post_init__()
 
         # ------------------------------Sence------------------------------
-        # switch robot to unitree-a1
+        # switch robot to unitree go2w
         self.scene.robot = UNITREE_GO2W_CFG.replace(prim_path="{ENV_REGEX_NS}/Robot")
         self.scene.height_scanner.prim_path = "{ENV_REGEX_NS}/Robot/" + self.base_link_name
+        self.scene.height_scanner_base.prim_path = "{ENV_REGEX_NS}/Robot/" + self.base_link_name
         # scale down the terrains because the robot is small
         self.scene.terrain.terrain_generator.sub_terrains["boxes"].grid_height_range = (0.025, 0.1)
         self.scene.terrain.terrain_generator.sub_terrains["random_rough"].noise_range = (0.01, 0.06)
@@ -106,16 +106,16 @@ class UnitreeGo2WRoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         self.rewards.lin_vel_z_l2.weight = -2.0
         self.rewards.ang_vel_xy_l2.weight = -0.05
         self.rewards.flat_orientation_l2.weight = 0
-        self.rewards.base_height_l2.weight = -5.0
+        self.rewards.base_height_l2.weight = 0
         self.rewards.base_height_l2.params["target_height"] = 0.35
         self.rewards.base_height_l2.params["asset_cfg"].body_names = [self.base_link_name]
         self.rewards.body_lin_acc_l2.weight = 0
         self.rewards.body_lin_acc_l2.params["asset_cfg"].body_names = [self.base_link_name]
 
         # Joint penaltie
-        self.rewards.joint_torques_l2.weight = -2e-4
+        self.rewards.joint_torques_l2.weight = -2.5e-5
         self.rewards.joint_torques_l2.params["asset_cfg"].joint_names = [f"^(?!{self.wheel_joint_name}).*"]
-        self.rewards.joint_torques_wheel_l2.weight = -5e-4
+        self.rewards.joint_torques_wheel_l2.weight = -2.5e-4
         self.rewards.joint_torques_wheel_l2.params["asset_cfg"].joint_names = [self.wheel_joint_name]
         # UNUESD self.rewards.joint_vel_l1.weight = 0.0
         self.rewards.joint_vel_l2.weight = 0
@@ -130,9 +130,10 @@ class UnitreeGo2WRoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         self.rewards.joint_pos_limits.weight = -5.0
         self.rewards.joint_pos_limits.params["asset_cfg"].joint_names = [f"^(?!{self.wheel_joint_name}).*"]
         self.rewards.joint_vel_limits.weight = -5.0
+        self.rewards.joint_vel_limits.params["asset_cfg"].joint_names = [self.wheel_joint_name]
 
         # Action penalties
-        self.rewards.action_rate_l2.weight = 0
+        self.rewards.action_rate_l2.weight = -0.01
         # UNUESD self.rewards.action_l2.weight = 0.0
 
         # Contact sensor
@@ -142,8 +143,8 @@ class UnitreeGo2WRoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         self.rewards.contact_forces.params["sensor_cfg"].body_names = [self.foot_link_name]
 
         # Velocity-tracking rewards
-        self.rewards.track_lin_vel_xy_exp.weight = 1.5
-        self.rewards.track_ang_vel_z_exp.weight = 0.75
+        self.rewards.track_lin_vel_xy_exp.weight = 3.0
+        self.rewards.track_ang_vel_z_exp.weight = 1.5
 
         # Others
         self.rewards.feet_air_time.weight = 0
@@ -153,14 +154,18 @@ class UnitreeGo2WRoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         self.rewards.feet_slide.weight = 0
         self.rewards.feet_slide.params["sensor_cfg"].body_names = [self.foot_link_name]
         self.rewards.feet_slide.params["asset_cfg"].body_names = [self.foot_link_name]
-        self.rewards.joint_power.weight = 0
+        self.rewards.joint_power.weight = -2e-5
+        self.rewards.joint_power.params["asset_cfg"].joint_names = [f"^(?!{self.wheel_joint_name}).*"]
         self.rewards.stand_still_when_zero_command.weight = -0.5
         self.rewards.stand_still_when_zero_command.params["asset_cfg"].joint_names = [f"^(?!{self.wheel_joint_name}).*"]
-        self.rewards.joint_position_penalty.weight = -0.7
+        self.rewards.joint_position_penalty.weight = -0.5
         self.rewards.joint_position_penalty.params["asset_cfg"].joint_names = [f"^(?!{self.wheel_joint_name}).*"]
+        self.rewards.joint_position_penalty.params["velocity_threshold"] = 100
         self.rewards.feet_height_exp.weight = 0
         self.rewards.feet_height_exp.params["target_height"] = 0.1
         self.rewards.feet_height_exp.params["asset_cfg"].body_names = [self.foot_link_name]
+        self.rewards.feet_gait.weight = 3.0
+        self.rewards.feet_gait.params["synced_feet_pair_names"] = (("FL_foot", "RR_foot"), ("FR_foot", "RL_foot"))
         self.rewards.wheel_spin_in_air_penalty.weight = 0
         self.rewards.wheel_spin_in_air_penalty.params["sensor_cfg"].body_names = [self.foot_link_name]
         self.rewards.wheel_spin_in_air_penalty.params["asset_cfg"].joint_names = [self.wheel_joint_name]

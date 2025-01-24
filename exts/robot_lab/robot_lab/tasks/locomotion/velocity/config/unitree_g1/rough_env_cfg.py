@@ -111,6 +111,7 @@ class UnitreeG1RoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         # Scene
         self.scene.robot = G1_MINIMAL_CFG.replace(prim_path="{ENV_REGEX_NS}/Robot")
         self.scene.height_scanner.prim_path = "{ENV_REGEX_NS}/Robot/" + self.base_link_name
+        self.scene.height_scanner_base.prim_path = "{ENV_REGEX_NS}/Robot/" + self.base_link_name
 
         # Randomization
         self.events.randomize_rigid_body_mass.params["asset_cfg"].body_names = [self.base_link_name]
@@ -120,7 +121,7 @@ class UnitreeG1RoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         # Rewards
         self.rewards.lin_vel_z_l2.weight = 0.0
         self.rewards.undesired_contacts.weight = 0.0
-        self.rewards.flat_orientation_l2.weight = -1.0
+        self.rewards.flat_orientation_l2.weight = 0
         self.rewards.action_rate_l2.weight = -0.005
         self.rewards.joint_acc_l2.weight = -1.25e-7
         self.rewards.joint_acc_l2.params["asset_cfg"] = SceneEntityCfg(

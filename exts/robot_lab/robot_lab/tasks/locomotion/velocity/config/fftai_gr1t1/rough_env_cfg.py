@@ -26,6 +26,7 @@ class FFTAIGR1T1RoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         # switch robot to fftai-GR1T1
         self.scene.robot = FFTAI_GR1T1_CFG.replace(prim_path="{ENV_REGEX_NS}/Robot")
         self.scene.height_scanner.prim_path = "{ENV_REGEX_NS}/Robot/" + self.base_link_name
+        self.scene.height_scanner_base.prim_path = "{ENV_REGEX_NS}/Robot/" + self.base_link_name
 
         # ------------------------------Observations------------------------------
         # self.observations.policy.base_lin_vel = None
@@ -48,7 +49,7 @@ class FFTAIGR1T1RoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         # Root penalties
         self.rewards.lin_vel_z_l2.weight = 0
         self.rewards.ang_vel_xy_l2.weight = -0.05
-        self.rewards.flat_orientation_l2.weight = -1.0
+        self.rewards.flat_orientation_l2.weight = 0
         self.rewards.base_height_l2.weight = 0
         self.rewards.body_lin_acc_l2.weight = 0
 
