@@ -43,5 +43,5 @@ class FFTAIGR1T1FlatPPORunnerCfg(FFTAIGR1T1RoughPPORunnerCfg):
     def __post_init__(self):
         super().__post_init__()
 
-        self.max_iterations = 1000
+        self.max_iterations = 1500
         self.experiment_name = "gr1t1_flat"
