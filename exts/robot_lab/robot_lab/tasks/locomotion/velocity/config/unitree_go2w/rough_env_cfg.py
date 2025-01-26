@@ -115,7 +115,7 @@ class UnitreeGo2WRoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         # Joint penaltie
         self.rewards.joint_torques_l2.weight = -2.5e-5
         self.rewards.joint_torques_l2.params["asset_cfg"].joint_names = [f"^(?!{self.wheel_joint_name}).*"]
-        self.rewards.joint_torques_wheel_l2.weight = -2.5e-4
+        self.rewards.joint_torques_wheel_l2.weight = -2.5e-5
         self.rewards.joint_torques_wheel_l2.params["asset_cfg"].joint_names = [self.wheel_joint_name]
         # UNUESD self.rewards.joint_vel_l1.weight = 0.0
         self.rewards.joint_vel_l2.weight = 0
@@ -124,12 +124,12 @@ class UnitreeGo2WRoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         self.rewards.joint_vel_wheel_l2.params["asset_cfg"].joint_names = [self.wheel_joint_name]
         self.rewards.joint_acc_l2.weight = -2.5e-7
         self.rewards.joint_acc_l2.params["asset_cfg"].joint_names = [f"^(?!{self.wheel_joint_name}).*"]
-        self.rewards.joint_acc_wheel_l2.weight = -2.5e-9
+        self.rewards.joint_acc_wheel_l2.weight = -2.5e-10
         self.rewards.joint_acc_wheel_l2.params["asset_cfg"].joint_names = [self.wheel_joint_name]
         # self.rewards.create_joint_deviation_l1_rewterm("joint_deviation_l1", -0.1, [".*"])
         self.rewards.joint_pos_limits.weight = -5.0
         self.rewards.joint_pos_limits.params["asset_cfg"].joint_names = [f"^(?!{self.wheel_joint_name}).*"]
-        self.rewards.joint_vel_limits.weight = -5.0
+        self.rewards.joint_vel_limits.weight = -1.0
         self.rewards.joint_vel_limits.params["asset_cfg"].joint_names = [self.wheel_joint_name]
 
         # Action penalties
@@ -158,7 +158,7 @@ class UnitreeGo2WRoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         self.rewards.joint_power.params["asset_cfg"].joint_names = [f"^(?!{self.wheel_joint_name}).*"]
         self.rewards.stand_still_when_zero_command.weight = -0.5
         self.rewards.stand_still_when_zero_command.params["asset_cfg"].joint_names = [f"^(?!{self.wheel_joint_name}).*"]
-        self.rewards.joint_position_penalty.weight = 0
+        self.rewards.joint_position_penalty.weight = -0.5
         self.rewards.joint_position_penalty.params["asset_cfg"].joint_names = [f"^(?!{self.wheel_joint_name}).*"]
         self.rewards.joint_position_penalty.params["velocity_threshold"] = 100
         self.rewards.feet_height_exp.weight = 0
@@ -175,6 +175,6 @@ class UnitreeGo2WRoughEnvCfg(LocomotionVelocityRoughEnvCfg):
             self.disable_zero_weight_rewards()
 
         # ------------------------------Terminations------------------------------
-        self.terminations.illegal_contact.params["sensor_cfg"].body_names = [self.base_link_name, ".*_hip"]
+        self.terminations.illegal_contact.params["sensor_cfg"].body_names = [self.base_link_name]
 
         # ------------------------------Commands------------------------------
