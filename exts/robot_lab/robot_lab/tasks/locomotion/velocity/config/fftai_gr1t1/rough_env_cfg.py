@@ -76,7 +76,7 @@ class FFTAIGR1T1RoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         self.rewards.joint_torques_l2.weight = 0
         # UNUESD self.rewards.joint_vel_l1.weight = 0.0
         self.rewards.joint_vel_l2.weight = 0
-        self.rewards.joint_acc_l2.weight = -1.25e-7
+        self.rewards.joint_acc_l2.weight = -1e-8
         self.rewards.create_joint_deviation_l1_rewterm(
             "joint_deviation_other_l1", -0.2, ["head_.*", ".*_hip_yaw", ".*_hip_roll", ".*_shoulder_.*", ".*_wrist_.*"]
         )
@@ -88,7 +88,7 @@ class FFTAIGR1T1RoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         self.rewards.joint_vel_limits.weight = 0
 
         # Action penalties
-        self.rewards.action_rate_l2.weight = -0.005
+        self.rewards.action_rate_l2.weight = -0.0005
         # UNUESD self.rewards.action_l2.weight = 0.0
 
         # Contact sensor
