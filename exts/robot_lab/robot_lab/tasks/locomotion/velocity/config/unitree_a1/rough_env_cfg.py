@@ -79,7 +79,7 @@ class UnitreeA1RoughEnvCfg(LocomotionVelocityRoughEnvCfg):
 
         # Root penalties
         self.rewards.lin_vel_z_l2.weight = -2.0
-        self.rewards.ang_vel_xy_l2.weight = -0.1
+        self.rewards.ang_vel_xy_l2.weight = -0.05
         self.rewards.flat_orientation_l2.weight = -2.5
         self.rewards.base_height_l2.weight = -5.0
         self.rewards.base_height_l2.params["target_height"] = 0.35
@@ -115,16 +115,16 @@ class UnitreeA1RoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         self.rewards.feet_air_time.params["sensor_cfg"].body_names = [self.foot_link_name]
         self.rewards.feet_contact.weight = 0
         self.rewards.feet_contact.params["sensor_cfg"].body_names = [self.foot_link_name]
-        self.rewards.feet_slide.weight = -0.1
+        self.rewards.feet_slide.weight = 0
         self.rewards.feet_slide.params["sensor_cfg"].body_names = [self.foot_link_name]
         self.rewards.feet_slide.params["asset_cfg"].body_names = [self.foot_link_name]
         self.rewards.joint_power.weight = -2e-5
         self.rewards.stand_still_when_zero_command.weight = -0.5
         self.rewards.joint_position_penalty.weight = -0.5
-        self.rewards.feet_height_exp.weight = 1.5
+        self.rewards.feet_height_exp.weight = 0
         self.rewards.feet_height_exp.params["target_height"] = 0.05
         self.rewards.feet_height_exp.params["asset_cfg"].body_names = [self.foot_link_name]
-        self.rewards.feet_gait.weight = 3.0
+        self.rewards.feet_gait.weight = 0
         self.rewards.feet_gait.params["synced_feet_pair_names"] = (("FL_foot", "RR_foot"), ("FR_foot", "RL_foot"))
         if self.recover_mode:
             self.rewards.upward.weight = 0.5
