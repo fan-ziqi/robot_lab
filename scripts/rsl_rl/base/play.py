@@ -150,6 +150,7 @@ def main():
         with torch.inference_mode():
             # agent stepping
             actions = policy(obs)
+            # actions = torch.zeros_like(actions)
             # env stepping
             obs, _, _, _ = env.step(actions)
         if args_cli.video:

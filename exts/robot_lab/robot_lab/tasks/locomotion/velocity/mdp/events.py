@@ -51,21 +51,21 @@ def randomize_rigid_body_inertia(
     inertias = asset.root_physx_view.get_inertias()
 
     # apply randomization on default values
-    inertias[env_ids[:, None], body_ids] = asset.data.default_inertia[env_ids[:, None], body_ids].clone()
+    inertias[env_ids[:, None], body_ids, :] = asset.data.default_inertia[env_ids[:, None], body_ids, :].clone()
 
     # randomize each diagonal element (xx, yy, zz -> indices 0, 4, 8)
     for idx in [0, 4, 8]:
         # Extract and randomize the specific diagonal element
         randomized_inertias = _randomize_prop_by_op(
-            inertias[env_ids[:, None], body_ids][:, :, idx],
+            inertias[:, :, idx],
             inertia_distribution_params,
             env_ids,
             body_ids,
-            operation=operation,
-            distribution=distribution,
+            operation,
+            distribution,
         )
         # Assign the randomized values back to the inertia tensor
-        inertias[env_ids[:, None], body_ids][:, :, idx] = randomized_inertias
+        inertias[env_ids[:, None], body_ids, idx] = randomized_inertias
 
     # set the inertia tensors into the physics simulation
     asset.root_physx_view.set_inertias(inertias, env_ids)
@@ -115,14 +115,14 @@ def randomize_com_positions(
 
     for dim_idx in range(3):  # Randomize x, y, z independently
         randomized_offset = _randomize_prop_by_op(
-            com_offsets[env_ids[:, None], body_ids][:, :, dim_idx],
+            com_offsets[:, :, dim_idx],
             com_distribution_params,
             env_ids,
             body_ids,
-            operation=operation,
-            distribution=distribution,
+            operation,
+            distribution,
         )
-        com_offsets[env_ids[:, None], body_ids][:, :, dim_idx] = randomized_offset
+        com_offsets[env_ids[:, None], body_ids, dim_idx] = randomized_offset[env_ids[:, None], body_ids]
 
     # Set the randomized COM offsets into the simulation
     asset.root_physx_view.set_coms(com_offsets, env_ids)

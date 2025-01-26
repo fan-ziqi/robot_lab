@@ -3,17 +3,15 @@
 
 from omni.isaac.lab.utils import configclass
 
-from .rough_env_cfg import UnitreeH1RoughEnvCfg
+from .rough_env_cfg import UnitreeA1FlipRoughEnvCfg
 
 
 @configclass
-class UnitreeH1FlatEnvCfg(UnitreeH1RoughEnvCfg):
+class UnitreeA1FlipFlatEnvCfg(UnitreeA1FlipRoughEnvCfg):
     def __post_init__(self):
         # post init of parent
         super().__post_init__()
 
-        # override rewards
-        self.rewards.base_height_l2.params["sensor_cfg"] = None
         # change terrain to flat
         self.scene.terrain.terrain_type = "plane"
         self.scene.terrain.terrain_generator = None
@@ -25,5 +23,5 @@ class UnitreeH1FlatEnvCfg(UnitreeH1RoughEnvCfg):
         self.curriculum.terrain_levels = None
 
         # If the weight of rewards is 0, set rewards to None
-        if self.__class__.__name__ == "UnitreeH1FlatEnvCfg":
+        if self.__class__.__name__ == "UnitreeA1FlipFlatEnvCfg":
             self.disable_zero_weight_rewards()

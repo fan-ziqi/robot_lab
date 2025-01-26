@@ -66,7 +66,7 @@ class UnitreeH1RoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         # Root penalties
         self.rewards.lin_vel_z_l2.weight = 0
         self.rewards.ang_vel_xy_l2.weight = -0.05
-        self.rewards.flat_orientation_l2.weight = 0
+        self.rewards.flat_orientation_l2.weight = -1.0
         self.rewards.base_height_l2.weight = 0
         self.rewards.body_lin_acc_l2.weight = 0
 
@@ -92,10 +92,10 @@ class UnitreeH1RoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         self.rewards.contact_forces.weight = 0
 
         # Velocity-tracking rewards
-        self.rewards.track_lin_vel_xy_exp.weight = 1.0
+        self.rewards.track_lin_vel_xy_exp.weight = 2.0
         self.rewards.track_lin_vel_xy_exp.func = mdp.track_lin_vel_xy_yaw_frame_exp
         self.rewards.track_lin_vel_xy_exp.params["std"] = 0.5
-        self.rewards.track_ang_vel_z_exp.weight = 1.0
+        self.rewards.track_ang_vel_z_exp.weight = 2.0
         self.rewards.track_ang_vel_z_exp.func = mdp.track_ang_vel_z_world_exp
         self.rewards.track_ang_vel_z_exp.params["std"] = 0.5
 
