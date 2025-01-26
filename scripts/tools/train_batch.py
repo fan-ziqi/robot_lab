@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import datetime
+import os
 import subprocess
 import time
 
@@ -25,8 +26,12 @@ commands = [
     "python scripts/rsl_rl/amp/train.py --task RobotLab-Isaac-Velocity-Flat-Amp-Unitree-A1-v0 --headless",
 ]
 
+log_dir = "logs"
+if not os.path.exists(log_dir):
+    os.makedirs(log_dir)
+
 timestamp = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-log_file = f"logs/train_batch_{timestamp}.log"
+log_file = f"{log_dir}/train_batch_{timestamp}.log"
 
 with open(log_file, "w") as log:
     for cmd in commands:
