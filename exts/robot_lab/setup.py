@@ -20,6 +20,7 @@ INSTALL_REQUIRES = [
     "lxml",
     "transformations",
     "pybullet",
+    "colorama",
 ]
 
 # Installation operation
