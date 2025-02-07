@@ -7,23 +7,34 @@
 
 import argparse
 
-from omni.isaac.lab.app import AppLauncher
+from isaaclab.app import AppLauncher
 
 # local imports
 import cli_args  # isort: skip
 
 # add argparse arguments
 parser = argparse.ArgumentParser(description="Train an RL agent with RSL-RL.")
+parser.add_argument("--video", action="store_true", default=False, help="Record videos during training.")
+parser.add_argument("--video_length", type=int, default=200, help="Length of the recorded video (in steps).")
 parser.add_argument(
     "--disable_fabric", action="store_true", default=False, help="Disable fabric and use USD I/O operations."
 )
 parser.add_argument("--num_envs", type=int, default=None, help="Number of environments to simulate.")
 parser.add_argument("--task", type=str, default=None, help="Name of the task.")
+parser.add_argument(
+    "--use_pretrained_checkpoint",
+    action="store_true",
+    help="Use the pre-trained checkpoint from Nucleus.",
+)
+parser.add_argument("--real-time", action="store_true", default=False, help="Run in real-time, if possible.")
 # append RSL-RL cli arguments
 cli_args.add_rsl_rl_args(parser)
 # append AppLauncher cli args
 AppLauncher.add_app_launcher_args(parser)
 args_cli = parser.parse_args()
+# always enable cameras to record video
+if args_cli.video:
+    args_cli.enable_cameras = True
 
 # launch omniverse app
 app_launcher = AppLauncher(args_cli)
@@ -35,11 +46,10 @@ import gymnasium as gym
 import numpy as np
 import torch
 
-from omni.isaac.lab.utils.math import quat_rotate
-from omni.isaac.lab_tasks.utils import parse_env_cfg
-from omni.isaac.lab_tasks.utils.wrappers.rsl_rl import RslRlVecEnvWrapper
+from isaaclab.utils.math import quat_rotate
+from isaaclab_rl.rsl_rl import RslRlVecEnvWrapper
+from isaaclab_tasks.utils import parse_env_cfg
 
-# Import extensions to set up environment tasks
 import robot_lab.tasks  # noqa: F401
 
 
@@ -63,7 +73,7 @@ def main():
     # disable randomization for play
     env_cfg.observations.policy.enable_corruption = False
     # remove random pushing
-    env_cfg.events.base_external_force_torque = None
+    env_cfg.events.randomize_apply_external_force_torque = None
     env_cfg.events.push_robot = None
 
     env_cfg.amp_num_preload_transitions = 1

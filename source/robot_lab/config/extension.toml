@@ -1,0 +1,33 @@
+[package]
+
+# Semantic Versioning is used: https://semver.org/
+version = "2.0"
+
+# Description
+category = "isaaclab"
+readme  = "README.md"
+
+title = "A generic robot RL library based on IsaacLab"
+author = "Ziqi Fan"
+maintainer = "Ziqi Fan"
+description="A generic robot RL library based on IsaacLab"
+repository = "https://github.com/fan-ziqi/robot_lab.git"
+keywords = ["extension", "robot_lab", "isaaclab"]
+
+[dependencies]
+"isaaclab" = {}
+"isaaclab_assets" = {}
+"isaaclab_tasks" = {}
+# NOTE: Add additional dependencies here
+
+[[python.module]]
+name = "robot_lab"
+
+[isaaclab_settings]
+# TODO: Uncomment and list any apt dependencies here.
+#       If none, leave it commented out.
+# apt_deps = ["example_package"]
+# TODO: Uncomment and provide path to a ros_ws
+#       with rosdeps to be installed. If none,
+#       leave it commented out.
+# ros_ws = "path/from/extension_root/to/ros_ws"

@@ -1,7 +1,7 @@
 # Copyright (c) 2024-2025 Ziqi Fan
 # SPDX-License-Identifier: Apache-2.0
 
-# Copyright (c) 2022-2024, The Isaac Lab Project Developers.
+# Copyright (c) 2022-2025, The Isaac Lab Project Developers.
 # All rights reserved.
 #
 # SPDX-License-Identifier: BSD-3-Clause
@@ -12,7 +12,7 @@
 
 import argparse
 
-from omni.isaac.lab.app import AppLauncher
+from isaaclab.app import AppLauncher
 
 # local imports
 import cli_args  # isort: skip
@@ -26,6 +26,12 @@ parser.add_argument(
 )
 parser.add_argument("--num_envs", type=int, default=None, help="Number of environments to simulate.")
 parser.add_argument("--task", type=str, default=None, help="Name of the task.")
+parser.add_argument(
+    "--use_pretrained_checkpoint",
+    action="store_true",
+    help="Use the pre-trained checkpoint from Nucleus.",
+)
+parser.add_argument("--real-time", action="store_true", default=False, help="Run in real-time, if possible.")
 # append RSL-RL cli arguments
 cli_args.add_rsl_rl_args(parser)
 # append AppLauncher cli args
@@ -43,19 +49,16 @@ simulation_app = app_launcher.app
 
 import gymnasium as gym
 import os
+import time
 import torch
 
-from omni.isaac.lab.envs import DirectMARLEnv, multi_agent_to_single_agent
-from omni.isaac.lab.utils.dict import print_dict
-from omni.isaac.lab_tasks.utils import get_checkpoint_path, parse_env_cfg
-from omni.isaac.lab_tasks.utils.wrappers.rsl_rl import (
-    RslRlOnPolicyRunnerCfg,
-    RslRlVecEnvWrapper,
-    export_policy_as_jit,
-    export_policy_as_onnx,
-)
+from isaaclab.envs import DirectMARLEnv, multi_agent_to_single_agent
+from isaaclab.utils.assets import retrieve_file_path
+from isaaclab.utils.dict import print_dict
+from isaaclab.utils.pretrained_checkpoint import get_published_pretrained_checkpoint
+from isaaclab_rl.rsl_rl import RslRlOnPolicyRunnerCfg, RslRlVecEnvWrapper, export_policy_as_jit, export_policy_as_onnx
+from isaaclab_tasks.utils import get_checkpoint_path, parse_env_cfg
 
-# Import extensions to set up environment tasks
 import robot_lab.tasks  # noqa: F401
 from robot_lab.third_party.rsl_rl_amp.runners import AmpOnPolicyRunner
 
@@ -85,16 +88,34 @@ def main():
     env_cfg.events.push_robot = None
 
     env_cfg.commands.base_velocity.rel_standing_envs = 0.0
+    # env_cfg.commands.base_velocity.ranges.lin_vel_x = (0.5, 1.5)
+    # env_cfg.commands.base_velocity.ranges.lin_vel_y = (0.0, 0.0)
+    # env_cfg.commands.base_velocity.ranges.ang_vel_z = (0.0, 0.0)
+    # env_cfg.commands.base_velocity.ranges.heading = (0.0, 0.0)
 
     # specify directory for logging experiments
     log_root_path = os.path.join("logs", "rsl_rl", agent_cfg.experiment_name)
     log_root_path = os.path.abspath(log_root_path)
     print(f"[INFO] Loading experiment from directory: {log_root_path}")
-    resume_path = get_checkpoint_path(log_root_path, agent_cfg.load_run, agent_cfg.load_checkpoint)
+    if args_cli.use_pretrained_checkpoint:
+        resume_path = get_published_pretrained_checkpoint("rsl_rl", args_cli.task)
+        if not resume_path:
+            print("[INFO] Unfortunately a pre-trained checkpoint is currently unavailable for this task.")
+            return
+    elif args_cli.checkpoint:
+        resume_path = retrieve_file_path(args_cli.checkpoint)
+    else:
+        resume_path = get_checkpoint_path(log_root_path, agent_cfg.load_run, agent_cfg.load_checkpoint)
+
     log_dir = os.path.dirname(resume_path)
 
     # create isaac environment
     env = gym.make(args_cli.task, cfg=env_cfg, render_mode="rgb_array" if args_cli.video else None)
+
+    # convert to single-agent instance if required by the RL algorithm
+    if isinstance(env.unwrapped, DirectMARLEnv):
+        env = multi_agent_to_single_agent(env)
+
     # wrap for video recording
     if args_cli.video:
         video_kwargs = {
@@ -106,10 +127,6 @@ def main():
         print("[INFO] Recording videos during training.")
         print_dict(video_kwargs, nesting=4)
         env = gym.wrappers.RecordVideo(env, **video_kwargs)
-
-    # convert to single-agent instance if required by the RL algorithm
-    if isinstance(env.unwrapped, DirectMARLEnv):
-        env = multi_agent_to_single_agent(env)
 
     # wrap around environment for rsl-rl
     env = RslRlVecEnvWrapper(env)
@@ -137,15 +154,19 @@ def main():
         filename="policy.pt",
     )
 
+    dt = env.unwrapped.physics_dt
+
     # reset environment
     obs, _ = env.get_observations()
     timestep = 0
     # simulate environment
     while simulation_app.is_running():
+        start_time = time.time()
         # run everything in inference mode
         with torch.inference_mode():
             # agent stepping
             actions = policy(obs)
+            # actions = torch.zeros_like(actions)
             # env stepping
             obs, _, _, _ = env.step(actions)
         if args_cli.video:
@@ -153,6 +174,11 @@ def main():
             # Exit the play loop after recording one video
             if timestep == args_cli.video_length:
                 break
+
+        # time delay for real-time evaluation
+        sleep_time = dt - (time.time() - start_time)
+        if args_cli.real_time and sleep_time > 0:
+            time.sleep(sleep_time)
 
     # close the simulator
     env.close()

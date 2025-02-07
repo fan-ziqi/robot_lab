@@ -58,4 +58,4 @@ repos:
           - .github/LICENSE_HEADER.txt
           - --use-current-year
 
-exclude: ^(exts/robot_lab/robot_lab/third_party/|.vscode/|.github/)
+exclude: ^(source/robot_lab/robot_lab/third_party/|.vscode/|.github/)
