@@ -165,57 +165,60 @@ Anymal D
 
 ```bash
 # Train
-python scripts/rsl_rl/base/train.py --task RobotLab-Isaac-Velocity-Flat-Anymal-D-v0 --headless
+python scripts/rsl_rl/base/train.py --task RobotLab-Isaac-Velocity-Rough-Anymal-D-v0 --headless
 # Play
-python scripts/rsl_rl/base/play.py --task RobotLab-Isaac-Velocity-Flat-Anymal-D-v0
+python scripts/rsl_rl/base/play.py --task RobotLab-Isaac-Velocity-Rough-Anymal-D-v0
 ```
 
 Unitree A1
 
 ```bash
 # Train
-python scripts/rsl_rl/base/train.py --task RobotLab-Isaac-Velocity-Flat-Unitree-A1-v0 --headless
+python scripts/rsl_rl/base/train.py --task RobotLab-Isaac-Velocity-Rough-Unitree-A1-v0 --headless
 # Play
-python scripts/rsl_rl/base/play.py --task RobotLab-Isaac-Velocity-Flat-Unitree-A1-v0
+python scripts/rsl_rl/base/play.py --task RobotLab-Isaac-Velocity-Rough-Unitree-A1-v0
 ```
 
-Unitree Go2W
+Unitree Go2W (Currently unavailable)
+
+> [!NOTE]
+> Due to some bugs in IsaacLab, this will be available in the next version.
 
 ```bash
 # Train
-python scripts/rsl_rl/base/train.py --task RobotLab-Isaac-Velocity-Flat-Unitree-Go2W-v0 --headless
+python scripts/rsl_rl/base/train.py --task RobotLab-Isaac-Velocity-Rough-Unitree-Go2W-v0 --headless
 # Play
-python scripts/rsl_rl/base/play.py --task RobotLab-Isaac-Velocity-Flat-Unitree-Go2W-v0
+python scripts/rsl_rl/base/play.py --task RobotLab-Isaac-Velocity-Rough-Unitree-Go2W-v0
 ```
 
 FFTAI GR1T1
 
 ```bash
 # Train
-python scripts/rsl_rl/base/train.py --task RobotLab-Isaac-Velocity-Flat-FFTAI-GR1T1-v0 --headless
+python scripts/rsl_rl/base/train.py --task RobotLab-Isaac-Velocity-Rough-FFTAI-GR1T1-v0 --headless
 # Play
-python scripts/rsl_rl/base/play.py --task RobotLab-Isaac-Velocity-Flat-FFTAI-GR1T1-v0
+python scripts/rsl_rl/base/play.py --task RobotLab-Isaac-Velocity-Rough-FFTAI-GR1T1-v0
 ```
 
 Unitree H1
 
 ```bash
 # Train
-python scripts/rsl_rl/base/train.py --task RobotLab-Isaac-Velocity-Flat-Unitree-H1-v0 --headless
+python scripts/rsl_rl/base/train.py --task RobotLab-Isaac-Velocity-Rough-Unitree-H1-v0 --headless
 # Play
-python scripts/rsl_rl/base/play.py --task RobotLab-Isaac-Velocity-Flat-Unitree-H1-v0
+python scripts/rsl_rl/base/play.py --task RobotLab-Isaac-Velocity-Rough-Unitree-H1-v0
 ```
 
 Unitree G1
 
 ```bash
 # Train
-python scripts/rsl_rl/base/train.py --task RobotLab-Isaac-Velocity-Flat-Unitree-G1-v0 --headless
+python scripts/rsl_rl/base/train.py --task RobotLab-Isaac-Velocity-Rough-Unitree-G1-v0 --headless
 # Play
-python scripts/rsl_rl/base/play.py --task RobotLab-Isaac-Velocity-Flat-Unitree-G1-v0
+python scripts/rsl_rl/base/play.py --task RobotLab-Isaac-Velocity-Rough-Unitree-G1-v0
 ```
 
-The above configs are flat, you can change `Flat` to `Rough`
+The above configs are rough, you can change `Rough` to `Flat`
 
 **Note**
 
