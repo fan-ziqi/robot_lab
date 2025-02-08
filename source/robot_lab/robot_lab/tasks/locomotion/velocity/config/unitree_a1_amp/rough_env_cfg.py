@@ -60,7 +60,7 @@ class UnitreeA1AmpRoughEnvCfg(LocomotionVelocityRoughEnvCfg):
     observations: UnitreeA1AmpObservationsCfg = UnitreeA1AmpObservationsCfg()
     events: UnitreeA1AmpEventCfg = UnitreeA1AmpEventCfg()
 
-    base_link_name = "trunk"
+    base_link_name = "base"
     foot_link_name = ".*_foot"
 
     def __post_init__(self):

@@ -16,7 +16,7 @@ from robot_lab.assets.unitree import UNITREE_A1_CFG  # isort: skip
 
 @configclass
 class UnitreeA1RoughEnvCfg(LocomotionVelocityRoughEnvCfg):
-    base_link_name = "trunk"
+    base_link_name = "base"
     foot_link_name = ".*_foot"
 
     recover_mode = False  # Unvalible now

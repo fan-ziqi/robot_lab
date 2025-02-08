@@ -15,10 +15,9 @@ from robot_lab.tasks.locomotion.velocity.velocity_env_cfg import LocomotionVeloc
 # Pre-defined configs
 ##
 # use cloud assets
-from isaaclab_assets.robots.unitree import UNITREE_A1_CFG  # isort: skip
-
+# from isaaclab_assets.robots.unitree import UNITREE_A1_CFG  # isort: skip
 # use local assets
-# from robot_lab.assets.unitree import UNITREE_A1_CFG  # isort: skip
+from robot_lab.assets.unitree import UNITREE_A1_CFG  # isort: skip
 
 
 @configclass
@@ -61,7 +60,7 @@ class UnitreeA1HandStandRewardsCfg(RewardsCfg):
 class UnitreeA1HandStandRoughEnvCfg(LocomotionVelocityRoughEnvCfg):
     rewards: UnitreeA1HandStandRewardsCfg = UnitreeA1HandStandRewardsCfg()
 
-    base_link_name = "trunk"
+    base_link_name = "base"
     foot_link_name = ".*_foot"
 
     def __post_init__(self):
