@@ -181,14 +181,20 @@ python scripts/rsl_rl/base/play.py --task RobotLab-Isaac-Velocity-Rough-Unitree-
 
 Unitree Go2W (Currently unavailable)
 
-> [!NOTE]
-> Due to some bugs in IsaacLab, this will be available in the next version.
-
 ```bash
 # Train
 python scripts/rsl_rl/base/train.py --task RobotLab-Isaac-Velocity-Rough-Unitree-Go2W-v0 --headless
 # Play
 python scripts/rsl_rl/base/play.py --task RobotLab-Isaac-Velocity-Rough-Unitree-Go2W-v0
+```
+
+Unitree B2W (Currently unavailable)
+
+```bash
+# Train
+python scripts/rsl_rl/base/train.py --task RobotLab-Isaac-Velocity-Rough-Unitree-B2W-v0 --headless
+# Play
+python scripts/rsl_rl/base/play.py --task RobotLab-Isaac-Velocity-Rough-Unitree-B2W-v0
 ```
 
 FFTAI GR1T1
