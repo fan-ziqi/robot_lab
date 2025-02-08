@@ -1,0 +1,46 @@
+<?xml version="1.0"?>
+
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+    <xacro:property name="stair_length" value="0.640" />
+    <xacro:property name="stair_width" value="0.310" />
+    <xacro:property name="stair_height" value="0.170" />
+
+    <xacro:macro name="stairs" params="stairs xpos ypos zpos">
+
+        <joint name="stair_joint_origin" type="fixed">
+            <origin rpy="0 0 0" xyz="0 0 0"/>
+            <parent link="world"/>
+            <child link="stair_link_${stairs}"/>
+        </joint>
+
+        <link name="stair_link_${stairs}">
+            <visual>
+                <geometry>
+                    <box size="${stair_length} ${stair_width} ${stair_height}"/>
+                </geometry>
+                <material name="grey"/>
+                <origin rpy="0 0 0" xyz="${xpos} ${ypos} ${zpos}"/>
+            </visual>
+            <collision>
+                <geometry>
+                    <box size="${stair_length} ${stair_width} ${stair_height}"/>
+                </geometry>
+            </collision>
+            <inertial>
+                <mass value="0.80"/>
+                <inertia ixx="100" ixy="0" ixz="0" iyy="100" iyz="0" izz="100" />
+            </inertial>
+        </link>
+
+        <xacro:if value="${stairs}">
+            <xacro:stairs stairs="${stairs-1}" xpos="0" ypos="${ypos-stair_width/2}" zpos="${zpos+stair_height}"/>
+            <joint name="stair_joint_${stairs}" type="fixed">
+                <parent link="stair_link_${stairs}"/>
+                <child link="stair_link_${stairs-1}"/>
+            </joint>
+        </xacro:if>
+
+    </xacro:macro>
+
+</robot>

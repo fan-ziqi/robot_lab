@@ -8,8 +8,10 @@ from robot_lab.tasks.locomotion.velocity.velocity_env_cfg import LocomotionVeloc
 ##
 # Pre-defined configs
 ##
-# use cloud assets
-from isaaclab_assets.robots.unitree import UNITREE_GO2_CFG  # isort: skip
+# # use cloud assets
+# from isaaclab_assets.robots.unitree import UNITREE_GO2_CFG  # isort: skip
+# use local assets
+from robot_lab.assets.unitree import UNITREE_GO2_CFG  # isort: skip
 
 
 @configclass
@@ -132,7 +134,7 @@ class UnitreeGo2RoughEnvCfg(LocomotionVelocityRoughEnvCfg):
             self.disable_zero_weight_rewards()
 
         # ------------------------------Terminations------------------------------
-        self.terminations.illegal_contact.params["sensor_cfg"].body_names = [self.base_link_name, "Head_.*"]
+        self.terminations.illegal_contact.params["sensor_cfg"].body_names = [self.base_link_name]
         if self.recover_mode:
             self.terminations.illegal_contact = None
 
