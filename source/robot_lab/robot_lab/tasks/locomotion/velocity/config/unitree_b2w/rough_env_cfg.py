@@ -49,7 +49,7 @@ class UnitreeB2WRoughEnvCfg(LocomotionVelocityRoughEnvCfg):
     actions: UnitreeB2WActionsCfg = UnitreeB2WActionsCfg()
     rewards: UnitreeB2WRewardsCfg = UnitreeB2WRewardsCfg()
 
-    base_link_name = "base"
+    base_link_name = "base_link"
     foot_link_name = ".*_foot"
     wheel_joint_name = ".*_foot_joint"
 
@@ -108,7 +108,7 @@ class UnitreeB2WRoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         self.rewards.ang_vel_xy_l2.weight = -0.01
         self.rewards.flat_orientation_l2.weight = -2.5
         self.rewards.base_height_l2.weight = -5.0
-        self.rewards.base_height_l2.params["target_height"] = 0.60
+        self.rewards.base_height_l2.params["target_height"] = 0.65
         self.rewards.base_height_l2.params["asset_cfg"].body_names = [self.base_link_name]
         self.rewards.body_lin_acc_l2.weight = 0
         self.rewards.body_lin_acc_l2.params["asset_cfg"].body_names = [self.base_link_name]

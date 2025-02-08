@@ -179,6 +179,15 @@ python scripts/rsl_rl/base/train.py --task RobotLab-Isaac-Velocity-Rough-Unitree
 python scripts/rsl_rl/base/play.py --task RobotLab-Isaac-Velocity-Rough-Unitree-A1-v0
 ```
 
+Unitree Go2
+
+```bash
+# Train
+python scripts/rsl_rl/base/train.py --task RobotLab-Isaac-Velocity-Rough-Unitree-Go2-v0 --headless
+# Play
+python scripts/rsl_rl/base/play.py --task RobotLab-Isaac-Velocity-Rough-Unitree-Go2-v0
+```
+
 Unitree Go2W (Currently unavailable)
 
 ```bash
