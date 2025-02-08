@@ -188,7 +188,7 @@ python scripts/rsl_rl/base/train.py --task RobotLab-Isaac-Velocity-Rough-Unitree
 python scripts/rsl_rl/base/play.py --task RobotLab-Isaac-Velocity-Rough-Unitree-Go2-v0
 ```
 
-Unitree Go2W (Currently unavailable)
+Unitree Go2W
 
 ```bash
 # Train
@@ -197,7 +197,16 @@ python scripts/rsl_rl/base/train.py --task RobotLab-Isaac-Velocity-Rough-Unitree
 python scripts/rsl_rl/base/play.py --task RobotLab-Isaac-Velocity-Rough-Unitree-Go2W-v0
 ```
 
-Unitree B2W (Currently unavailable)
+Unitree B2
+
+```bash
+# Train
+python scripts/rsl_rl/base/train.py --task RobotLab-Isaac-Velocity-Rough-Unitree-B2-v0 --headless
+# Play
+python scripts/rsl_rl/base/play.py --task RobotLab-Isaac-Velocity-Rough-Unitree-B2-v0
+```
+
+Unitree B2W
 
 ```bash
 # Train
