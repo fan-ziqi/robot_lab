@@ -61,10 +61,10 @@ def joint_position_penalty(
     return torch.where(
         torch.logical_or(cmd > 0.1, body_vel > velocity_threshold), reward, stand_still_scale * reward
     )  # * torch.clamp(-asset.data.projected_gravity_b[:, 2], 0, 1)
-    reward = torch.square(
-        asset.data.joint_pos[:, asset_cfg.joint_ids] - asset.data.default_joint_pos[:, asset_cfg.joint_ids]
-    )
-    return torch.sum(reward, dim=1)
+    # reward = torch.square(
+    #     asset.data.joint_pos[:, asset_cfg.joint_ids] - asset.data.default_joint_pos[:, asset_cfg.joint_ids]
+    # )
+    # return torch.sum(reward, dim=1)
 
 
 class GaitReward(ManagerTermBase):
