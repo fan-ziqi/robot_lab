@@ -10,7 +10,7 @@
 
 ## Overview
 
-**robot_lab** is an extension project based on Isaac Lab. It allows you to develop in an isolated environment, outside of the core Isaac Lab repository.
+**robot_lab** is a RL extension library for robots, based on IsaacLab. It allows you to develop in an isolated environment, outside of the core Isaac Lab repository.
 
 > [!IMPORTANT]
 > This code repository is currently at **[v2.0](https://github.com/fan-ziqi/robot_lab/releases/tag/v2.0)**, which corresponds to **[IsaacLab-v2.0.0](https://github.com/isaac-sim/IsaacLab/releases/tag/v2.0.0)**.
@@ -400,10 +400,10 @@ Some examples of packages that can likely be excluded are:
 Please cite the following if you use this code or parts of it:
 
 ```
-@software{fan-ziqi2024robot_lab,
-  author = {fan-ziqi},
-  title = {robot_lab: An extension project based on Isaac Lab.},
+@software{fan-ziqi2025robot_lab,
+  author = {Ziqi Fan},
+  title = {robot_lab: RL Extension Library for Robots, Based on IsaacLab.},
   url = {https://github.com/fan-ziqi/robot_lab},
-  year = {2024}
+  year = {2025}
 }
 ```
