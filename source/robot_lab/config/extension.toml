@@ -7,16 +7,18 @@ version = "2.0"
 category = "isaaclab"
 readme  = "README.md"
 
-title = "A generic robot RL library based on IsaacLab"
+title = "RL Extension Library for Robots, Based on IsaacLab."
 author = "Ziqi Fan"
 maintainer = "Ziqi Fan"
-description="A generic robot RL library based on IsaacLab"
+description="RL Extension Library for Robots, Based on IsaacLab."
 repository = "https://github.com/fan-ziqi/robot_lab.git"
 keywords = ["extension", "robot_lab", "isaaclab"]
 
 [dependencies]
 "isaaclab" = {}
 "isaaclab_assets" = {}
+"isaaclab_mimic" = {}
+"isaaclab_rl" = {}
 "isaaclab_tasks" = {}
 # NOTE: Add additional dependencies here
 
