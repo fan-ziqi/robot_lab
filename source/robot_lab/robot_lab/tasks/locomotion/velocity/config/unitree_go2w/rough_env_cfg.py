@@ -175,6 +175,6 @@ class UnitreeGo2WRoughEnvCfg(LocomotionVelocityRoughEnvCfg):
             self.disable_zero_weight_rewards()
 
         # ------------------------------Terminations------------------------------
-        self.terminations.illegal_contact.params["sensor_cfg"].body_names = [self.base_link_name, ".*_hip"]
+        self.terminations.illegal_contact.params["sensor_cfg"].body_names = [self.base_link_name]
 
         # ------------------------------Commands------------------------------

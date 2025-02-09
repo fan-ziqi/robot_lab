@@ -63,10 +63,6 @@ class UnitreeB2WRoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         self.scene.robot = UNITREE_B2W_CFG.replace(prim_path="{ENV_REGEX_NS}/Robot")
         self.scene.height_scanner.prim_path = "{ENV_REGEX_NS}/Robot/" + self.base_link_name
         self.scene.height_scanner_base.prim_path = "{ENV_REGEX_NS}/Robot/" + self.base_link_name
-        # scale down the terrains because the robot is small
-        self.scene.terrain.terrain_generator.sub_terrains["boxes"].grid_height_range = (0.025, 0.1)
-        self.scene.terrain.terrain_generator.sub_terrains["random_rough"].noise_range = (0.01, 0.06)
-        self.scene.terrain.terrain_generator.sub_terrains["random_rough"].noise_step = 0.01
 
         # ------------------------------Observations------------------------------
         self.observations.policy.joint_pos.func = mdp.joint_pos_rel_without_wheel
@@ -176,6 +172,9 @@ class UnitreeB2WRoughEnvCfg(LocomotionVelocityRoughEnvCfg):
             self.disable_zero_weight_rewards()
 
         # ------------------------------Terminations------------------------------
-        self.terminations.illegal_contact.params["sensor_cfg"].body_names = [self.base_link_name, ".*_hip"]
+        self.terminations.illegal_contact.params["sensor_cfg"].body_names = [self.base_link_name]
 
         # ------------------------------Commands------------------------------
+        self.commands.base_velocity.ranges.lin_vel_x = (-1.5, 1.5)
+        self.commands.base_velocity.ranges.lin_vel_y = (-1.5, 1.5)
+        self.commands.base_velocity.ranges.ang_vel_z = (-1.5, 1.5)
