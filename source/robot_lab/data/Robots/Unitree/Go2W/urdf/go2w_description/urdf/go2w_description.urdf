@@ -250,7 +250,7 @@ Stephen Brawner (brawner@gmail.com)
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="package://go2w_description/dae/calf.stl" />
+          filename="package://go2w_description/dae/calf.dae" />
       </geometry>
       <material
         name="">
@@ -396,10 +396,10 @@ Stephen Brawner (brawner@gmail.com)
       </material>
     </visual>
     <collision>
-      <origin rpy="1.5707963267948966 0 0" xyz="0 0.0 0" />
+      <origin rpy="1.5707963267948966 0 0" xyz="0 0.048 0" />
       <geometry>
-        <mesh filename="package://go2w_description/dae/left_wheel.dae" />
-        <!-- <cylinder length="0.045" radius="0.086" /> -->
+        <!-- <mesh filename="package://go2w_description/dae/left_wheel.dae" /> -->
+        <cylinder length="0.045" radius="0.086" />
       </geometry>
     </collision>
   </link>
@@ -418,7 +418,9 @@ Stephen Brawner (brawner@gmail.com)
       <!-- <dynamics damping="0.01" friction="0.01"/> -->
       <limit
       effort="23.7"
-      velocity="30.1" />
+      velocity="30.1"
+      lower="-999999"
+      upper="999999" />
   </joint>
 
   <link
@@ -553,7 +555,7 @@ Stephen Brawner (brawner@gmail.com)
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="package://go2w_description/dae/calf_mirror.stl" />
+          filename="package://go2w_description/dae/calf_mirror.dae" />
       </geometry>
       <material
         name="">
@@ -700,10 +702,10 @@ Stephen Brawner (brawner@gmail.com)
       </material>
     </visual>
     <collision>
-      <origin rpy="1.5707963267948966 0 0" xyz="0 -0.0 0" />
+      <origin rpy="1.5707963267948966 0 0" xyz="0 -0.048 0" />
       <geometry>
-        <mesh filename="package://go2w_description/dae/right_wheel.dae" />
-        <!-- <cylinder length="0.045" radius="0.086" /> -->
+        <!-- <mesh filename="package://go2w_description/dae/right_wheel.dae" /> -->
+        <cylinder length="0.045" radius="0.086" />
       </geometry>
     </collision>
   </link>
@@ -721,7 +723,9 @@ Stephen Brawner (brawner@gmail.com)
       xyz="0 1 0" />
       <limit
       effort="23.7"
-      velocity="30.1" />
+      velocity="30.1"
+      lower="-999999"
+      upper="999999"/>
   </joint>
 
   <link
@@ -856,7 +860,7 @@ Stephen Brawner (brawner@gmail.com)
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="package://go2w_description/dae/calf.stl" />
+          filename="package://go2w_description/dae/calf.dae" />
       </geometry>
       <material
         name="">
@@ -1004,10 +1008,10 @@ Stephen Brawner (brawner@gmail.com)
       </material>
     </visual>
     <collision>
-      <origin rpy="1.5707963267948966 0 0" xyz="0 0.0 0" />
+      <origin rpy="1.5707963267948966 0 0" xyz="0 0.048 0" />
       <geometry>
-        <mesh filename="package://go2w_description/dae/left_wheel.dae" />
-        <!-- <cylinder length="0.045" radius="0.086" /> -->
+        <!-- <mesh filename="package://go2w_description/dae/left_wheel.dae" /> -->
+        <cylinder length="0.045" radius="0.086" />
       </geometry>
     </collision>
   </link>
@@ -1025,7 +1029,9 @@ Stephen Brawner (brawner@gmail.com)
       xyz="0 1 0" />
       <limit
       effort="23.7"
-      velocity="30.1" />
+      velocity="30.1"
+      lower="-999999"
+      upper="999999"/>
   </joint>
 
   <link
@@ -1160,7 +1166,7 @@ Stephen Brawner (brawner@gmail.com)
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="package://go2w_description/dae/calf_mirror.stl" />
+          filename="package://go2w_description/dae/calf_mirror.dae" />
       </geometry>
       <material
         name="">
@@ -1307,10 +1313,10 @@ Stephen Brawner (brawner@gmail.com)
       </material>
     </visual>
     <collision>
-      <origin rpy="1.5707963267948966 0 0" xyz="0 -0.0 0" />
+      <origin rpy="1.5707963267948966 0 0" xyz="0 -0.048 0" />
       <geometry>
-        <mesh filename="package://go2w_description/dae/right_wheel.dae" />
-        <!-- <cylinder length="0.045" radius="0.086" /> -->
+        <!-- <mesh filename="package://go2w_description/dae/right_wheel.dae" /> -->
+        <cylinder length="0.045" radius="0.086" />
       </geometry>
     </collision>
   </link>
@@ -1328,7 +1334,9 @@ Stephen Brawner (brawner@gmail.com)
       xyz="0 1 0" />
       <limit
       effort="23.7"
-      velocity="30.1" />
+      velocity="30.1"
+      lower="-999999"
+      upper="999999"/>
   </joint>
   <link
     name="imu">
