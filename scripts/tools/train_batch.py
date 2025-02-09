@@ -12,6 +12,7 @@ colorama.init(autoreset=True)
 
 commands = [
     "python scripts/rsl_rl/base/train.py --task RobotLab-Isaac-Velocity-Flat-FFTAI-GR1T1-v0 --headless",
+    "python scripts/rsl_rl/base/train.py --task RobotLab-Isaac-Velocity-Flat-FFTAI-GR1T2-v0 --headless",
     "python scripts/rsl_rl/base/train.py --task RobotLab-Isaac-Velocity-Flat-Unitree-A1-v0 --headless",
     "python scripts/rsl_rl/base/train.py --task RobotLab-Isaac-Velocity-Flat-Anymal-D-v0 --headless",
     "python scripts/rsl_rl/base/train.py --task RobotLab-Isaac-Velocity-Flat-Unitree-Go2-v0 --headless",
@@ -20,9 +21,8 @@ commands = [
     "python scripts/rsl_rl/base/train.py --task RobotLab-Isaac-Velocity-Flat-Unitree-B2W-v0 --headless",
     "python scripts/rsl_rl/base/train.py --task RobotLab-Isaac-Velocity-Flat-Unitree-H1-v0 --headless",
     "python scripts/rsl_rl/base/train.py --task RobotLab-Isaac-Velocity-Flat-Unitree-G1-v0 --headless",
-    "python scripts/rsl_rl/base/train.py --task RobotLab-Isaac-Velocity-Flat-Njust-V2-Fixed-v0 --headless",
-    "python scripts/rsl_rl/base/train.py --task RobotLab-Isaac-Velocity-Flat-Njust-V2-Wheel-v0 --headless",
     "python scripts/rsl_rl/base/train.py --task RobotLab-Isaac-Velocity-Rough-FFTAI-GR1T1-v0 --headless",
+    "python scripts/rsl_rl/base/train.py --task RobotLab-Isaac-Velocity-Rough-FFTAI-GR1T2-v0 --headless",
     "python scripts/rsl_rl/base/train.py --task RobotLab-Isaac-Velocity-Rough-Unitree-A1-v0 --headless",
     "python scripts/rsl_rl/base/train.py --task RobotLab-Isaac-Velocity-Rough-Anymal-D-v0 --headless",
     "python scripts/rsl_rl/base/train.py --task RobotLab-Isaac-Velocity-Rough-Unitree-Go2-v0 --headless",

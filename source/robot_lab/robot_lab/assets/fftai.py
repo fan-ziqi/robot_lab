@@ -158,3 +158,13 @@ FFTAI_GR1T1_LOWER_LIMB_CFG.actuators = (
     },
 )
 """Configuration for the FFTAI GR1T1 Humanoid robot with fixed upper limb."""
+
+
+FFTAI_GR1T2_CFG = FFTAI_GR1T1_CFG.copy()
+FFTAI_GR1T2_CFG.spawn.usd_path = f"{ISAACLAB_ASSETS_DATA_DIR}/Robots/FFTAI/GR1T2/GR1T2.usd"
+"""Configuration for the FFTAI GR1T1 Humanoid robot."""
+
+
+FFTAI_GR1T2_LOWER_LIMB_CFG = FFTAI_GR1T1_LOWER_LIMB_CFG.copy()
+FFTAI_GR1T2_LOWER_LIMB_CFG.spawn.usd_path = f"{ISAACLAB_ASSETS_DATA_DIR}/Robots/FFTAI/GR1T2/GR1T2_lower_limb.usd"
+"""Configuration for the FFTAI GR1T2 Humanoid robot with fixed upper limb."""

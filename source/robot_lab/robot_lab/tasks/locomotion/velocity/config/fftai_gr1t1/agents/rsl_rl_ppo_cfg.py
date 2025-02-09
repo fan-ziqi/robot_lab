@@ -10,7 +10,7 @@ class FFTAIGR1T1RoughPPORunnerCfg(RslRlOnPolicyRunnerCfg):
     num_steps_per_env = 24
     max_iterations = 3000
     save_interval = 100
-    experiment_name = "gr1t1_rough"
+    experiment_name = "fftai_gr1t1_rough"
     empirical_normalization = False
     policy = RslRlPpoActorCriticCfg(
         init_noise_std=1.0,
@@ -40,4 +40,4 @@ class FFTAIGR1T1FlatPPORunnerCfg(FFTAIGR1T1RoughPPORunnerCfg):
         super().__post_init__()
 
         self.max_iterations = 1500
-        self.experiment_name = "gr1t1_flat"
+        self.experiment_name = "fftai_gr1t1_flat"
