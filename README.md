@@ -400,10 +400,10 @@ Some examples of packages that can likely be excluded are:
 Please cite the following if you use this code or parts of it:
 
 ```
-@software{fan-ziqi2025robot_lab,
+@software{fan-ziqi2024robot_lab,
   author = {Ziqi Fan},
   title = {robot_lab: RL Extension Library for Robots, Based on IsaacLab.},
   url = {https://github.com/fan-ziqi/robot_lab},
-  year = {2025}
+  year = {2024}
 }
 ```
