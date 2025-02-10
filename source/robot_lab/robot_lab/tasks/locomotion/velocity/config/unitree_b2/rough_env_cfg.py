@@ -45,6 +45,8 @@ class UnitreeB2RoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         self.events.randomize_rigid_body_mass.params["asset_cfg"].body_names = [self.base_link_name]
         self.events.randomize_com_positions.params["asset_cfg"].body_names = [self.base_link_name]
         self.events.randomize_apply_external_force_torque.params["asset_cfg"].body_names = [self.base_link_name]
+        self.events.randomize_apply_external_force_torque.params["force_range"] = (-50.0, 50.0)
+        self.events.randomize_apply_external_force_torque.params["torque_range"] = (-10.0, 10.0)
         if self.recover_mode:
             self.events.randomize_reset_base.params = {
                 "pose_range": {
@@ -108,13 +110,13 @@ class UnitreeB2RoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         self.rewards.feet_air_time.params["sensor_cfg"].body_names = [self.foot_link_name]
         self.rewards.feet_contact.weight = 0
         self.rewards.feet_contact.params["sensor_cfg"].body_names = [self.foot_link_name]
-        self.rewards.feet_slide.weight = 0
+        self.rewards.feet_slide.weight = -0.1
         self.rewards.feet_slide.params["sensor_cfg"].body_names = [self.foot_link_name]
         self.rewards.feet_slide.params["asset_cfg"].body_names = [self.foot_link_name]
         self.rewards.joint_power.weight = -2e-5
         self.rewards.stand_still_when_zero_command.weight = -0.5
         self.rewards.joint_position_penalty.weight = -0.5
-        self.rewards.feet_height_exp.weight = 0
+        self.rewards.feet_height_exp.weight = 0.5
         self.rewards.feet_height_exp.params["target_height"] = 0.05
         self.rewards.feet_height_exp.params["asset_cfg"].body_names = [self.foot_link_name]
         self.rewards.feet_gait.weight = 1.0

@@ -48,8 +48,8 @@ class FFTAIGR1T2RoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         self.scene.height_scanner_base.prim_path = "{ENV_REGEX_NS}/Robot/" + self.base_link_name
 
         # ------------------------------Observations------------------------------
-        # self.observations.policy.base_lin_vel = None
-        # self.observations.policy.height_scan = None
+        self.observations.policy.base_lin_vel = None
+        self.observations.policy.height_scan = None
 
         # ------------------------------Actions------------------------------
         # reduce action scale
@@ -76,7 +76,7 @@ class FFTAIGR1T2RoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         self.rewards.joint_torques_l2.weight = 0
         # UNUESD self.rewards.joint_vel_l1.weight = 0.0
         self.rewards.joint_vel_l2.weight = 0
-        self.rewards.joint_acc_l2.weight = -1e-8
+        self.rewards.joint_acc_l2.weight = -1e-9
         self.rewards.create_joint_deviation_l1_rewterm(
             "joint_deviation_other_l1", -0.2, ["head_.*", ".*_hip_yaw", ".*_hip_roll", ".*_shoulder_.*", ".*_wrist_.*"]
         )
@@ -88,7 +88,7 @@ class FFTAIGR1T2RoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         self.rewards.joint_vel_limits.weight = 0
 
         # Action penalties
-        self.rewards.action_rate_l2.weight = -0.0005
+        self.rewards.action_rate_l2.weight = -0.0001
         # UNUESD self.rewards.action_l2.weight = 0.0
 
         # Contact sensor
@@ -96,10 +96,10 @@ class FFTAIGR1T2RoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         self.rewards.contact_forces.weight = 0
 
         # Velocity-tracking rewards
-        self.rewards.track_lin_vel_xy_exp.weight = 2.0
+        self.rewards.track_lin_vel_xy_exp.weight = 5.0
         self.rewards.track_lin_vel_xy_exp.func = mdp.track_lin_vel_xy_yaw_frame_exp
         self.rewards.track_lin_vel_xy_exp.params["std"] = 0.5
-        self.rewards.track_ang_vel_z_exp.weight = 2.0
+        self.rewards.track_ang_vel_z_exp.weight = 5.0
         self.rewards.track_ang_vel_z_exp.func = mdp.track_ang_vel_z_world_exp
         self.rewards.track_ang_vel_z_exp.params["std"] = 0.5
 
@@ -128,6 +128,6 @@ class FFTAIGR1T2RoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         ]
 
         # ------------------------------Commands------------------------------
-        self.commands.base_velocity.ranges.lin_vel_x = (0.0, 1.0)
-        self.commands.base_velocity.ranges.lin_vel_y = (0.0, 0.0)
-        self.commands.base_velocity.ranges.ang_vel_z = (-1.0, 1.0)
+        # self.commands.base_velocity.ranges.lin_vel_x = (0.0, 1.0)
+        # self.commands.base_velocity.ranges.lin_vel_y = (0.0, 0.0)
+        # self.commands.base_velocity.ranges.ang_vel_z = (-1.0, 1.0)
