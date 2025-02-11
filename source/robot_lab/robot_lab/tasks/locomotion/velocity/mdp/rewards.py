@@ -29,7 +29,7 @@ def joint_power(env: ManagerBasedRLEnv, asset_cfg: SceneEntityCfg = SceneEntityC
     return reward
 
 
-def stand_still_when_zero_command(
+def stand_still_without_cmd(
     env: ManagerBasedRLEnv, command_name: str, asset_cfg: SceneEntityCfg = SceneEntityCfg("robot")
 ) -> torch.Tensor:
     """Penalize joint positions that deviate from the default one when no command."""
@@ -207,6 +207,16 @@ def feet_contact(
     return reward
 
 
+def feet_stumble(env: ManagerBasedRLEnv, sensor_cfg: SceneEntityCfg) -> torch.Tensor:
+    # extract the used quantities (to enable type-hinting)
+    contact_sensor: ContactSensor = env.scene.sensors[sensor_cfg.name]
+    forces_z = torch.abs(contact_sensor.data.net_forces_w[:, sensor_cfg.body_ids, 2])
+    forces_xy= torch.norm(contact_sensor.data.net_forces_w[:, sensor_cfg.body_ids, :2], dim=2)
+    contact = contact_sensor.compute_first_contact(env.step_dt)[:, sensor_cfg.body_ids]
+    # Penalize feet hitting vertical surfaces
+    return torch.any(contact & (forces_xy > forces_z), dim=1)
+
+
 def feet_distance_y_exp(
     env: ManagerBasedRLEnv, stance_width: float, std: float, asset_cfg: SceneEntityCfg = SceneEntityCfg("robot")
 ) -> torch.Tensor:
@@ -353,6 +363,32 @@ def track_ang_vel_world_z_exp(
         env.command_manager.get_command(command_name)[:, 2] - asset.data.root_com_ang_vel_w[:, 2]
     )
     return torch.exp(-ang_vel_error / std**2)
+
+
+def feet_height_body_exp(
+    env: ManagerBasedRLEnv, asset_cfg: SceneEntityCfg, target_height: float, std: float
+) -> torch.Tensor:
+    """Reward the swinging feet for clearing a specified height off the ground"""
+    asset: RigidObject = env.scene[asset_cfg.name]
+    cur_footpos_translated = asset.data.body_pos_w[:, asset_cfg.body_ids, :] - asset.data.root_pos_w[:, :].unsqueeze(1)
+    footpos_in_body_frame = torch.zeros(env.num_envs, len(asset_cfg.body_ids), 3, device=env.device)
+    cur_footvel_translated = asset.data.body_lin_vel_w[:, asset_cfg.body_ids, :] - asset.data.root_lin_vel_w[
+        :, :
+    ].unsqueeze(1)
+    footvel_in_body_frame = torch.zeros(env.num_envs, len(asset_cfg.body_ids), 3, device=env.device)
+    for i in range(len(asset_cfg.body_ids)):
+        footpos_in_body_frame[:, i, :] = math_utils.quat_rotate_inverse(
+            asset.data.root_quat_w, cur_footpos_translated[:, i, :]
+        )
+        footvel_in_body_frame[:, i, :] = math_utils.quat_rotate_inverse(
+            asset.data.root_quat_w, cur_footvel_translated[:, i, :]
+        )
+    height_error = torch.square(footpos_in_body_frame[:, :, 2] - target_height).view(env.num_envs, -1)
+    foot_leteral_vel = torch.sqrt(torch.sum(torch.square(footvel_in_body_frame[:, :, :2]), dim=2)).view(
+        env.num_envs, -1
+    )
+    reward = torch.sum(height_error * foot_leteral_vel, dim=1)
+    return torch.exp(-reward / std**2)
 
 
 def base_height_l2(

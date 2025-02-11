@@ -107,7 +107,7 @@ class CommandsCfg:
     base_velocity = mdp.UniformVelocityCommandCfg(
         asset_name="robot",
         resampling_time_range=(10.0, 10.0),
-        rel_standing_envs=0.1,
+        rel_standing_envs=0.02,
         rel_heading_envs=1.0,
         heading_command=True,
         heading_control_stiffness=0.5,
@@ -478,6 +478,14 @@ class RewardsCfg:
         },
     )
 
+    feet_stumble = RewTerm(
+        func=mdp.feet_stumble,
+        weight=0.0,
+        params={
+            "sensor_cfg": SceneEntityCfg("contact_forces", body_names=""),
+        },
+    )
+
     feet_slide = RewTerm(
         func=mdp.feet_slide,
         weight=0.0,
@@ -520,6 +528,16 @@ class RewardsCfg:
     #     },
     # )
 
+    feet_height_body_exp = RewTerm(
+        func=mdp.feet_height_body_exp,
+        weight=0.0,
+        params={
+            "std": math.sqrt(0.25),
+            "asset_cfg": SceneEntityCfg("robot", body_names=""),
+            "target_height": -0.3,
+        },
+    )
+
     joint_power = RewTerm(
         func=mdp.joint_power,
         weight=0.0,
@@ -528,8 +546,8 @@ class RewardsCfg:
         },
     )
 
-    stand_still_when_zero_command = RewTerm(
-        func=mdp.stand_still_when_zero_command,
+    stand_still_without_cmd = RewTerm(
+        func=mdp.stand_still_without_cmd,
         weight=0.0,
         params={
             "command_name": "base_velocity",

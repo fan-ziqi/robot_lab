@@ -42,7 +42,7 @@ class FFTAIGR1T2RoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         super().__post_init__()
 
         # ------------------------------Sence------------------------------
-        # switch robot to fftai-GR1T2
+        # switch robot to fftai gr1t2
         self.scene.robot = FFTAI_GR1T2_CFG.replace(prim_path="{ENV_REGEX_NS}/Robot")
         self.scene.height_scanner.prim_path = "{ENV_REGEX_NS}/Robot/" + self.base_link_name
         self.scene.height_scanner_base.prim_path = "{ENV_REGEX_NS}/Robot/" + self.base_link_name
@@ -112,7 +112,7 @@ class FFTAIGR1T2RoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         self.rewards.feet_slide.params["sensor_cfg"].body_names = [self.foot_link_name]
         self.rewards.feet_slide.params["asset_cfg"].body_names = [self.foot_link_name]
         self.rewards.joint_power.weight = 0
-        self.rewards.stand_still_when_zero_command.weight = 0
+        self.rewards.stand_still_without_cmd.weight = 0
 
         # If the weight of rewards is 0, set rewards to None
         if self.__class__.__name__ == "FFTAIGR1T2RoughEnvCfg":
