@@ -78,7 +78,9 @@ class FFTAIGR1T1RoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         self.rewards.joint_vel_l2.weight = 0
         self.rewards.joint_acc_l2.weight = -1e-9
         self.rewards.create_joint_deviation_l1_rewterm(
-            "joint_deviation_other_l1", -0.2, [".*head_.*", ".*_hip_yaw", ".*_hip_roll", ".*_shoulder_.*", ".*_wrist_.*"]
+            "joint_deviation_other_l1",
+            -0.2,
+            [".*head_.*", ".*_hip_yaw", ".*_hip_roll", ".*_shoulder_.*", ".*_wrist_.*"],
         )
         self.rewards.create_joint_deviation_l1_rewterm("joint_deviation_torso_l1", -0.4, [".*waist_.*"])
         self.rewards.create_joint_deviation_l1_rewterm("joint_deviation_elbow_l1", -0.05, [".*_elbow_pitch"])

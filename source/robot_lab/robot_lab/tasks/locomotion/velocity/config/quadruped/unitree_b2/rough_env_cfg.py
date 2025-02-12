@@ -38,12 +38,19 @@ class UnitreeB2RoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         # reduce action scale
         self.actions.joint_pos.scale = 0.25
         self.actions.joint_pos.clip = {".*": (-100.0, 100.0)}
+        self.actions.joint_pos.preserve_order = True
+        self.actions.joint_pos.joint_names = [
+            "FR_hip_joint", "FR_thigh_joint", "FR_calf_joint",
+            "FL_hip_joint", "FL_thigh_joint", "FL_calf_joint",
+            "RR_hip_joint", "RR_thigh_joint", "RR_calf_joint",
+            "RL_hip_joint", "RL_thigh_joint", "RL_calf_joint",
+        ]
 
         # ------------------------------Events------------------------------
         self.events.randomize_rigid_body_mass.params["asset_cfg"].body_names = [self.base_link_name]
         self.events.randomize_com_positions.params["asset_cfg"].body_names = [self.base_link_name]
         self.events.randomize_apply_external_force_torque.params["asset_cfg"].body_names = [self.base_link_name]
-        self.events.randomize_apply_external_force_torque.params["force_range"] = (-50.0, 50.0)
+        self.events.randomize_apply_external_force_torque.params["force_range"] = (-30.0, 30.0)
         self.events.randomize_apply_external_force_torque.params["torque_range"] = (-10.0, 10.0)
 
         # ------------------------------Rewards------------------------------
@@ -62,7 +69,7 @@ class UnitreeB2RoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         self.rewards.body_lin_acc_l2.params["asset_cfg"].body_names = [self.base_link_name]
 
         # Joint penaltie
-        self.rewards.joint_torques_l2.weight = -2.5e-5
+        self.rewards.joint_torques_l2.weight = -2.5e-6
         # UNUESD self.rewards.joint_vel_l1.weight = 0.0
         self.rewards.joint_vel_l2.weight = 0
         self.rewards.joint_acc_l2.weight = -2.5e-8
@@ -71,7 +78,7 @@ class UnitreeB2RoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         self.rewards.joint_vel_limits.weight = 0
 
         # Action penalties
-        self.rewards.action_rate_l2.weight = -0.01
+        self.rewards.action_rate_l2.weight = -0.005
         # UNUESD self.rewards.action_l2.weight = 0.0
 
         # Contact sensor
