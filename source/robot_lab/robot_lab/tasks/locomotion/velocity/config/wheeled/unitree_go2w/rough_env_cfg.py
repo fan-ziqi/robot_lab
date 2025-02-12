@@ -92,12 +92,14 @@ class UnitreeGo2WRoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         self.actions.joint_pos.joint_names = [f"^(?!{self.wheel_joint_name}).*"]
         self.actions.joint_vel.joint_names = [self.wheel_joint_name]
         self.actions.joint_pos.preserve_order = True
+        # fmt: off
         self.actions.joint_pos.joint_names = [
             "FR_hip_joint", "FR_thigh_joint", "FR_calf_joint",
             "FL_hip_joint", "FL_thigh_joint", "FL_calf_joint",
             "RR_hip_joint", "RR_thigh_joint", "RR_calf_joint",
             "RL_hip_joint", "RL_thigh_joint", "RL_calf_joint",
         ]
+        # fmt: on
         self.actions.joint_vel.preserve_order = True
         self.actions.joint_vel.joint_names = ["FR_foot_joint", "FL_foot_joint", "RR_foot_joint", "RL_foot_joint"]
 

@@ -39,12 +39,14 @@ class UnitreeB2RoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         self.actions.joint_pos.scale = 0.25
         self.actions.joint_pos.clip = {".*": (-100.0, 100.0)}
         self.actions.joint_pos.preserve_order = True
+        # fmt: off
         self.actions.joint_pos.joint_names = [
             "FR_hip_joint", "FR_thigh_joint", "FR_calf_joint",
             "FL_hip_joint", "FL_thigh_joint", "FL_calf_joint",
             "RR_hip_joint", "RR_thigh_joint", "RR_calf_joint",
             "RL_hip_joint", "RL_thigh_joint", "RL_calf_joint",
         ]
+        # fmt: on
 
         # ------------------------------Events------------------------------
         self.events.randomize_rigid_body_mass.params["asset_cfg"].body_names = [self.base_link_name]

@@ -11,10 +11,10 @@ from collections import deque
 from torch.utils.tensorboard import SummaryWriter as TensorboardSummaryWriter
 
 import robot_lab.third_party.rsl_rl as rsl_rl
-from robot_lab.third_party.rsl_rl.algorithms import PPO
-from robot_lab.third_party.rsl_rl.env import VecEnv
-from robot_lab.third_party.rsl_rl.modules import ActorCritic, ActorCriticRecurrent, EmpiricalNormalization
-from robot_lab.third_party.rsl_rl.utils import store_code_state
+from rsl_rl.algorithms import PPO
+from rsl_rl.env import VecEnv
+from rsl_rl.modules import ActorCritic, ActorCriticRecurrent, EmpiricalNormalization
+from rsl_rl.utils import store_code_state
 
 
 class OnPolicyRunner:
@@ -72,12 +72,12 @@ class OnPolicyRunner:
             self.logger_type = self.logger_type.lower()
 
             if self.logger_type == "neptune":
-                from robot_lab.third_party.rsl_rl.utils.neptune_utils import NeptuneSummaryWriter
+                from rsl_rl.utils.neptune_utils import NeptuneSummaryWriter
 
                 self.writer = NeptuneSummaryWriter(log_dir=self.log_dir, flush_secs=10, cfg=self.cfg)
                 self.writer.log_config(self.env.cfg, self.cfg, self.alg_cfg, self.policy_cfg)
             elif self.logger_type == "wandb":
-                from robot_lab.third_party.rsl_rl.utils.wandb_utils import WandbSummaryWriter
+                from rsl_rl.utils.wandb_utils import WandbSummaryWriter
 
                 self.writer = WandbSummaryWriter(log_dir=self.log_dir, flush_secs=10, cfg=self.cfg)
                 self.writer.log_config(self.env.cfg, self.cfg, self.alg_cfg, self.policy_cfg)

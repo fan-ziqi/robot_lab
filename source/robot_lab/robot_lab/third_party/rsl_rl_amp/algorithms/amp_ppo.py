@@ -32,8 +32,8 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 
-from robot_lab.third_party.rsl_rl.modules import ActorCritic
-from robot_lab.third_party.rsl_rl.storage import RolloutStorage
+from rsl_rl.modules import ActorCritic
+from rsl_rl.storage import RolloutStorage
 from robot_lab.third_party.rsl_rl_amp.storage.replay_buffer import ReplayBuffer
 
 
