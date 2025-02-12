@@ -52,6 +52,8 @@ class UnitreeH1RoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         # self.observations.policy.height_scan = None
 
         # ------------------------------Actions------------------------------
+        # reduce action scale
+        # self.actions.joint_pos.scale = 1.0
 
         # ------------------------------Events------------------------------
         self.events.randomize_rigid_body_mass.params["asset_cfg"].body_names = [self.base_link_name]

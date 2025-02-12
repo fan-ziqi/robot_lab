@@ -48,8 +48,8 @@ class FFTAIGR1T2RoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         self.scene.height_scanner_base.prim_path = "{ENV_REGEX_NS}/Robot/" + self.base_link_name
 
         # ------------------------------Observations------------------------------
-        self.observations.policy.base_lin_vel = None
-        self.observations.policy.height_scan = None
+        # self.observations.policy.base_lin_vel = None
+        # self.observations.policy.height_scan = None
 
         # ------------------------------Actions------------------------------
         # reduce action scale
@@ -76,7 +76,7 @@ class FFTAIGR1T2RoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         self.rewards.joint_torques_l2.weight = 0
         # UNUESD self.rewards.joint_vel_l1.weight = 0.0
         self.rewards.joint_vel_l2.weight = 0
-        self.rewards.joint_acc_l2.weight = -1e-9
+        self.rewards.joint_acc_l2.weight = -1.25e-7
         self.rewards.create_joint_deviation_l1_rewterm(
             "joint_deviation_other_l1",
             -0.2,
@@ -90,7 +90,7 @@ class FFTAIGR1T2RoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         self.rewards.joint_vel_limits.weight = 0
 
         # Action penalties
-        self.rewards.action_rate_l2.weight = -0.0001
+        self.rewards.action_rate_l2.weight = -0.005
         # UNUESD self.rewards.action_l2.weight = 0.0
 
         # Contact sensor
@@ -108,7 +108,7 @@ class FFTAIGR1T2RoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         # Others
         self.rewards.feet_air_time.weight = 1.0
         self.rewards.feet_air_time.params["sensor_cfg"].body_names = [self.foot_link_name]
-        self.rewards.feet_air_time.params["threshold"] = 0.8
+        self.rewards.feet_air_time.params["threshold"] = 0.6
         self.rewards.feet_contact.weight = 0
         self.rewards.feet_slide.weight = -0.25
         self.rewards.feet_slide.params["sensor_cfg"].body_names = [self.foot_link_name]
