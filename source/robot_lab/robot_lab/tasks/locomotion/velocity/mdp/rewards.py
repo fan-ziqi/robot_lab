@@ -272,13 +272,6 @@ def feet_distance_xy_exp(
     # Compute differences in x and y
     stance_diff_x = torch.square(desired_xs - footsteps_in_body_frame[:, :, 0])
     stance_diff_y = torch.square(desired_ys - footsteps_in_body_frame[:, :, 1])
-    # print(footsteps_in_body_frame[0, 0, 0], footsteps_in_body_frame[0, 1, 0], footsteps_in_body_frame[0, 2, 0], footsteps_in_body_frame[0, 3, 0])
-    print(
-        footsteps_in_body_frame[0, 0, 1],
-        footsteps_in_body_frame[0, 1, 1],
-        footsteps_in_body_frame[0, 2, 1],
-        footsteps_in_body_frame[0, 3, 1],
-    )
 
     # Combine x and y differences and compute the exponential penalty
     stance_diff = stance_diff_x + stance_diff_y
