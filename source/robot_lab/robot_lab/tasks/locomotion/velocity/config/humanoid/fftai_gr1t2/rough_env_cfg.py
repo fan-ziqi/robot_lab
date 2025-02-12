@@ -78,9 +78,9 @@ class FFTAIGR1T2RoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         self.rewards.joint_vel_l2.weight = 0
         self.rewards.joint_acc_l2.weight = -1e-9
         self.rewards.create_joint_deviation_l1_rewterm(
-            "joint_deviation_other_l1", -0.2, ["head_.*", ".*_hip_yaw", ".*_hip_roll", ".*_shoulder_.*", ".*_wrist_.*"]
+            "joint_deviation_other_l1", -0.2, [".*head_.*", ".*_hip_yaw", ".*_hip_roll", ".*_shoulder_.*", ".*_wrist_.*"]
         )
-        self.rewards.create_joint_deviation_l1_rewterm("joint_deviation_torso_l1", -0.4, ["waist_.*"])
+        self.rewards.create_joint_deviation_l1_rewterm("joint_deviation_torso_l1", -0.4, [".*waist_.*"])
         self.rewards.create_joint_deviation_l1_rewterm("joint_deviation_elbow_l1", -0.05, [".*_elbow_pitch"])
         self.rewards.create_joint_deviation_l1_rewterm("joint_deviation_knee_l1", -0.1, [".*_knee_pitch"])
         self.rewards.joint_pos_limits.weight = -1.0
@@ -120,14 +120,14 @@ class FFTAIGR1T2RoughEnvCfg(LocomotionVelocityRoughEnvCfg):
 
         # ------------------------------Terminations------------------------------
         self.terminations.illegal_contact.params["sensor_cfg"].body_names = [
-            "waist_.*",
-            "head_.*",
+            ".*waist_.*",
+            ".*head_.*",
             ".*_thigh_.*",
             ".*_arm_.*",
             ".*_hand_.*",
         ]
 
         # ------------------------------Commands------------------------------
-        # self.commands.base_velocity.ranges.lin_vel_x = (0.0, 1.0)
-        # self.commands.base_velocity.ranges.lin_vel_y = (0.0, 0.0)
-        # self.commands.base_velocity.ranges.ang_vel_z = (-1.0, 1.0)
+        self.commands.base_velocity.ranges.lin_vel_x = (0.0, 1.0)
+        self.commands.base_velocity.ranges.lin_vel_y = (0.0, 0.0)
+        self.commands.base_velocity.ranges.ang_vel_z = (-1.0, 1.0)
