@@ -295,7 +295,7 @@ python scripts/rsl_rl/base/play.py --task RobotLab-Isaac-Velocity-Flat-HandStand
 For example, to generate Unitree A1 usd file:
 
 ```bash
-python scripts/tools/convert_urdf.py a1.urdf source/robot_lab/data/Robots/Unitree/A1/a1.usd  --merge-join
+python scripts/tools/convert_urdf.py source/robot_lab/data/Robots/Unitree/A1/a1_description/urdf/a1.urdf source/robot_lab/data/Robots/Unitree/A1/a1.usd  --merge-join
 ```
 
 Check [import_new_asset](https://docs.robotsfan.com/isaaclab/source/how-to/import_new_asset.html) for detail
