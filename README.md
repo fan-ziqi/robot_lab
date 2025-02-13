@@ -1,7 +1,7 @@
 # robot_lab
 
-[![IsaacSim](https://img.shields.io/badge/IsaacSim-4.2.0-silver.svg)](https://docs.omniverse.nvidia.com/isaacsim/latest/overview.html)
-[![Isaac Lab](https://img.shields.io/badge/IsaacLab-1.2.0-silver)](https://isaac-sim.github.io/IsaacLab)
+[![IsaacSim](https://img.shields.io/badge/IsaacSim-4.5.0-silver.svg)](https://docs.omniverse.nvidia.com/isaacsim/latest/overview.html)
+[![Isaac Lab](https://img.shields.io/badge/IsaacLab-2.0.0-silver)](https://isaac-sim.github.io/IsaacLab)
 [![Python](https://img.shields.io/badge/python-3.10-blue.svg)](https://docs.python.org/3/whatsnew/3.10.html)
 [![Linux platform](https://img.shields.io/badge/platform-linux--64-orange.svg)](https://releases.ubuntu.com/20.04/)
 [![Windows platform](https://img.shields.io/badge/platform-windows--64-orange.svg)](https://www.microsoft.com/en-us/)
@@ -10,17 +10,23 @@
 
 ## Overview
 
-**robot_lab** is an extension project based on Isaac Lab. It allows you to develop in an isolated environment, outside of the core Isaac Lab repository.
+**robot_lab** is a RL extension library for robots, based on IsaacLab. It allows you to develop in an isolated environment, outside of the core Isaac Lab repository.
 
-If you want to run policy in gazebo or real robot, please use [rl_sar](https://github.com/fan-ziqi/rl_sar) project.
+> [!IMPORTANT]
+> This code repository is currently at **[v2.0](https://github.com/fan-ziqi/robot_lab/releases/tag/v2.0)**, which corresponds to **[IsaacLab-v2.0.0](https://github.com/isaac-sim/IsaacLab/releases/tag/v2.0.0)**.
+>
+> If you prefer to use **[IsaacLab-v1.4.1](https://github.com/isaac-sim/IsaacLab/releases/tag/v1.4.1)**, please refer to the **[v1.1](https://github.com/fan-ziqi/robot_lab/releases/tag/v1.1)** release of this repository.
 
-[Click to discuss on Discord](https://discord.gg/vmVjkhVugU)
+> [!NOTE]
+> If you want to run policy in gazebo or real robot, please use [rl_sar](https://github.com/fan-ziqi/rl_sar) project.
+>
+> [Click to discuss on Discord](https://discord.gg/vmVjkhVugU)
 
 ## Installation
 
-- Install Isaac Lab by following the [installation guide](https://isaac-sim.github.io/IsaacLab/source/setup/installation/index.html). We recommend using the conda installation as it simplifies calling Python scripts from the terminal.
+- Install Isaac Lab by following the [installation guide](https://isaac-sim.github.io/IsaacLab/main/source/setup/installation/index.html). We recommend using the conda installation as it simplifies calling Python scripts from the terminal.
 
-- Clone the repository separately from the Isaac Lab installation (i.e. outside the `IsaacLab` directory):
+- Clone this repository separately from the Isaac Lab installation (i.e. outside the `IsaacLab` directory):
 
   ```bash
   git clone https://github.com/fan-ziqi/robot_lab.git
@@ -29,7 +35,7 @@ If you want to run policy in gazebo or real robot, please use [rl_sar](https://g
 - Using a python interpreter that has Isaac Lab installed, install the library
 
   ```bash
-  python -m pip install -e ./exts/robot_lab
+  python -m pip install -e source/robot_lab
   ```
 
 - Verify that the extension is correctly installed by running the following command to print all the available environments in the extension:
@@ -54,15 +60,15 @@ If everything executes correctly, it should create a file .python.env in the `.v
 
 <summary>Setup as Omniverse Extension (Optional, click to expand)</summary>
 
-We provide an example UI extension that will load upon enabling your extension defined in `exts/robot_lab/robot_lab/ui_extension_example.py`. For more information on UI extensions, enable and check out the source code of the `omni.isaac.ui_template` extension and refer to the introduction on [Isaac Sim Workflows 1.2.3. GUI](https://docs.omniverse.nvidia.com/isaacsim/latest/introductory_tutorials/tutorial_intro_workflows.html#gui).
+We provide an example UI extension that will load upon enabling your extension defined in `source/robot_lab/robot_lab/ui_extension_example.py`.
 
 To enable your extension, follow these steps:
 
 1. **Add the search path of your repository** to the extension manager:
     - Navigate to the extension manager using `Window` -> `Extensions`.
     - Click on the **Hamburger Icon** (☰), then go to `Settings`.
-    - In the `Extension Search Paths`, enter the absolute path to `robot_lab/exts`
-    - If not already present, in the `Extension Search Paths`, enter the path that leads to Isaac Lab's extension directory (`IsaacLab/source/extensions`)
+    - In the `Extension Search Paths`, enter the absolute path to `robot_lab/source`
+    - If not already present, in the `Extension Search Paths`, enter the path that leads to Isaac Lab's extension directory directory (`IsaacLab/source`)
     - Click on the **Hamburger Icon** (☰), then click `Refresh`.
 
 2. **Search and enable your extension**:
@@ -80,7 +86,7 @@ To enable your extension, follow these steps:
 ### Building Isaac Lab Base Image
 
 Currently, we don't have the Docker for Isaac Lab publicly available. Hence, you'd need to build the docker image
-for Isaac Lab locally by following the steps [here](https://isaac-sim.github.io/IsaacLab/source/deployment/index.html).
+for Isaac Lab locally by following the steps [here](https://isaac-sim.github.io/IsaacLab/main/source/deployment/index.html).
 
 Once you have built the base Isaac Lab image, you can check it exists by doing:
 
@@ -93,14 +99,14 @@ docker images
 # isaac-lab-base                   latest    28be62af627e   32 minutes ago   18.9GB
 ```
 
-### Building Isaac Lab Template Image
+### Building robot_lab Image
 
-Following above, you can build the docker container for this project. It is called `isaac-lab-template`. However,
+Following above, you can build the docker container for this project. It is called `robot-lab`. However,
 you can modify this name inside the [`docker/docker-compose.yaml`](docker/docker-compose.yaml).
 
 ```bash
 cd docker
-docker compose --env-file .env.base --file docker-compose.yaml build isaac-lab-template
+docker compose --env-file .env.base --file docker-compose.yaml build robot-lab
 ```
 
 You can verify the image is built successfully using the same command as earlier:
@@ -111,7 +117,7 @@ docker images
 # Output should look something like:
 #
 # REPOSITORY                       TAG       IMAGE ID       CREATED             SIZE
-# isaac-lab-template               latest    00b00b647e1b   2 minutes ago       18.9GB
+# robot-lab                        latest    00b00b647e1b   2 minutes ago       18.9GB
 # isaac-lab-base                   latest    892938acb55c   About an hour ago   18.9GB
 ```
 
@@ -123,7 +129,7 @@ After building, the usual next step is to start the containers associated with y
 docker compose --env-file .env.base --file docker-compose.yaml up
 ```
 
-This will start the services defined in your `docker-compose.yaml` file, including isaac-lab-template.
+This will start the services defined in your `docker-compose.yaml` file, including robot-lab.
 
 If you want to run it in detached mode (in the background), use:
 
@@ -136,7 +142,7 @@ docker compose --env-file .env.base --file docker-compose.yaml up -d
 If you want to run commands inside the running container, you can use the `exec` command:
 
 ```bash
-docker exec --interactive --tty -e DISPLAY=${DISPLAY} isaac-lab-template /bin/bash
+docker exec --interactive --tty -e DISPLAY=${DISPLAY} robot-lab /bin/bash
 ```
 
 ### Shutting down the container
@@ -155,61 +161,97 @@ This stops and removes the containers, but keeps the images.
 
 ### Base Locomotion
 
-FFTAI GR1T1
-
-```bash
-# Train
-python scripts/rsl_rl/base/train.py --task RobotLab-Isaac-Velocity-Flat-FFTAI-GR1T1-v0 --headless
-# Play
-python scripts/rsl_rl/base/play.py --task RobotLab-Isaac-Velocity-Flat-FFTAI-GR1T1-v0
-```
-
 Anymal D
 
 ```bash
 # Train
-python scripts/rsl_rl/base/train.py --task RobotLab-Isaac-Velocity-Flat-Anymal-D-v0 --headless
+python scripts/rsl_rl/base/train.py --task RobotLab-Isaac-Velocity-Rough-Anymal-D-v0 --headless
 # Play
-python scripts/rsl_rl/base/play.py --task RobotLab-Isaac-Velocity-Flat-Anymal-D-v0
+python scripts/rsl_rl/base/play.py --task RobotLab-Isaac-Velocity-Rough-Anymal-D-v0
 ```
 
 Unitree A1
 
 ```bash
 # Train
-python scripts/rsl_rl/base/train.py --task RobotLab-Isaac-Velocity-Flat-Unitree-A1-v0 --headless
+python scripts/rsl_rl/base/train.py --task RobotLab-Isaac-Velocity-Rough-Unitree-A1-v0 --headless
 # Play
-python scripts/rsl_rl/base/play.py --task RobotLab-Isaac-Velocity-Flat-Unitree-A1-v0
+python scripts/rsl_rl/base/play.py --task RobotLab-Isaac-Velocity-Rough-Unitree-A1-v0
 ```
 
-Unitree Go2W (Unvalible for now)
+Unitree Go2
 
 ```bash
 # Train
-python scripts/rsl_rl/base/train.py --task RobotLab-Isaac-Velocity-Flat-Unitree-Go2W-v0 --headless
+python scripts/rsl_rl/base/train.py --task RobotLab-Isaac-Velocity-Rough-Unitree-Go2-v0 --headless
 # Play
-python scripts/rsl_rl/base/play.py --task RobotLab-Isaac-Velocity-Flat-Unitree-Go2W-v0
+python scripts/rsl_rl/base/play.py --task RobotLab-Isaac-Velocity-Rough-Unitree-Go2-v0
+```
+
+Unitree Go2W
+
+```bash
+# Train
+python scripts/rsl_rl/base/train.py --task RobotLab-Isaac-Velocity-Rough-Unitree-Go2W-v0 --headless
+# Play
+python scripts/rsl_rl/base/play.py --task RobotLab-Isaac-Velocity-Rough-Unitree-Go2W-v0
+```
+
+Unitree B2
+
+```bash
+# Train
+python scripts/rsl_rl/base/train.py --task RobotLab-Isaac-Velocity-Rough-Unitree-B2-v0 --headless
+# Play
+python scripts/rsl_rl/base/play.py --task RobotLab-Isaac-Velocity-Rough-Unitree-B2-v0
+```
+
+Unitree B2W
+
+```bash
+# Train
+python scripts/rsl_rl/base/train.py --task RobotLab-Isaac-Velocity-Rough-Unitree-B2W-v0 --headless
+# Play
+python scripts/rsl_rl/base/play.py --task RobotLab-Isaac-Velocity-Rough-Unitree-B2W-v0
+```
+
+FFTAI GR1T1
+
+```bash
+# Train
+python scripts/rsl_rl/base/train.py --task RobotLab-Isaac-Velocity-Rough-FFTAI-GR1T1-v0 --headless
+# Play
+python scripts/rsl_rl/base/play.py --task RobotLab-Isaac-Velocity-Rough-FFTAI-GR1T1-v0
+```
+
+FFTAI GR1T2
+
+```bash
+# Train
+python scripts/rsl_rl/base/train.py --task RobotLab-Isaac-Velocity-Rough-FFTAI-GR1T2-v0 --headless
+# Play
+python scripts/rsl_rl/base/play.py --task RobotLab-Isaac-Velocity-Rough-FFTAI-GR1T2-v0
 ```
 
 Unitree H1
 
 ```bash
 # Train
-python scripts/rsl_rl/base/train.py --task RobotLab-Isaac-Velocity-Flat-Unitree-H1-v0 --headless
+python scripts/rsl_rl/base/train.py --task RobotLab-Isaac-Velocity-Rough-Unitree-H1-v0 --headless
 # Play
-python scripts/rsl_rl/base/play.py --task RobotLab-Isaac-Velocity-Flat-Unitree-H1-v0
+python scripts/rsl_rl/base/play.py --task RobotLab-Isaac-Velocity-Rough-Unitree-H1-v0
 ```
 
 Unitree G1
 
 ```bash
 # Train
-python scripts/rsl_rl/base/train.py --task RobotLab-Isaac-Velocity-Flat-Unitree-G1-v0 --headless
+python scripts/rsl_rl/base/train.py --task RobotLab-Isaac-Velocity-Rough-Unitree-G1-v0 --headless
 # Play
-python scripts/rsl_rl/base/play.py --task RobotLab-Isaac-Velocity-Flat-Unitree-G1-v0
+python scripts/rsl_rl/base/play.py --task RobotLab-Isaac-Velocity-Rough-Unitree-G1-v0
 ```
 
-The above configs are flat, you can change `Flat` to `Rough`
+The above configs are rough, you can change `Rough` to `Flat`
 
 **Note**
 
@@ -226,7 +268,7 @@ Unitree A1
 
 ```bash
 # Retarget motion files
-python exts/robot_lab/robot_lab/third_party/amp_utils/scripts/retarget_kp_motions.py
+python source/robot_lab/robot_lab/third_party/amp_utils/scripts/retarget_kp_motions.py
 # Replay AMP data
 python scripts/rsl_rl/amp/replay_amp_data.py --task RobotLab-Isaac-Velocity-Flat-Amp-Unitree-A1-v0
 # Train
@@ -253,7 +295,7 @@ python scripts/rsl_rl/base/play.py --task RobotLab-Isaac-Velocity-Flat-HandStand
 For example, to generate Unitree A1 usd file:
 
 ```bash
-python scripts/tools/convert_urdf.py a1.urdf exts/robot_lab/data/Robots/Unitree/A1/a1.usd  --merge-join
+python scripts/tools/convert_urdf.py source/robot_lab/data/Robots/Unitree/A1/a1_description/urdf/a1.urdf source/robot_lab/data/Robots/Unitree/A1/a1.usd  --merge-join
 ```
 
 Check [import_new_asset](https://docs.robotsfan.com/isaaclab/source/how-to/import_new_asset.html) for detail
@@ -272,7 +314,7 @@ itself. However, its various instances are included in directories within the en
 This looks like as follows:
 
 ```tree
-exts/robot_lab/tasks/locomotion/
+source/robot_lab/tasks/locomotion/
 ├── __init__.py
 └── velocity
     ├── config
@@ -285,12 +327,12 @@ exts/robot_lab/tasks/locomotion/
     └── velocity_env_cfg.py  # <- this is the base task configuration
 ```
 
-The environments are then registered in the `exts/robot_lab/tasks/locomotion/velocity/config/unitree_a1/__init__.py`:
+The environments are then registered in the `source/robot_lab/tasks/locomotion/velocity/config/unitree_a1/__init__.py`:
 
 ```python
 gym.register(
     id="RobotLab-Isaac-Velocity-Flat-Unitree-A1-v0",
-    entry_point="omni.isaac.lab.envs:ManagerBasedRLEnv",
+    entry_point="isaaclab.envs:ManagerBasedRLEnv",
     disable_env_checker=True,
     kwargs={
         "env_cfg_entry_point": f"{__name__}.flat_env_cfg:UnitreeA1FlatEnvCfg",
@@ -300,7 +342,7 @@ gym.register(
 
 gym.register(
     id="RobotLab-Isaac-Velocity-Rough-Unitree-A1-v0",
-    entry_point="omni.isaac.lab.envs:ManagerBasedRLEnv",
+    entry_point="isaaclab.envs:ManagerBasedRLEnv",
     disable_env_checker=True,
     kwargs={
         "env_cfg_entry_point": f"{__name__}.rough_env_cfg:UnitreeA1RoughEnvCfg",
@@ -342,7 +384,7 @@ In some VsCode versions, the indexing of part of the extensions is missing. In t
 ```json
 {
     "python.analysis.extraPaths": [
-        "<path-to-ext-repo>/exts/robot_lab"
+        "<path-to-ext-repo>/source/robot_lab"
     ]
 }
 ```
@@ -368,8 +410,8 @@ Please cite the following if you use this code or parts of it:
 
 ```
 @software{fan-ziqi2024robot_lab,
-  author = {fan-ziqi},
-  title = {{robot_lab: An extension project based on Isaac Lab.}},
+  author = {Ziqi Fan},
+  title = {robot_lab: RL Extension Library for Robots, Based on IsaacLab.},
   url = {https://github.com/fan-ziqi/robot_lab},
   year = {2024}
 }

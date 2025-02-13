@@ -34,3 +34,6 @@ _isaac_sim*
 _repo
 _build
 .lastformat
+
+config.yaml
+.asset_hash

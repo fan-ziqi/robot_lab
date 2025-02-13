@@ -1,7 +1,7 @@
-x-default-isaac-lab-template-environment: &default-isaac-lab-template-environment
+x-default-robot-lab-environment: &default-robot-lab-environment
   - OMNI_KIT_ALLOW_ROOT=1
 
-x-default-isaac-lab-template-deploy: &default-isaac-lab-template-deploy
+x-default-robot-lab-deploy: &default-robot-lab-deploy
   resources:
     reservations:
       devices:
@@ -10,7 +10,7 @@ x-default-isaac-lab-template-deploy: &default-isaac-lab-template-deploy
           capabilities: [ gpu ]
 
 services:
-  isaac-lab-template:
+  robot-lab:
     env_file: .env.base
     build:
       context: ../
@@ -18,15 +18,15 @@ services:
       args:
         - ISAACLAB_BASE_IMAGE_ARG=${ISAACLAB_BASE_IMAGE}
         - DOCKER_ISAACLAB_EXTENSION_TEMPLATE_PATH_ARG=${DOCKER_ISAACLAB_EXTENSION_TEMPLATE_PATH}
-    image: isaac-lab-template
-    container_name: isaac-lab-template
+    image: robot-lab
+    container_name: robot-lab
     volumes:
       - type: bind
         source: ../
         target: ${DOCKER_ISAACLAB_EXTENSION_TEMPLATE_PATH}
     network_mode: host
-    environment: *default-isaac-lab-template-environment
-    deploy: *default-isaac-lab-template-deploy
+    environment: *default-robot-lab-environment
+    deploy: *default-robot-lab-deploy
     # This is the entrypoint for the container
     entrypoint: bash
     stdin_open: true

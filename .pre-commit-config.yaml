@@ -18,7 +18,7 @@ repos:
       - id: check-yaml
       - id: check-merge-conflict
       - id: check-case-conflict
-      - id: check-executables-have-shebangs
+      # - id: check-executables-have-shebangs
       - id: check-toml
       - id: end-of-file-fixer
       - id: check-shebang-scripts-are-executable
@@ -58,4 +58,4 @@ repos:
           - .github/LICENSE_HEADER.txt
           - --use-current-year
 
-exclude: ^(exts/robot_lab/robot_lab/third_party/|.vscode/)
+exclude: ^(source/robot_lab/robot_lab/third_party/|.vscode/|.github/)

@@ -1,7 +1,7 @@
 # Copyright (c) 2024-2025 Ziqi Fan
 # SPDX-License-Identifier: Apache-2.0
 
-# Copyright (c) 2022-2024, The Isaac Lab Project Developers.
+# Copyright (c) 2022-2025, The Isaac Lab Project Developers.
 # All rights reserved.
 #
 # SPDX-License-Identifier: BSD-3-Clause
@@ -9,17 +9,11 @@
 from __future__ import annotations
 
 import argparse
+import random
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from omni.isaac.lab_tasks.utils.wrappers.rsl_rl import RslRlOnPolicyRunnerCfg
-
-import os
-import sys
-
-current_dir = os.path.dirname(os.path.abspath(__file__))
-if current_dir not in sys.path:
-    sys.path.append(current_dir)
+    from isaaclab_rl.rsl_rl import RslRlOnPolicyRunnerCfg
 
 
 def add_rsl_rl_args(parser: argparse.ArgumentParser):
@@ -58,7 +52,7 @@ def parse_rsl_rl_cfg(task_name: str, args_cli: argparse.Namespace) -> RslRlOnPol
     Returns:
         The parsed configuration for RSL-RL agent based on inputs.
     """
-    from omni.isaac.lab_tasks.utils.parse_cfg import load_cfg_from_registry
+    from isaaclab_tasks.utils.parse_cfg import load_cfg_from_registry
 
     # load the default configuration
     rslrl_cfg: RslRlOnPolicyRunnerCfg = load_cfg_from_registry(task_name, "rsl_rl_cfg_entry_point")
@@ -78,6 +72,9 @@ def update_rsl_rl_cfg(agent_cfg: RslRlOnPolicyRunnerCfg, args_cli: argparse.Name
     """
     # override the default configuration with CLI arguments
     if hasattr(args_cli, "seed") and args_cli.seed is not None:
+        # randomly sample a seed if seed = -1
+        if args_cli.seed == -1:
+            args_cli.seed = random.randint(0, 10000)
         agent_cfg.seed = args_cli.seed
     if args_cli.resume is not None:
         agent_cfg.resume = args_cli.resume
