@@ -11,11 +11,14 @@
 """Launch Isaac Sim Simulator first."""
 
 import argparse
+import os
+import sys
 
 from isaaclab.app import AppLauncher
 
 # local imports
-import cli_args  # isort: skip
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+import cli_args
 
 # add argparse arguments
 parser = argparse.ArgumentParser(description="Train an RL agent with RSL-RL.")
@@ -32,6 +35,7 @@ parser.add_argument(
     help="Use the pre-trained checkpoint from Nucleus.",
 )
 parser.add_argument("--real-time", action="store_true", default=False, help="Run in real-time, if possible.")
+parser.add_argument("--keyboard", action="store_true", default=False, help="Whether to use keyboard.")
 # append RSL-RL cli arguments
 cli_args.add_rsl_rl_args(parser)
 # append AppLauncher cli args
@@ -48,11 +52,15 @@ simulation_app = app_launcher.app
 """Rest everything follows."""
 
 import gymnasium as gym
-import os
 import time
 import torch
 
+import carb
+import omni
+import rsl_rl_utils
+
 from isaaclab.envs import DirectMARLEnv, multi_agent_to_single_agent
+from isaaclab.managers import ObservationTermCfg as ObsTerm
 from isaaclab.utils.assets import retrieve_file_path
 from isaaclab.utils.dict import print_dict
 from isaaclab.utils.pretrained_checkpoint import get_published_pretrained_checkpoint
@@ -60,7 +68,7 @@ from isaaclab_rl.rsl_rl import RslRlOnPolicyRunnerCfg, RslRlVecEnvWrapper, expor
 from isaaclab_tasks.utils import get_checkpoint_path, parse_env_cfg
 
 import robot_lab.tasks  # noqa: F401
-from robot_lab.third_party.rsl_rl_amp.runners import AmpOnPolicyRunner
+from robot_lab.third_party.rsl_rl_amp.runners import AmpOnPolicyRunner as OnPolicyRunner
 
 
 def main():
@@ -92,6 +100,18 @@ def main():
     # env_cfg.commands.base_velocity.ranges.lin_vel_y = (0.0, 0.0)
     # env_cfg.commands.base_velocity.ranges.ang_vel_z = (0.0, 0.0)
     # env_cfg.commands.base_velocity.ranges.heading = (0.0, 0.0)
+
+    if args_cli.keyboard:
+        env_cfg.scene.num_envs = 1
+        base_vel_cmd_input = torch.zeros((env_cfg.scene.num_envs, 3), dtype=torch.float32)
+        system_input = carb.input.acquire_input_interface()
+        system_input.subscribe_to_keyboard_events(
+            omni.appwindow.get_default_app_window().get_keyboard(),
+            lambda event: rsl_rl_utils.sub_keyboard_event(event, base_vel_cmd_input),
+        )
+        env_cfg.observations.policy.velocity_commands = ObsTerm(
+            func=lambda env: base_vel_cmd_input.clone().to(env.device),
+        )
 
     # specify directory for logging experiments
     log_root_path = os.path.join("logs", "rsl_rl", agent_cfg.experiment_name)
@@ -133,7 +153,7 @@ def main():
 
     print(f"[INFO]: Loading model checkpoint from: {resume_path}")
     # load previously trained model
-    ppo_runner = AmpOnPolicyRunner(env, agent_cfg.to_dict(), log_dir=None, device=agent_cfg.device)
+    ppo_runner = OnPolicyRunner(env, agent_cfg.to_dict(), log_dir=None, device=agent_cfg.device)
     ppo_runner.load(resume_path)
 
     # obtain the trained policy for inference
@@ -174,6 +194,9 @@ def main():
             # Exit the play loop after recording one video
             if timestep == args_cli.video_length:
                 break
+
+        if args_cli.keyboard:
+            rsl_rl_utils.camera_follow(env)
 
         # time delay for real-time evaluation
         sleep_time = dt - (time.time() - start_time)

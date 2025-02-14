@@ -159,6 +159,9 @@ This stops and removes the containers, but keeps the images.
 
 ## Try examples
 
+> [!NOTE]
+> If you want to control with the keyboard during playback, add ``--keyboard`` after the ``play.py`` script.
+
 ### Base Locomotion
 
 Anymal D
@@ -416,3 +419,10 @@ Please cite the following if you use this code or parts of it:
   year = {2024}
 }
 ```
+
+## Acknowledgements
+
+The project uses some code from the following open-source code repositories:
+
+- [Alescontrela/AMP_for_hardware](https://github.com/Alescontrela/AMP_for_hardware)
+- [Zhefan-Xu/isaac-go2-ros2](https://github.com/Zhefan-Xu/isaac-go2-ros2)

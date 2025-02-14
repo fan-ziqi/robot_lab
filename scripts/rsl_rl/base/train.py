@@ -11,13 +11,14 @@
 """Launch Isaac Sim Simulator first."""
 
 import argparse
+import os
 import sys
 
 from isaaclab.app import AppLauncher
 
 # local imports
-import cli_args  # isort: skip
-
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+import cli_args
 
 # add argparse arguments
 parser = argparse.ArgumentParser(description="Train an RL agent with RSL-RL.")
@@ -28,7 +29,7 @@ parser.add_argument("--num_envs", type=int, default=None, help="Number of enviro
 parser.add_argument("--task", type=str, default=None, help="Name of the task.")
 parser.add_argument("--seed", type=int, default=None, help="Seed used for the environment")
 parser.add_argument("--max_iterations", type=int, default=None, help="RL Policy training iterations.")
-parser.add_argument("--recovery_mode", type=bool, default=None, help="Whether to use recovery mode.")
+parser.add_argument("--recovery_mode", action="store_true", default=False, help="Whether to use recovery mode.")
 # append RSL-RL cli arguments
 cli_args.add_rsl_rl_args(parser)
 # append AppLauncher cli args
@@ -92,28 +93,27 @@ def main(env_cfg: ManagerBasedRLEnvCfg | DirectRLEnvCfg | DirectMARLEnvCfg, agen
     env_cfg.sim.device = args_cli.device if args_cli.device is not None else env_cfg.sim.device
 
     # set recovery mode
-    if args_cli.recovery_mode is not None:
-        if args_cli.recovery_mode:
-            env_cfg.events.randomize_reset_base.params = {
-                "pose_range": {
-                    "x": (-0.5, 0.5),
-                    "y": (-0.5, 0.5),
-                    "z": (0.0, 1.0),
-                    "roll": (-3.14, 3.14),
-                    "pitch": (-3.14, 3.14),
-                    "yaw": (-3.14, 3.14),
-                },
-                "velocity_range": {
-                    "x": (-0.5, 0.5),
-                    "y": (-0.5, 0.5),
-                    "z": (-0.5, 0.5),
-                    "roll": (-0.5, 0.5),
-                    "pitch": (-0.5, 0.5),
-                    "yaw": (-0.5, 0.5),
-                },
-            }
-            env_cfg.rewards.upward.weight = 0.5
-            env_cfg.terminations.illegal_contact = None
+    if args_cli.recovery_mode:
+        env_cfg.events.randomize_reset_base.params = {
+            "pose_range": {
+                "x": (-0.5, 0.5),
+                "y": (-0.5, 0.5),
+                "z": (0.0, 1.0),
+                "roll": (-3.14, 3.14),
+                "pitch": (-3.14, 3.14),
+                "yaw": (-3.14, 3.14),
+            },
+            "velocity_range": {
+                "x": (-0.5, 0.5),
+                "y": (-0.5, 0.5),
+                "z": (-0.5, 0.5),
+                "roll": (-0.5, 0.5),
+                "pitch": (-0.5, 0.5),
+                "yaw": (-0.5, 0.5),
+            },
+        }
+        env_cfg.rewards.upward.weight = 0.5
+        env_cfg.terminations.illegal_contact = None
 
     # specify directory for logging experiments
     log_root_path = os.path.join("logs", "rsl_rl", agent_cfg.experiment_name)

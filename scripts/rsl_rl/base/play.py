@@ -11,11 +11,14 @@
 """Launch Isaac Sim Simulator first."""
 
 import argparse
+import os
+import sys
 
 from isaaclab.app import AppLauncher
 
 # local imports
-import cli_args  # isort: skip
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+import cli_args
 
 # add argparse arguments
 parser = argparse.ArgumentParser(description="Train an RL agent with RSL-RL.")
@@ -32,6 +35,7 @@ parser.add_argument(
     help="Use the pre-trained checkpoint from Nucleus.",
 )
 parser.add_argument("--real-time", action="store_true", default=False, help="Run in real-time, if possible.")
+parser.add_argument("--keyboard", action="store_true", default=False, help="Whether to use keyboard.")
 # append RSL-RL cli arguments
 cli_args.add_rsl_rl_args(parser)
 # append AppLauncher cli args
@@ -48,13 +52,16 @@ simulation_app = app_launcher.app
 """Rest everything follows."""
 
 import gymnasium as gym
-import os
 import time
 import torch
 
+import carb
+import omni
+import rsl_rl_utils
 from rsl_rl.runners import OnPolicyRunner
 
 from isaaclab.envs import DirectMARLEnv, multi_agent_to_single_agent
+from isaaclab.managers import ObservationTermCfg as ObsTerm
 from isaaclab.utils.assets import retrieve_file_path
 from isaaclab.utils.dict import print_dict
 from isaaclab.utils.pretrained_checkpoint import get_published_pretrained_checkpoint
@@ -89,12 +96,24 @@ def main():
     env_cfg.events.push_robot = None
 
     # env_cfg.commands.base_velocity.rel_standing_envs = 0.0
-    env_cfg.commands.base_velocity.ranges.lin_vel_x = (0.5, 1.5)
-    env_cfg.commands.base_velocity.ranges.lin_vel_y = (0.0, 0.0)
-    env_cfg.commands.base_velocity.ranges.ang_vel_z = (0.0, 0.0)
-    env_cfg.commands.base_velocity.ranges.heading = (0.0, 0.0)
+    # env_cfg.commands.base_velocity.ranges.lin_vel_x = (0.5, 1.5)
+    # env_cfg.commands.base_velocity.ranges.lin_vel_y = (0.0, 0.0)
+    # env_cfg.commands.base_velocity.ranges.ang_vel_z = (0.0, 0.0)
+    # env_cfg.commands.base_velocity.ranges.heading = (0.0, 0.0)
 
     env_cfg.terminations.illegal_contact = None
+
+    if args_cli.keyboard:
+        env_cfg.scene.num_envs = 1
+        cmd_vel = torch.zeros((env_cfg.scene.num_envs, 3), dtype=torch.float32)
+        system_input = carb.input.acquire_input_interface()
+        system_input.subscribe_to_keyboard_events(
+            omni.appwindow.get_default_app_window().get_keyboard(),
+            lambda event: rsl_rl_utils.sub_keyboard_event(event, cmd_vel, lin_vel=1.0, ang_vel=1.0),
+        )
+        env_cfg.observations.policy.velocity_commands = ObsTerm(
+            func=lambda env: cmd_vel.clone().to(env.device),
+        )
 
     # specify directory for logging experiments
     log_root_path = os.path.join("logs", "rsl_rl", agent_cfg.experiment_name)
@@ -177,6 +196,9 @@ def main():
             # Exit the play loop after recording one video
             if timestep == args_cli.video_length:
                 break
+
+        if args_cli.keyboard:
+            rsl_rl_utils.camera_follow(env)
 
         # time delay for real-time evaluation
         sleep_time = dt - (time.time() - start_time)
