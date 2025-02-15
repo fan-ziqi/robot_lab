@@ -9,7 +9,9 @@ from isaaclab.assets import Articulation, RigidObject
 from isaaclab.managers import SceneEntityCfg
 from isaaclab.utils.math import quat_rotate
 
-from robot_lab.tasks.locomotion.velocity.config.unitree_a1_amp.env.manager_based_rl_amp_env import ManagerBasedRLAmpEnv
+from robot_lab.tasks.locomotion.velocity.config.quadruped.unitree_a1_amp.env.manager_based_rl_amp_env import (
+    ManagerBasedRLAmpEnv,
+)
 
 
 def reset_amp(

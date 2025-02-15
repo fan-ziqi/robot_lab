@@ -9,7 +9,7 @@ from isaaclab.managers import ObservationTermCfg as ObsTerm
 from isaaclab.utils import configclass
 
 import robot_lab.tasks.locomotion.velocity.mdp as mdp
-from robot_lab.tasks.locomotion.velocity.config.unitree_a1_amp.env.events import reset_amp
+from robot_lab.tasks.locomotion.velocity.config.quadruped.unitree_a1_amp.env.events import reset_amp
 from robot_lab.tasks.locomotion.velocity.velocity_env_cfg import (
     EventCfg,
     LocomotionVelocityRoughEnvCfg,
