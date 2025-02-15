@@ -123,7 +123,7 @@ class ActionsCfg:
     """Action specifications for the MDP."""
 
     joint_pos = mdp.JointPositionActionCfg(
-        asset_name="robot", joint_names=[".*"], scale=0.5, use_default_offset=True, clip=None
+        asset_name="robot", joint_names=[".*"], scale=0.5, use_default_offset=True, clip=None, preserve_order=True
     )
 
 
@@ -165,14 +165,14 @@ class ObservationsCfg:
             noise=Unoise(n_min=-0.01, n_max=0.01),
             clip=(-100.0, 100.0),
             scale=1.0,
-            params={"asset_cfg": SceneEntityCfg("robot", joint_names=".*")},
+            params={"asset_cfg": SceneEntityCfg("robot", joint_names=".*", preserve_order=True)},
         )
         joint_vel = ObsTerm(
             func=mdp.joint_vel_rel,
             noise=Unoise(n_min=-1.5, n_max=1.5),
             clip=(-100.0, 100.0),
             scale=1.0,
-            params={"asset_cfg": SceneEntityCfg("robot", joint_names=".*")},
+            params={"asset_cfg": SceneEntityCfg("robot", joint_names=".*", preserve_order=True)},
         )
         actions = ObsTerm(
             func=mdp.last_action,
@@ -204,13 +204,13 @@ class ObservationsCfg:
         )
         joint_pos = ObsTerm(
             func=mdp.joint_pos_rel,
-            params={"asset_cfg": SceneEntityCfg("robot", joint_names=".*")},
+            params={"asset_cfg": SceneEntityCfg("robot", joint_names=".*", preserve_order=True)},
             scale=1.0,
             clip=(-100.0, 100.0),
         )
         joint_vel = ObsTerm(
             func=mdp.joint_vel_rel,
-            params={"asset_cfg": SceneEntityCfg("robot", joint_names=".*")},
+            params={"asset_cfg": SceneEntityCfg("robot", joint_names=".*", preserve_order=True)},
             scale=1.0,
             clip=(-100.0, 100.0),
         )
