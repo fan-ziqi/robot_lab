@@ -425,4 +425,3 @@ Please cite the following if you use this code or parts of it:
 The project uses some code from the following open-source code repositories:
 
 - [Alescontrela/AMP_for_hardware](https://github.com/Alescontrela/AMP_for_hardware)
-- [Zhefan-Xu/isaac-go2-ros2](https://github.com/Zhefan-Xu/isaac-go2-ros2)

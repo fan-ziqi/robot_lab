@@ -105,6 +105,8 @@ def main():
 
     if args_cli.keyboard:
         env_cfg.scene.num_envs = 1
+        env_cfg.terminations.time_out = None
+        env_cfg.commands.base_velocity.debug_vis = False
         cmd_vel = torch.zeros((env_cfg.scene.num_envs, 3), dtype=torch.float32)
         system_input = carb.input.acquire_input_interface()
         system_input.subscribe_to_keyboard_events(
