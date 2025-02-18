@@ -20,7 +20,7 @@
 > [!NOTE]
 > If you want to run policy in gazebo or real robot, please use [rl_sar](https://github.com/fan-ziqi/rl_sar) project.
 >
-> [Click to discuss on Discord](https://discord.gg/vmVjkhVugU)
+> Discuss in [Github Discussion](https://github.com/fan-ziqi/robot_lab/discussions) or [Discord](https://discord.gg/vmVjkhVugU).
 
 ## Installation
 
