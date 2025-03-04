@@ -8,9 +8,29 @@ from typing import TYPE_CHECKING, Sequence
 
 from isaaclab.managers import CommandTerm, CommandTermCfg
 from isaaclab.utils import configclass
+import robot_lab.tasks.locomotion.velocity.mdp as mdp
 
 if TYPE_CHECKING:
     from isaaclab.envs import ManagerBasedEnv
+
+
+class UniformThresholdVelocityCommand(mdp.UniformVelocityCommand):
+    """Command generator that generates a velocity command in SE(2) from uniform distribution with threshold."""
+
+    cfg: mdp.UniformThresholdVelocityCommandCfg
+    """The configuration of the command generator."""
+
+    def _resample_command(self, env_ids: Sequence[int]):
+        super()._resample_command(env_ids)
+        # set small commands to zero
+        self.vel_command_b[env_ids, :2] *= (torch.norm(self.vel_command_b[env_ids, :2], dim=1) > 0.2).unsqueeze(1)
+
+
+@configclass
+class UniformThresholdVelocityCommandCfg(mdp.UniformVelocityCommandCfg):
+    """Configuration for the uniform threshold velocity command generator."""
+
+    class_type: type = UniformThresholdVelocityCommand
 
 
 class DiscreteCommandController(CommandTerm):

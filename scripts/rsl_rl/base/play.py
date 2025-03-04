@@ -55,11 +55,10 @@ import gymnasium as gym
 import time
 import torch
 
-import carb
-import omni
 import rsl_rl_utils
 from rsl_rl.runners import OnPolicyRunner
 
+from isaaclab.devices import Se2Keyboard
 from isaaclab.envs import DirectMARLEnv, multi_agent_to_single_agent
 from isaaclab.managers import ObservationTermCfg as ObsTerm
 from isaaclab.utils.assets import retrieve_file_path
@@ -107,14 +106,9 @@ def main():
         env_cfg.scene.num_envs = 1
         env_cfg.terminations.time_out = None
         env_cfg.commands.base_velocity.debug_vis = False
-        cmd_vel = torch.zeros((env_cfg.scene.num_envs, 3), dtype=torch.float32)
-        system_input = carb.input.acquire_input_interface()
-        system_input.subscribe_to_keyboard_events(
-            omni.appwindow.get_default_app_window().get_keyboard(),
-            lambda event: rsl_rl_utils.sub_keyboard_event(event, cmd_vel, lin_vel=1.0, ang_vel=1.0),
-        )
+        controller = Se2Keyboard(v_x_sensitivity=1.0, v_y_sensitivity=1.0, omega_z_sensitivity=1.0)
         env_cfg.observations.policy.velocity_commands = ObsTerm(
-            func=lambda env: cmd_vel.clone().to(env.device),
+            func=lambda env: torch.tensor(controller.advance(), dtype=torch.float32).unsqueeze(0).to(env.device),
         )
 
     # specify directory for logging experiments

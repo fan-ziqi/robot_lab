@@ -11,27 +11,59 @@ import colorama
 colorama.init(autoreset=True)
 
 commands = [
-    "python scripts/rsl_rl/base/train.py --task RobotLab-Isaac-Velocity-Flat-FFTAI-GR1T1-v0 --headless",
-    "python scripts/rsl_rl/base/train.py --task RobotLab-Isaac-Velocity-Flat-FFTAI-GR1T2-v0 --headless",
-    "python scripts/rsl_rl/base/train.py --task RobotLab-Isaac-Velocity-Flat-Unitree-A1-v0 --headless",
-    "python scripts/rsl_rl/base/train.py --task RobotLab-Isaac-Velocity-Flat-Anymal-D-v0 --headless",
-    "python scripts/rsl_rl/base/train.py --task RobotLab-Isaac-Velocity-Flat-Unitree-Go2-v0 --headless",
-    "python scripts/rsl_rl/base/train.py --task RobotLab-Isaac-Velocity-Flat-Unitree-Go2W-v0 --headless",
-    "python scripts/rsl_rl/base/train.py --task RobotLab-Isaac-Velocity-Flat-Unitree-B2-v0 --headless",
-    "python scripts/rsl_rl/base/train.py --task RobotLab-Isaac-Velocity-Flat-Unitree-B2W-v0 --headless",
-    "python scripts/rsl_rl/base/train.py --task RobotLab-Isaac-Velocity-Flat-Unitree-H1-v0 --headless",
-    "python scripts/rsl_rl/base/train.py --task RobotLab-Isaac-Velocity-Flat-Unitree-G1-v0 --headless",
-    "python scripts/rsl_rl/base/train.py --task RobotLab-Isaac-Velocity-Rough-FFTAI-GR1T1-v0 --headless",
-    "python scripts/rsl_rl/base/train.py --task RobotLab-Isaac-Velocity-Rough-FFTAI-GR1T2-v0 --headless",
+    # "python scripts/rsl_rl/base/train.py --task RobotLab-Isaac-Velocity-Flat-FFTAI-GR1T1-v0 --headless",
+    # "python scripts/rsl_rl/base/train.py --task RobotLab-Isaac-Velocity-Flat-FFTAI-GR1T2-v0 --headless",
+    # "python scripts/rsl_rl/base/train.py --task RobotLab-Isaac-Velocity-Flat-Unitree-A1-v0 --headless",
+    # "python scripts/rsl_rl/base/train.py --task RobotLab-Isaac-Velocity-Flat-Anymal-D-v0 --headless",
+    # "python scripts/rsl_rl/base/train.py --task RobotLab-Isaac-Velocity-Flat-Unitree-Go2-v0 --headless",
+    # "python scripts/rsl_rl/base/train.py --task RobotLab-Isaac-Velocity-Flat-Unitree-Go2W-v0 --headless",
+    # "python scripts/rsl_rl/base/train.py --task RobotLab-Isaac-Velocity-Flat-Unitree-B2-v0 --headless",
+    # "python scripts/rsl_rl/base/train.py --task RobotLab-Isaac-Velocity-Flat-Unitree-B2W-v0 --headless",
+    # "python scripts/rsl_rl/base/train.py --task RobotLab-Isaac-Velocity-Flat-Unitree-H1-v0 --headless",
+    # "python scripts/rsl_rl/base/train.py --task RobotLab-Isaac-Velocity-Flat-Unitree-G1-v0 --headless",
+    # "python scripts/rsl_rl/base/train.py --task RobotLab-Isaac-Velocity-Flat-Njust-V2-Fixed-v0 --headless",
+    # "python scripts/rsl_rl/base/train.py --task RobotLab-Isaac-Velocity-Flat-Njust-V2-Wheel-v0 --headless",
+    # "python scripts/rsl_rl/base/train.py --task RobotLab-Isaac-Velocity-Rough-FFTAI-GR1T1-v0 --headless",
+    # "python scripts/rsl_rl/base/train.py --task RobotLab-Isaac-Velocity-Rough-FFTAI-GR1T2-v0 --headless",
     "python scripts/rsl_rl/base/train.py --task RobotLab-Isaac-Velocity-Rough-Unitree-A1-v0 --headless",
-    "python scripts/rsl_rl/base/train.py --task RobotLab-Isaac-Velocity-Rough-Anymal-D-v0 --headless",
+    # "python scripts/rsl_rl/base/train.py --task RobotLab-Isaac-Velocity-Rough-Anymal-D-v0 --headless",
     "python scripts/rsl_rl/base/train.py --task RobotLab-Isaac-Velocity-Rough-Unitree-Go2-v0 --headless",
     "python scripts/rsl_rl/base/train.py --task RobotLab-Isaac-Velocity-Rough-Unitree-Go2W-v0 --headless",
     "python scripts/rsl_rl/base/train.py --task RobotLab-Isaac-Velocity-Rough-Unitree-B2-v0 --headless",
     "python scripts/rsl_rl/base/train.py --task RobotLab-Isaac-Velocity-Rough-Unitree-B2W-v0 --headless",
-    "python scripts/rsl_rl/base/train.py --task RobotLab-Isaac-Velocity-Rough-Unitree-H1-v0 --headless",
-    "python scripts/rsl_rl/base/train.py --task RobotLab-Isaac-Velocity-Rough-Unitree-G1-v0 --headless",
-    "python scripts/rsl_rl/amp/train.py --task RobotLab-Isaac-Velocity-Flat-Amp-Unitree-A1-v0 --headless",
+    # "python scripts/rsl_rl/base/train.py --task RobotLab-Isaac-Velocity-Rough-Unitree-H1-v0 --headless",
+    # "python scripts/rsl_rl/base/train.py --task RobotLab-Isaac-Velocity-Rough-Unitree-G1-v0 --headless",
+    # "python scripts/rsl_rl/base/train.py --task RobotLab-Isaac-Velocity-Rough-Njust-V2-Fixed-v0 --headless",
+    # "python scripts/rsl_rl/base/train.py --task RobotLab-Isaac-Velocity-Rough-Njust-V2-Wheel-v0 --headless",
+    # "python scripts/rsl_rl/amp/train.py --task RobotLab-Isaac-Velocity-Flat-Amp-Unitree-A1-v0 --headless",
+]
+
+play_commands = [
+    "python scripts/rsl_rl/base/play.py --task RobotLab-Isaac-Velocity-Flat-FFTAI-GR1T1-v0",
+    "python scripts/rsl_rl/base/play.py --task RobotLab-Isaac-Velocity-Flat-FFTAI-GR1T2-v0",
+    "python scripts/rsl_rl/base/play.py --task RobotLab-Isaac-Velocity-Flat-Unitree-A1-v0",
+    "python scripts/rsl_rl/base/play.py --task RobotLab-Isaac-Velocity-Flat-Anymal-D-v0",
+    "python scripts/rsl_rl/base/play.py --task RobotLab-Isaac-Velocity-Flat-Unitree-Go2-v0",
+    "python scripts/rsl_rl/base/play.py --task RobotLab-Isaac-Velocity-Flat-Unitree-Go2W-v0",
+    "python scripts/rsl_rl/base/play.py --task RobotLab-Isaac-Velocity-Flat-Unitree-B2-v0",
+    "python scripts/rsl_rl/base/play.py --task RobotLab-Isaac-Velocity-Flat-Unitree-B2W-v0",
+    "python scripts/rsl_rl/base/play.py --task RobotLab-Isaac-Velocity-Flat-Unitree-H1-v0",
+    "python scripts/rsl_rl/base/play.py --task RobotLab-Isaac-Velocity-Flat-Unitree-G1-v0",
+    "python scripts/rsl_rl/base/play.py --task RobotLab-Isaac-Velocity-Flat-Njust-V2-Fixed-v0",
+    "python scripts/rsl_rl/base/play.py --task RobotLab-Isaac-Velocity-Flat-Njust-V2-Wheel-v0",
+    "python scripts/rsl_rl/base/play.py --task RobotLab-Isaac-Velocity-Rough-FFTAI-GR1T1-v0",
+    "python scripts/rsl_rl/base/play.py --task RobotLab-Isaac-Velocity-Rough-FFTAI-GR1T2-v0",
+    "python scripts/rsl_rl/base/play.py --task RobotLab-Isaac-Velocity-Rough-Unitree-A1-v0",
+    "python scripts/rsl_rl/base/play.py --task RobotLab-Isaac-Velocity-Rough-Anymal-D-v0",
+    "python scripts/rsl_rl/base/play.py --task RobotLab-Isaac-Velocity-Rough-Unitree-Go2-v0",
+    "python scripts/rsl_rl/base/play.py --task RobotLab-Isaac-Velocity-Rough-Unitree-Go2W-v0",
+    "python scripts/rsl_rl/base/play.py --task RobotLab-Isaac-Velocity-Rough-Unitree-B2-v0",
+    "python scripts/rsl_rl/base/play.py --task RobotLab-Isaac-Velocity-Rough-Unitree-B2W-v0",
+    "python scripts/rsl_rl/base/play.py --task RobotLab-Isaac-Velocity-Rough-Unitree-H1-v0",
+    "python scripts/rsl_rl/base/play.py --task RobotLab-Isaac-Velocity-Rough-Unitree-G1-v0",
+    "python scripts/rsl_rl/base/play.py --task RobotLab-Isaac-Velocity-Rough-Njust-V2-Fixed-v0",
+    "python scripts/rsl_rl/base/play.py --task RobotLab-Isaac-Velocity-Rough-Njust-V2-Wheel-v0",
+    "python scripts/rsl_rl/amp/play.py --task RobotLab-Isaac-Velocity-Flat-Amp-Unitree-A1-v0",
 ]
 
 log_dir = "logs"
@@ -43,7 +75,7 @@ log_file = f"{log_dir}/train_batch_{timestamp}.log"
 
 with open(log_file, "w") as log:
     for cmd in commands:
-        # cmd += " --max_iterations 5"
+        cmd += " --max_iterations 10000"
         try:
             print(colorama.Fore.GREEN + f"Executing command: {cmd}")
             log.write(f"Executing command: {cmd}\n")
