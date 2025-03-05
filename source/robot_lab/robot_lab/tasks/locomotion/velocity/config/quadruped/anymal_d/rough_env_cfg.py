@@ -84,7 +84,7 @@ class AnymalDRoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         self.rewards.joint_pos_limits.weight = -5.0
         self.rewards.joint_vel_limits.weight = 0
         self.rewards.joint_power.weight = -2e-5
-        self.rewards.stand_still_without_cmd.weight = -1.0
+        self.rewards.stand_still_without_cmd.weight = -2.0
 
         # Action penalties
         self.rewards.action_rate_l2.weight = -0.01
@@ -111,7 +111,7 @@ class AnymalDRoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         self.rewards.feet_slide.weight = -0.1
         self.rewards.feet_slide.params["sensor_cfg"].body_names = [self.foot_link_name]
         self.rewards.feet_slide.params["asset_cfg"].body_names = [self.foot_link_name]
-        self.rewards.upward.weight = 2.5
+        self.rewards.upward.weight = 2.0
 
         # If the weight of rewards is 0, set rewards to None
         if self.__class__.__name__ == "AnymalDRoughEnvCfg":

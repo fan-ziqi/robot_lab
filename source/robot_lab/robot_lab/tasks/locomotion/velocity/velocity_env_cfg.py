@@ -464,10 +464,10 @@ class RewardsCfg:
 
     # Velocity-tracking rewards
     track_lin_vel_xy_exp = RewTerm(
-        func=mdp.track_lin_vel_xy_exp, weight=0.0, params={"command_name": "base_velocity", "std": math.sqrt(0.25)}
+        func=mdp.track_lin_vel_xy_exp, weight=0.0, params={"command_name": "base_velocity", "std": math.sqrt(0.5)}
     )
     track_ang_vel_z_exp = RewTerm(
-        func=mdp.track_ang_vel_z_exp, weight=0.0, params={"command_name": "base_velocity", "std": math.sqrt(0.25)}
+        func=mdp.track_ang_vel_z_exp, weight=0.0, params={"command_name": "base_velocity", "std": math.sqrt(0.5)}
     )
 
     # Others
@@ -600,17 +600,6 @@ class TerminationsCfg:
         params={"asset_cfg": SceneEntityCfg("robot"), "distance_buffer": 3.0},
         time_out=True,
     )
-
-    # Root terminations
-    # bad_orientation
-    # root_height_below_minimum
-
-    # Joint terminations
-    # joint_pos_out_of_limit
-    # joint_pos_out_of_manual_limit
-    # joint_vel_out_of_limit
-    # joint_vel_out_of_manual_limit
-    # joint_effort_out_of_limit
 
     # Contact sensor
     illegal_contact = DoneTerm(

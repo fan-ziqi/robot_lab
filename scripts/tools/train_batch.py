@@ -33,8 +33,8 @@ commands = [
     "python scripts/rsl_rl/base/train.py --task RobotLab-Isaac-Velocity-Rough-Unitree-B2W-v0 --headless",
     # "python scripts/rsl_rl/base/train.py --task RobotLab-Isaac-Velocity-Rough-Unitree-H1-v0 --headless",
     # "python scripts/rsl_rl/base/train.py --task RobotLab-Isaac-Velocity-Rough-Unitree-G1-v0 --headless",
-    # "python scripts/rsl_rl/base/train.py --task RobotLab-Isaac-Velocity-Rough-Njust-V2-Fixed-v0 --headless",
-    # "python scripts/rsl_rl/base/train.py --task RobotLab-Isaac-Velocity-Rough-Njust-V2-Wheel-v0 --headless",
+    "python scripts/rsl_rl/base/train.py --task RobotLab-Isaac-Velocity-Rough-Njust-V2-Fixed-v0 --headless",
+    "python scripts/rsl_rl/base/train.py --task RobotLab-Isaac-Velocity-Rough-Njust-V2-Wheel-v0 --headless",
     # "python scripts/rsl_rl/amp/train.py --task RobotLab-Isaac-Velocity-Flat-Amp-Unitree-A1-v0 --headless",
 ]
 
@@ -75,7 +75,7 @@ log_file = f"{log_dir}/train_batch_{timestamp}.log"
 
 with open(log_file, "w") as log:
     for cmd in commands:
-        cmd += " --max_iterations 10000"
+        cmd += " --max_iterations 5000"
         try:
             print(colorama.Fore.GREEN + f"Executing command: {cmd}")
             log.write(f"Executing command: {cmd}\n")
