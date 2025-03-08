@@ -161,6 +161,17 @@ This stops and removes the containers, but keeps the images.
 
 > [!NOTE]
 > If you want to control with the keyboard during playback, add ``--keyboard`` after the ``play.py`` script.
+>
+> ```
+> Key bindings:
+> ====================== ========================= ========================
+> Command                Key (+ve axis)            Key (-ve axis)
+> ====================== ========================= ========================
+> Move along x-axis      Numpad 8 / Arrow Up       Numpad 2 / Arrow Down
+> Move along y-axis      Numpad 4 / Arrow Right    Numpad 6 / Arrow Left
+> Rotate along z-axis    Numpad 7 / Z              Numpad 9 / X
+> ====================== ========================= ========================
+> ```
 
 ### Base Locomotion
 
