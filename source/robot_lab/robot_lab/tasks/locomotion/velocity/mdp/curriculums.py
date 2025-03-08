@@ -1,3 +1,6 @@
+# Copyright (c) 2024-2025 Ziqi Fan
+# SPDX-License-Identifier: Apache-2.0
+
 """Common functions that can be used to create curriculum for the learning environment.
 
 The functions can be passed to the :class:`isaaclab.managers.CurriculumTermCfg` object to enable

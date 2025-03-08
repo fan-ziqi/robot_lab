@@ -149,29 +149,3 @@ class UnitreeA1RoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         # self.terminations.illegal_contact = None
 
         # ------------------------------Commands------------------------------
-
-
-
-        # Test
-        self.rewards.feet_contact_without_cmd.weight = 0
-        # self.rewards.feet_stumble.weight = 0
-        # self.rewards.feet_slide.weight = 0
-        self.rewards.feet_height_body_exp.weight = 0
-        self.rewards.feet_gait.weight = 0
-        # self.rewards.base_height_l2.weight = 0
-        # self.rewards.joint_power.weight = 0
-        self.rewards.stand_still_without_cmd.weight = 0
-        self.rewards.joint_position_penalty.weight = 0
-        # self.rewards.contact_forces.weight = 0
-        self.rewards.upward.weight = 0
-        self.events.randomize_reset_base.params = {
-            "pose_range": {"x": (-0.5, 0.5), "y": (-0.5, 0.5), "yaw": (-3.14, 3.14)},
-            "velocity_range": {
-                "x": (-0.5, 0.5),
-                "y": (-0.5, 0.5),
-                "z": (-0.5, 0.5),
-                "roll": (-0.5, 0.5),
-                "pitch": (-0.5, 0.5),
-                "yaw": (-0.5, 0.5),
-            },
-        }
