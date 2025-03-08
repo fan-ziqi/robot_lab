@@ -9,7 +9,7 @@ from isaaclab.utils import configclass
 
 import robot_lab.tasks.locomotion.velocity.mdp as mdp
 from robot_lab.tasks.locomotion.velocity.config.quadruped.unitree_a1_handstand.env import rewards
-from robot_lab.tasks.locomotion.velocity.velocity_env_cfg import CommandsCfg, LocomotionVelocityRoughEnvCfg, RewardsCfg
+from robot_lab.tasks.locomotion.velocity.velocity_env_cfg import LocomotionVelocityRoughEnvCfg, RewardsCfg
 
 ##
 # Pre-defined configs
@@ -34,8 +34,7 @@ class UnitreeA1HandStandRewardsCfg(RewardsCfg):
         func=rewards.handstand_feet_on_air,
         weight=0.0,
         params={
-            "sensor_cfg": SceneEntityCfg("contact_forces"),
-            "foot_name": "",
+            "sensor_cfg": SceneEntityCfg("contact_forces", body_names=""),
         },
     )
 
@@ -43,8 +42,7 @@ class UnitreeA1HandStandRewardsCfg(RewardsCfg):
         func=rewards.handstand_feet_air_time,
         weight=0.0,
         params={
-            "sensor_cfg": SceneEntityCfg("contact_forces"),
-            "foot_name": "",
+            "sensor_cfg": SceneEntityCfg("contact_forces", body_names=""),
             "threshold": 5.0,
         },
     )
@@ -59,25 +57,8 @@ class UnitreeA1HandStandRewardsCfg(RewardsCfg):
 
 
 @configclass
-class UnitreeA1HandStandCommandsCfg(CommandsCfg):
-    """Command specifications for the MDP."""
-
-    state_command = mdp.DiscreteCommandControllerCfg(
-        resampling_time_range=(3.0, 3.0),
-        available_commands=[
-            # 0,  # default
-            1,  # front
-            2,  # back
-            3,  # left
-            4,  # right
-        ],
-    )
-
-
-@configclass
 class UnitreeA1HandStandRoughEnvCfg(LocomotionVelocityRoughEnvCfg):
     rewards: UnitreeA1HandStandRewardsCfg = UnitreeA1HandStandRewardsCfg()
-    commands: UnitreeA1HandStandCommandsCfg = UnitreeA1HandStandCommandsCfg()
 
     base_link_name = "base"
     foot_link_name = ".*_foot"
@@ -94,8 +75,6 @@ class UnitreeA1HandStandRoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         # post init of parent
         super().__post_init__()
         self.episode_length_s = 10.0
-        self.viewer.eye = (7.5, 7.5, 7.5)
-        self.viewer.resolution = (1920, 1080)
 
         # ------------------------------Sence------------------------------
         # switch robot to unitree-a1
@@ -121,6 +100,7 @@ class UnitreeA1HandStandRoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         # reduce action scale
         self.actions.joint_pos.scale = 0.25
         self.actions.joint_pos.clip = {".*": (-100.0, 100.0)}
+        self.actions.joint_pos.preserve_order = True
         self.actions.joint_pos.joint_names = self.joint_names
 
         # ------------------------------Events------------------------------
@@ -134,6 +114,7 @@ class UnitreeA1HandStandRoughEnvCfg(LocomotionVelocityRoughEnvCfg):
 
         # ------------------------------Rewards------------------------------
         # General
+        # UNUESD self.rewards.is_alive.weight = 0
         self.rewards.is_terminated.weight = 0
 
         # Root penalties
@@ -148,16 +129,16 @@ class UnitreeA1HandStandRoughEnvCfg(LocomotionVelocityRoughEnvCfg):
 
         # Joint penaltie
         self.rewards.joint_torques_l2.weight = -0.0002
+        # UNUESD self.rewards.joint_vel_l1.weight = 0.0
         self.rewards.joint_vel_l2.weight = 0
-        self.rewards.joint_acc_l2.weight = -2.5e-7
-        # # self.rewards.create_joint_deviation_l1_rewterm("joint_deviation_hip_l1", -0.2, [".*_hip_joint"])
+        self.rewards.joint_acc_l2.weight = -2.5e-8
+        # self.rewards.create_joint_deviation_l1_rewterm("joint_deviation_hip_l1", -0.1, [".*_hip_joint"])
         self.rewards.joint_pos_limits.weight = -5.0
         self.rewards.joint_vel_limits.weight = 0
-        self.rewards.joint_power.weight = -2e-5
-        self.rewards.stand_still_without_cmd.weight = 0
 
         # Action penalties
         self.rewards.action_rate_l2.weight = -0.05
+        # UNUESD self.rewards.action_l2.weight = 0.0
 
         # Contact sensor
         self.rewards.undesired_contacts.weight = -1.0
@@ -176,69 +157,40 @@ class UnitreeA1HandStandRoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         self.rewards.feet_air_time.params["sensor_cfg"].body_names = [self.foot_link_name]
         self.rewards.feet_contact.weight = 0
         self.rewards.feet_contact.params["sensor_cfg"].body_names = [self.foot_link_name]
-        self.rewards.feet_contact_without_cmd.weight = 0
-        self.rewards.feet_contact_without_cmd.params["sensor_cfg"].body_names = [self.foot_link_name]
         self.rewards.feet_slide.weight = 0
         self.rewards.feet_slide.params["sensor_cfg"].body_names = [self.foot_link_name]
         self.rewards.feet_slide.params["asset_cfg"].body_names = [self.foot_link_name]
+        self.rewards.joint_power.weight = -2e-5
+        self.rewards.stand_still_without_cmd.weight = 0
 
-        # # HandStand
-        # handstand_type = "back"  # which leg on air, can be "front", "back", "left", "right"
-        # if handstand_type == "front":
-        #     air_foot_name = "F.*_foot"
-        #     self.rewards.handstand_orientation_l2.weight = -1.0
-        #     self.rewards.handstand_orientation_l2.params["target_gravity"] = [-1.0, 0.0, 0.0]
-        #     self.rewards.handstand_feet_height_exp.params["target_height"] = 0.5
-        # elif handstand_type == "back":
-        #     air_foot_name = "R.*_foot"
-        #     self.rewards.handstand_orientation_l2.weight = -1.0
-        #     self.rewards.handstand_orientation_l2.params["target_gravity"] = [1.0, 0.0, 0.0]
-        #     self.rewards.handstand_feet_height_exp.params["target_height"] = 0.5
-        # elif handstand_type == "left":
-        #     air_foot_name = ".*L_foot"
-        #     self.rewards.handstand_orientation_l2.weight = 0
-        #     self.rewards.handstand_orientation_l2.params["target_gravity"] = [0.0, -1.0, 0.0]
-        #     self.rewards.handstand_feet_height_exp.params["target_height"] = 0.3
-        # elif handstand_type == "right":
-        #     air_foot_name = ".*R_foot"
-        #     self.rewards.handstand_orientation_l2.weight = 0
-        #     self.rewards.handstand_orientation_l2.params["target_gravity"] = [0.0, 1.0, 0.0]
-        #     self.rewards.handstand_feet_height_exp.params["target_height"] = 0.3
-        # self.rewards.handstand_feet_height_exp.weight = 10
-        # self.rewards.handstand_feet_height_exp.params["asset_cfg"].body_names = [air_foot_name]
-        # self.rewards.handstand_feet_on_air.weight = 1.0
-        # self.rewards.handstand_feet_on_air.params["sensor_cfg"].body_names = [air_foot_name]
-        # self.rewards.handstand_feet_air_time.weight = 1.0
-        # self.rewards.handstand_feet_air_time.params["sensor_cfg"].body_names = [air_foot_name]
-
+        # HandStand
+        handstand_type = "back"  # which leg on air, can be "front", "back", "left", "right"
+        if handstand_type == "front":
+            air_foot_name = "F.*_foot"
+            self.rewards.handstand_orientation_l2.weight = -1.0
+            self.rewards.handstand_orientation_l2.params["target_gravity"] = [-1.0, 0.0, 0.0]
+            self.rewards.handstand_feet_height_exp.params["target_height"] = 0.5
+        elif handstand_type == "back":
+            air_foot_name = "R.*_foot"
+            self.rewards.handstand_orientation_l2.weight = -1.0
+            self.rewards.handstand_orientation_l2.params["target_gravity"] = [1.0, 0.0, 0.0]
+            self.rewards.handstand_feet_height_exp.params["target_height"] = 0.5
+        elif handstand_type == "left":
+            air_foot_name = ".*L_foot"
+            self.rewards.handstand_orientation_l2.weight = 0
+            self.rewards.handstand_orientation_l2.params["target_gravity"] = [0.0, -1.0, 0.0]
+            self.rewards.handstand_feet_height_exp.params["target_height"] = 0.3
+        elif handstand_type == "right":
+            air_foot_name = ".*R_foot"
+            self.rewards.handstand_orientation_l2.weight = 0
+            self.rewards.handstand_orientation_l2.params["target_gravity"] = [0.0, 1.0, 0.0]
+            self.rewards.handstand_feet_height_exp.params["target_height"] = 0.3
         self.rewards.handstand_feet_height_exp.weight = 10
-        self.rewards.handstand_feet_height_exp.params["target_height"] = {
-            # "0": 0.0,  # default
-            "1": 0.5,  # front
-            "2": 0.5,  # back
-            "3": 0.3,  # left
-            "4": 0.3,  # right
-        }
-        self.rewards.handstand_orientation_l2.weight = -1.0
-        self.rewards.handstand_orientation_l2.params["target_gravity"] = {
-            # "0": [0.0, 0.0, -1.0],  # default
-            "1": [-1.0, 0.0, 0.0],  # front
-            "2": [1.0, 0.0, 0.0],  # back
-            "3": [0.0, -1.0, 0.0],  # left
-            "4": [0.0, 1.0, 0.0],  # right
-        }
-        foot_name_dict = {
-            # "0": "F.*_foot",  # default
-            "1": "F.*_foot",  # front
-            "2": "R.*_foot",  # back
-            "3": ".*L_foot",  # left
-            "4": ".*R_foot",  # right
-        }
-        self.rewards.handstand_feet_height_exp.params["foot_name"] = foot_name_dict
+        self.rewards.handstand_feet_height_exp.params["asset_cfg"].body_names = [air_foot_name]
         self.rewards.handstand_feet_on_air.weight = 1.0
-        self.rewards.handstand_feet_on_air.params["foot_name"] = foot_name_dict
+        self.rewards.handstand_feet_on_air.params["sensor_cfg"].body_names = [air_foot_name]
         self.rewards.handstand_feet_air_time.weight = 1.0
-        self.rewards.handstand_feet_air_time.params["foot_name"] = foot_name_dict
+        self.rewards.handstand_feet_air_time.params["sensor_cfg"].body_names = [air_foot_name]
 
         # If the weight of rewards is 0, set rewards to None
         if self.__class__.__name__ == "UnitreeA1HandStandRoughEnvCfg":
@@ -248,9 +200,9 @@ class UnitreeA1HandStandRoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         self.terminations.illegal_contact.params["sensor_cfg"].body_names = [f"^(?!.*{self.foot_link_name}).*"]
 
         # ------------------------------Commands------------------------------
-        self.commands.base_velocity.ranges.lin_vel_x = (0.0, 0.0)
-        self.commands.base_velocity.ranges.lin_vel_y = (0.0, 0.0)
-        self.commands.base_velocity.ranges.ang_vel_z = (0.0, 0.0)
-        self.commands.base_velocity.ranges.heading = (0.0, 0.0)
-        self.commands.base_velocity.heading_command = False
-        self.commands.base_velocity.debug_vis = False
+        # self.commands.base_velocity.ranges.lin_vel_x = (0.0, 0.0)
+        # self.commands.base_velocity.ranges.lin_vel_y = (0.0, 0.0)
+        # self.commands.base_velocity.ranges.ang_vel_z = (0.0, 0.0)
+        # self.commands.base_velocity.ranges.heading = (0.0, 0.0)
+        # self.commands.base_velocity.heading_command = False
+        # self.commands.base_velocity.debug_vis = False
