@@ -13,7 +13,7 @@ COPY ../ ${DOCKER_ISAACLAB_EXTENSION_TEMPLATE_PATH}
 
 # # Install whatever you need as additional dependencies.
 RUN bash -i -c "source ${HOME}/.bashrc && \
-    cd ${DOCKER_ISAACLAB_EXTENSION_TEMPLATE_PATH}/source/ext_template && \
+    cd ${DOCKER_ISAACLAB_EXTENSION_TEMPLATE_PATH}/source/robot_lab && \
     pip install -e ."
 
 # make working directory as the Isaac Lab directory

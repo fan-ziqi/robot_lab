@@ -160,7 +160,7 @@ This stops and removes the containers, but keeps the images.
 ## Try examples
 
 > [!NOTE]
-> If you want to control with the keyboard during playback, add ``--keyboard`` after the ``play.py`` script.
+> If you want to control a **SINGLE ROBOT** with the keyboard during playback, add `--keyboard` at the end of the play script.
 >
 > ```
 > Key bindings:
@@ -173,16 +173,7 @@ This stops and removes the containers, but keeps the images.
 > ====================== ========================= ========================
 > ```
 
-### Base Locomotion
-
-Anymal D
-
-```bash
-# Train
-python scripts/rsl_rl/base/train.py --task RobotLab-Isaac-Velocity-Rough-Anymal-D-v0 --headless
-# Play
-python scripts/rsl_rl/base/play.py --task RobotLab-Isaac-Velocity-Rough-Anymal-D-v0
-```
+### Quadruped
 
 Unitree A1
 
@@ -202,15 +193,6 @@ python scripts/rsl_rl/base/train.py --task RobotLab-Isaac-Velocity-Rough-Unitree
 python scripts/rsl_rl/base/play.py --task RobotLab-Isaac-Velocity-Rough-Unitree-Go2-v0
 ```
 
-Unitree Go2W
-
-```bash
-# Train
-python scripts/rsl_rl/base/train.py --task RobotLab-Isaac-Velocity-Rough-Unitree-Go2W-v0 --headless
-# Play
-python scripts/rsl_rl/base/play.py --task RobotLab-Isaac-Velocity-Rough-Unitree-Go2W-v0
-```
-
 Unitree B2
 
 ```bash
@@ -218,6 +200,26 @@ Unitree B2
 python scripts/rsl_rl/base/train.py --task RobotLab-Isaac-Velocity-Rough-Unitree-B2-v0 --headless
 # Play
 python scripts/rsl_rl/base/play.py --task RobotLab-Isaac-Velocity-Rough-Unitree-B2-v0
+```
+
+Anymal D
+
+```bash
+# Train
+python scripts/rsl_rl/base/train.py --task RobotLab-Isaac-Velocity-Rough-Anymal-D-v0 --headless
+# Play
+python scripts/rsl_rl/base/play.py --task RobotLab-Isaac-Velocity-Rough-Anymal-D-v0
+```
+
+### Wheeled
+
+Unitree Go2W
+
+```bash
+# Train
+python scripts/rsl_rl/base/train.py --task RobotLab-Isaac-Velocity-Rough-Unitree-Go2W-v0 --headless
+# Play
+python scripts/rsl_rl/base/play.py --task RobotLab-Isaac-Velocity-Rough-Unitree-Go2W-v0
 ```
 
 Unitree B2W
@@ -228,6 +230,8 @@ python scripts/rsl_rl/base/train.py --task RobotLab-Isaac-Velocity-Rough-Unitree
 # Play
 python scripts/rsl_rl/base/play.py --task RobotLab-Isaac-Velocity-Rough-Unitree-B2W-v0
 ```
+
+### Humanoid
 
 FFTAI GR1T1
 
@@ -265,16 +269,7 @@ python scripts/rsl_rl/base/train.py --task RobotLab-Isaac-Velocity-Rough-Unitree
 python scripts/rsl_rl/base/play.py --task RobotLab-Isaac-Velocity-Rough-Unitree-G1-v0
 ```
 
-The above configs are rough, you can change `Rough` to `Flat`
-
-**Note**
-
-* Record video of a trained agent (requires installing `ffmpeg`), add `--video --video_length 200`
-* Play/Train with 32 environments, add `--num_envs 32`
-* Play on specific folder or checkpoint, add `--load_run run_folder_name --checkpoint model.pt`
-* Resume training from folder or checkpoint, add `--resume --load_run run_folder_name --checkpoint model.pt`
-
-### AMP Locomotion
+### AMP for Quadruped
 
 The code for AMP training refers to [AMP_for_hardware](https://github.com/Alescontrela/AMP_for_hardware)
 
@@ -303,6 +298,14 @@ python scripts/rsl_rl/base/train.py --task RobotLab-Isaac-Velocity-Flat-HandStan
 # Play
 python scripts/rsl_rl/base/play.py --task RobotLab-Isaac-Velocity-Flat-HandStand-Unitree-A1-v0
 ```
+
+**Note**
+
+* You can change `Rough` to `Flat` in the above configs.
+* Record video of a trained agent (requires installing `ffmpeg`), add `--video --video_length 200`
+* Play/Train with 32 environments, add `--num_envs 32`
+* Play on specific folder or checkpoint, add `--load_run run_folder_name --checkpoint model.pt`
+* Resume training from folder or checkpoint, add `--resume --load_run run_folder_name --checkpoint model.pt`
 
 ## Add your own robot
 
