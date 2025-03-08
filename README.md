@@ -13,9 +13,7 @@
 **robot_lab** is a RL extension library for robots, based on IsaacLab. It allows you to develop in an isolated environment, outside of the core Isaac Lab repository.
 
 > [!IMPORTANT]
-> This code repository is currently at **[v2.0](https://github.com/fan-ziqi/robot_lab/releases/tag/v2.0)**, which corresponds to **[IsaacLab-v2.0.0](https://github.com/isaac-sim/IsaacLab/releases/tag/v2.0.0)**.
->
-> If you prefer to use **[IsaacLab-v1.4.1](https://github.com/isaac-sim/IsaacLab/releases/tag/v1.4.1)**, please refer to the **[v1.1](https://github.com/fan-ziqi/robot_lab/releases/tag/v1.1)** release of this repository.
+> This repository currently depends on **IsaacLab v2.0.0** or higher. If you prefer to use **IsaacLab v1.4.1**, please use it with **[v1.1](https://github.com/fan-ziqi/robot_lab/releases/tag/v1.1)** of this repository.
 
 > [!NOTE]
 > If you want to run policy in gazebo or real robot, please use [rl_sar](https://github.com/fan-ziqi/rl_sar) project.
