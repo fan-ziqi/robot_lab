@@ -384,27 +384,19 @@ pre-commit run --all-files
 
 In some VsCode versions, the indexing of part of the extensions is missing. In this case, add the path to your extension in `.vscode/settings.json` under the key `"python.analysis.extraPaths"`.
 
+**Note: Replace `<path-to-isaac-lab>` with your own IsaacLab path.**
+
 ```json
 {
     "python.analysis.extraPaths": [
-        "<path-to-ext-repo>/source/robot_lab"
+        "${workspaceFolder}/source/robot_lab",
+        "/<path-to-isaac-lab>/source/isaaclab",
+        "/<path-to-isaac-lab>/source/isaaclab_assets",
+        "/<path-to-isaac-lab>/source/isaaclab_mimic",
+        "/<path-to-isaac-lab>/source/isaaclab_rl",
+        "/<path-to-isaac-lab>/source/isaaclab_tasks",
     ]
 }
-```
-
-### Pylance Crash
-
-If you encounter a crash in `pylance`, it is probable that too many files are indexed and you run out of memory.
-A possible solution is to exclude some of omniverse packages that are not used in your project.
-To do so, modify `.vscode/settings.json` and comment out packages under the key `"python.analysis.extraPaths"`
-Some examples of packages that can likely be excluded are:
-
-```json
-"<path-to-isaac-sim>/extscache/omni.anim.*"         // Animation packages
-"<path-to-isaac-sim>/extscache/omni.kit.*"          // Kit UI tools
-"<path-to-isaac-sim>/extscache/omni.graph.*"        // Graph UI tools
-"<path-to-isaac-sim>/extscache/omni.services.*"     // Services tools
-...
 ```
 
 ## Citation
