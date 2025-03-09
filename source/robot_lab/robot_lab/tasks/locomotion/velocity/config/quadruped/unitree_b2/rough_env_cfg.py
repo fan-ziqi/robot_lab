@@ -90,13 +90,13 @@ class UnitreeB2RoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         self.rewards.body_lin_acc_l2.params["asset_cfg"].body_names = [self.base_link_name]
 
         # Joint penaltie
-        self.rewards.joint_torques_l2.weight = -2.5e-5
+        self.rewards.joint_torques_l2.weight = -2.5e-6
         self.rewards.joint_vel_l2.weight = 0
         self.rewards.joint_acc_l2.weight = -2.5e-7
         # self.rewards.create_joint_deviation_l1_rewterm("joint_deviation_hip_l1", -0.2, [".*_hip_joint"])
         self.rewards.joint_pos_limits.weight = -5.0
         self.rewards.joint_vel_limits.weight = 0
-        self.rewards.joint_power.weight = -2e-5
+        self.rewards.joint_power.weight = -2e-6
         self.rewards.stand_still_without_cmd.weight = -2.0
         self.rewards.joint_position_penalty.weight = -1.0
 
