@@ -535,24 +535,23 @@ class RewardsCfg:
         },
     )
 
-    feet_height_exp = RewTerm(
-        func=mdp.feet_height_exp,
+    feet_height = RewTerm(
+        func=mdp.feet_height,
         weight=0.0,
         params={
-            "std": math.sqrt(0.25),
-            "tanh_mult": 2.0,
-            "target_height": float,
-            "command_name": "base_velocity",
             "asset_cfg": SceneEntityCfg("robot", body_names=""),
+            "tanh_mult": 2.0,
+            "target_height": 0.05,
+            "command_name": "base_velocity",
         },
     )
 
-    feet_height_body_exp = RewTerm(
-        func=mdp.feet_height_body_exp,
+    feet_height_body = RewTerm(
+        func=mdp.feet_height_body,
         weight=0.0,
         params={
-            "std": math.sqrt(0.25),
             "asset_cfg": SceneEntityCfg("robot", body_names=""),
+            "tanh_mult": 2.0,
             "target_height": -0.3,
             "command_name": "base_velocity",
         },
