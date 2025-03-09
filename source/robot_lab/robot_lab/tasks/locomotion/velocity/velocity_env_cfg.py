@@ -416,8 +416,8 @@ class RewardsCfg:
         },
     )
 
-    joint_position_penalty = RewTerm(
-        func=mdp.joint_position_penalty,
+    joint_pos_penalty = RewTerm(
+        func=mdp.joint_pos_penalty,
         weight=0.0,
         params={
             "command_name": "base_velocity",
@@ -428,12 +428,24 @@ class RewardsCfg:
         },
     )
 
-    wheel_spin_in_air_penalty = RewTerm(
-        func=mdp.wheel_spin_in_air_penalty,
+    wheel_vel_penalty = RewTerm(
+        func=mdp.wheel_vel_penalty,
         weight=0.0,
         params={
             "asset_cfg": SceneEntityCfg("robot", joint_names=""),
             "sensor_cfg": SceneEntityCfg("contact_forces", body_names=""),
+            "command_name": "base_velocity",
+            "velocity_threshold": 0.5,
+            "command_threshold": 0.1,
+        },
+    )
+
+    joint_mirror = RewTerm(
+        func=mdp.joint_mirror,
+        weight=0.0,
+        params={
+            "asset_cfg": SceneEntityCfg("robot"),
+            "mirror_joints": [["FR.*", "RL.*"], ["FL.*", "RR.*"]],
         },
     )
 

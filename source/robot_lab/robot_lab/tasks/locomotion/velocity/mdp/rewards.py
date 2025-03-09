@@ -105,7 +105,7 @@ def stand_still_without_cmd(
     return reward
 
 
-def joint_position_penalty(
+def joint_pos_penalty(
     env: ManagerBasedRLEnv,
     command_name: str,
     asset_cfg: SceneEntityCfg,
@@ -230,6 +230,33 @@ class GaitReward(ManagerTermBase):
         se_act_0 = torch.clip(torch.square(air_time[:, foot_0] - contact_time[:, foot_1]), max=self.max_err**2)
         se_act_1 = torch.clip(torch.square(contact_time[:, foot_0] - air_time[:, foot_1]), max=self.max_err**2)
         return torch.exp(-(se_act_0 + se_act_1) / self.std)
+
+
+def joint_mirror(env: ManagerBasedRLEnv, asset_cfg: SceneEntityCfg, mirror_joints: list[list[str]]) -> torch.Tensor:
+    # extract the used quantities (to enable type-hinting)
+    asset: Articulation = env.scene[asset_cfg.name]
+    if not hasattr(env, "mirror_joints_cache") or env.mirror_joints_cache is None:
+        env.mirror_joints_cache = [
+            asset.find_joints(joint_name) for joint_pair in mirror_joints for joint_name in joint_pair
+        ]
+    # compute out of limits constraints
+    diff1 = torch.sum(
+        torch.square(
+            asset.data.joint_pos[:, env.mirror_joints_cache[0][0]]
+            - asset.data.joint_pos[:, env.mirror_joints_cache[1][0]]
+        ),
+        dim=-1,
+    )
+    diff2 = torch.sum(
+        torch.square(
+            asset.data.joint_pos[:, env.mirror_joints_cache[2][0]]
+            - asset.data.joint_pos[:, env.mirror_joints_cache[3][0]]
+        ),
+        dim=-1,
+    )
+    reward = 0.5 * (diff1 + diff2)
+    reward *= torch.clamp(-env.scene["robot"].data.projected_gravity_b[:, 2], 0, 0.7) / 0.7
+    return reward
 
 
 def feet_air_time(
@@ -412,9 +439,7 @@ def feet_height_body(
             asset.data.root_quat_w, cur_footvel_translated[:, i, :]
         )
     foot_z_target_error = torch.square(footpos_in_body_frame[:, :, 2] - target_height).view(env.num_envs, -1)
-    foot_velocity_tanh = torch.tanh(
-        tanh_mult * torch.norm(footvel_in_body_frame[:, :, :2], dim=2)
-    )
+    foot_velocity_tanh = torch.tanh(tanh_mult * torch.norm(footvel_in_body_frame[:, :, :2], dim=2))
     reward = torch.sum(foot_z_target_error * foot_velocity_tanh, dim=1)
     reward *= torch.linalg.norm(env.command_manager.get_command(command_name), dim=1) > 0.1
     reward *= torch.clamp(-env.scene["robot"].data.projected_gravity_b[:, 2], 0, 0.7) / 0.7
@@ -469,16 +494,27 @@ def feet_slide(
 #     return torch.sum(diff, dim=1)
 
 
-def wheel_spin_in_air_penalty(
+def wheel_vel_penalty(
     env: ManagerBasedRLEnv,
     sensor_cfg: SceneEntityCfg,
+    command_name: str,
+    velocity_threshold: float,
+    command_threshold: float,
     asset_cfg: SceneEntityCfg = SceneEntityCfg("robot"),
 ) -> torch.Tensor:
     asset: Articulation = env.scene[asset_cfg.name]
+    cmd = torch.linalg.norm(env.command_manager.get_command(command_name), dim=1)
+    body_vel = torch.linalg.norm(asset.data.root_lin_vel_b[:, :2], dim=1)
     joint_vel = torch.abs(asset.data.joint_vel[:, asset_cfg.joint_ids])
     contact_sensor: ContactSensor = env.scene.sensors[sensor_cfg.name]
     in_air = contact_sensor.compute_first_air(env.step_dt)[:, sensor_cfg.body_ids]
-    reward = torch.sum(in_air * joint_vel, dim=1)
+    running_reward = torch.sum(in_air * joint_vel, dim=1)
+    standing_reward = torch.sum(joint_vel, dim=1)
+    reward = torch.where(
+        torch.logical_or(cmd > command_threshold, body_vel > velocity_threshold),
+        running_reward,
+        standing_reward,
+    )
     return reward
 
 
