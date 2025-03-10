@@ -522,7 +522,7 @@ def upward(env: ManagerBasedRLEnv, std: float, asset_cfg: SceneEntityCfg = Scene
     """Penalize z-axis base linear velocity using L2 squared kernel."""
     # extract the used quantities (to enable type-hinting)
     asset: RigidObject = env.scene[asset_cfg.name]
-    reward = torch.square(torch.clamp((1 - asset.data.projected_gravity_b[:, 2]) * (1 / 1.7), 0, 1))
+    reward = torch.square((1 - asset.data.projected_gravity_b[:, 2]))
     return reward
     # upward_error = torch.square(asset.data.projected_gravity_b[:, 2] - (-1))
     # return torch.exp(-upward_error / std**2)
