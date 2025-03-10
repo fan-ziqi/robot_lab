@@ -218,6 +218,6 @@ class UnitreeGo2WRoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         self.terminations.illegal_contact = None
 
         # ------------------------------Commands------------------------------
-        self.commands.base_velocity.ranges.lin_vel_x = (-2.0, 2.0)
-        self.commands.base_velocity.ranges.lin_vel_y = (-2.0, 2.0)
-        self.commands.base_velocity.ranges.ang_vel_z = (-1.5, 1.5)
+        # self.commands.base_velocity.ranges.lin_vel_x = (-2.0, 2.0)
+        # self.commands.base_velocity.ranges.lin_vel_y = (-2.0, 2.0)
+        # self.commands.base_velocity.ranges.ang_vel_z = (-1.5, 1.5)
