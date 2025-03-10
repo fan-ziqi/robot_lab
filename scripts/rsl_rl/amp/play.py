@@ -98,7 +98,11 @@ def main():
         env_cfg.scene.num_envs = 1
         env_cfg.terminations.time_out = None
         env_cfg.commands.base_velocity.debug_vis = False
-        controller = Se2Keyboard(v_x_sensitivity=1.0, v_y_sensitivity=1.0, omega_z_sensitivity=1.0)
+        controller = Se2Keyboard(
+            v_x_sensitivity=env_cfg.commands.base_velocity.ranges.lin_vel_x[1],
+            v_y_sensitivity=env_cfg.commands.base_velocity.ranges.lin_vel_y[1],
+            omega_z_sensitivity=env_cfg.commands.base_velocity.ranges.ang_vel_z[1],
+        )
         env_cfg.observations.policy.velocity_commands = ObsTerm(
             func=lambda env: torch.tensor(controller.advance(), dtype=torch.float32).unsqueeze(0).to(env.device),
         )
