@@ -149,8 +149,8 @@ class UnitreeA1HandStandRoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         # Velocity-tracking rewards
         self.rewards.track_lin_vel_xy_exp.weight = 3.0
         self.rewards.track_ang_vel_z_exp.weight = 1.5
-        self.rewards.track_lin_vel_xy_exp.func = mdp.track_lin_vel_world_xy_exp
-        self.rewards.track_ang_vel_z_exp.func = mdp.track_ang_vel_world_z_exp
+        self.rewards.track_lin_vel_xy_exp.func = mdp.track_lin_vel_xy_yaw_frame_exp
+        self.rewards.track_ang_vel_z_exp.func = mdp.track_ang_vel_z_world_exp
 
         # Others
         self.rewards.feet_air_time.weight = 0
