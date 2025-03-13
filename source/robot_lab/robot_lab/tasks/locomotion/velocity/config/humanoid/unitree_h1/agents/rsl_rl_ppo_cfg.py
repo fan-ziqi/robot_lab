@@ -10,7 +10,7 @@ class UnitreeH1RoughPPORunnerCfg(RslRlOnPolicyRunnerCfg):
     num_steps_per_env = 24
     max_iterations = 3000
     save_interval = 100
-    experiment_name = "h1_rough"
+    experiment_name = "unitree_h1_rough"
     empirical_normalization = False
     policy = RslRlPpoActorCriticCfg(
         init_noise_std=1.0,
@@ -40,4 +40,4 @@ class UnitreeH1FlatPPORunnerCfg(UnitreeH1RoughPPORunnerCfg):
         super().__post_init__()
 
         self.max_iterations = 1000
-        self.experiment_name = "h1_flat"
+        self.experiment_name = "unitree_h1_flat"

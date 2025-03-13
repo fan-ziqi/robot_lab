@@ -43,7 +43,7 @@ log_file = f"{log_dir}/train_batch_{timestamp}.log"
 
 with open(log_file, "w") as log:
     for cmd in commands:
-        # cmd += " --max_iterations 5"
+        cmd += " --max_iterations 10000"
         try:
             print(colorama.Fore.GREEN + f"Executing command: {cmd}")
             log.write(f"Executing command: {cmd}\n")

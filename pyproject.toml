@@ -56,7 +56,7 @@ known_isaaclabparty = [
 ]
 
 # Modify the following to include the package names of your first-party code
-known_firstparty = "ext_template"
+known_firstparty = "robot_lab"
 known_local_folder = "config"
 
 [tool.pyright]

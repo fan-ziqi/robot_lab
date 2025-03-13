@@ -13,9 +13,7 @@
 **robot_lab** is a RL extension library for robots, based on IsaacLab. It allows you to develop in an isolated environment, outside of the core Isaac Lab repository.
 
 > [!IMPORTANT]
-> This code repository is currently at **[v2.0](https://github.com/fan-ziqi/robot_lab/releases/tag/v2.0)**, which corresponds to **[IsaacLab-v2.0.0](https://github.com/isaac-sim/IsaacLab/releases/tag/v2.0.0)**.
->
-> If you prefer to use **[IsaacLab-v1.4.1](https://github.com/isaac-sim/IsaacLab/releases/tag/v1.4.1)**, please refer to the **[v1.1](https://github.com/fan-ziqi/robot_lab/releases/tag/v1.1)** release of this repository.
+> This repository currently depends on **IsaacLab v2.0.0** or higher. If you prefer to use **IsaacLab v1.4.1**, please use it with **[v1.1](https://github.com/fan-ziqi/robot_lab/releases/tag/v1.1)** of this repository.
 
 > [!NOTE]
 > If you want to run policy in gazebo or real robot, please use [rl_sar](https://github.com/fan-ziqi/rl_sar) project.
@@ -160,18 +158,20 @@ This stops and removes the containers, but keeps the images.
 ## Try examples
 
 > [!NOTE]
-> If you want to control with the keyboard during playback, add ``--keyboard`` after the ``play.py`` script.
+> If you want to control a **SINGLE ROBOT** with the keyboard during playback, add `--keyboard` at the end of the play script.
+>
+> ```
+> Key bindings:
+> ====================== ========================= ========================
+> Command                Key (+ve axis)            Key (-ve axis)
+> ====================== ========================= ========================
+> Move along x-axis      Numpad 8 / Arrow Up       Numpad 2 / Arrow Down
+> Move along y-axis      Numpad 4 / Arrow Right    Numpad 6 / Arrow Left
+> Rotate along z-axis    Numpad 7 / Z              Numpad 9 / X
+> ====================== ========================= ========================
+> ```
 
-### Base Locomotion
-
-Anymal D
-
-```bash
-# Train
-python scripts/rsl_rl/base/train.py --task RobotLab-Isaac-Velocity-Rough-Anymal-D-v0 --headless
-# Play
-python scripts/rsl_rl/base/play.py --task RobotLab-Isaac-Velocity-Rough-Anymal-D-v0
-```
+### Quadruped
 
 Unitree A1
 
@@ -191,15 +191,6 @@ python scripts/rsl_rl/base/train.py --task RobotLab-Isaac-Velocity-Rough-Unitree
 python scripts/rsl_rl/base/play.py --task RobotLab-Isaac-Velocity-Rough-Unitree-Go2-v0
 ```
 
-Unitree Go2W
-
-```bash
-# Train
-python scripts/rsl_rl/base/train.py --task RobotLab-Isaac-Velocity-Rough-Unitree-Go2W-v0 --headless
-# Play
-python scripts/rsl_rl/base/play.py --task RobotLab-Isaac-Velocity-Rough-Unitree-Go2W-v0
-```
-
 Unitree B2
 
 ```bash
@@ -207,6 +198,26 @@ Unitree B2
 python scripts/rsl_rl/base/train.py --task RobotLab-Isaac-Velocity-Rough-Unitree-B2-v0 --headless
 # Play
 python scripts/rsl_rl/base/play.py --task RobotLab-Isaac-Velocity-Rough-Unitree-B2-v0
+```
+
+Anymal D
+
+```bash
+# Train
+python scripts/rsl_rl/base/train.py --task RobotLab-Isaac-Velocity-Rough-Anymal-D-v0 --headless
+# Play
+python scripts/rsl_rl/base/play.py --task RobotLab-Isaac-Velocity-Rough-Anymal-D-v0
+```
+
+### Wheeled
+
+Unitree Go2W
+
+```bash
+# Train
+python scripts/rsl_rl/base/train.py --task RobotLab-Isaac-Velocity-Rough-Unitree-Go2W-v0 --headless
+# Play
+python scripts/rsl_rl/base/play.py --task RobotLab-Isaac-Velocity-Rough-Unitree-Go2W-v0
 ```
 
 Unitree B2W
@@ -217,6 +228,8 @@ python scripts/rsl_rl/base/train.py --task RobotLab-Isaac-Velocity-Rough-Unitree
 # Play
 python scripts/rsl_rl/base/play.py --task RobotLab-Isaac-Velocity-Rough-Unitree-B2W-v0
 ```
+
+### Humanoid
 
 FFTAI GR1T1
 
@@ -254,16 +267,7 @@ python scripts/rsl_rl/base/train.py --task RobotLab-Isaac-Velocity-Rough-Unitree
 python scripts/rsl_rl/base/play.py --task RobotLab-Isaac-Velocity-Rough-Unitree-G1-v0
 ```
 
-The above configs are rough, you can change `Rough` to `Flat`
-
-**Note**
-
-* Record video of a trained agent (requires installing `ffmpeg`), add `--video --video_length 200`
-* Play/Train with 32 environments, add `--num_envs 32`
-* Play on specific folder or checkpoint, add `--load_run run_folder_name --checkpoint model.pt`
-* Resume training from folder or checkpoint, add `--resume --load_run run_folder_name --checkpoint model.pt`
-
-### AMP Locomotion
+### AMP for Quadruped
 
 The code for AMP training refers to [AMP_for_hardware](https://github.com/Alescontrela/AMP_for_hardware)
 
@@ -292,6 +296,14 @@ python scripts/rsl_rl/base/train.py --task RobotLab-Isaac-Velocity-Flat-HandStan
 # Play
 python scripts/rsl_rl/base/play.py --task RobotLab-Isaac-Velocity-Flat-HandStand-Unitree-A1-v0
 ```
+
+**Note**
+
+* You can change `Rough` to `Flat` in the above configs.
+* Record video of a trained agent (requires installing `ffmpeg`), add `--video --video_length 200`
+* Play/Train with 32 environments, add `--num_envs 32`
+* Play on specific folder or checkpoint, add `--load_run run_folder_name --checkpoint model.pt`
+* Resume training from folder or checkpoint, add `--resume --load_run run_folder_name --checkpoint model.pt`
 
 ## Add your own robot
 
@@ -384,27 +396,19 @@ pre-commit run --all-files
 
 In some VsCode versions, the indexing of part of the extensions is missing. In this case, add the path to your extension in `.vscode/settings.json` under the key `"python.analysis.extraPaths"`.
 
+**Note: Replace `<path-to-isaac-lab>` with your own IsaacLab path.**
+
 ```json
 {
     "python.analysis.extraPaths": [
-        "<path-to-ext-repo>/source/robot_lab"
+        "${workspaceFolder}/source/robot_lab",
+        "/<path-to-isaac-lab>/source/isaaclab",
+        "/<path-to-isaac-lab>/source/isaaclab_assets",
+        "/<path-to-isaac-lab>/source/isaaclab_mimic",
+        "/<path-to-isaac-lab>/source/isaaclab_rl",
+        "/<path-to-isaac-lab>/source/isaaclab_tasks",
     ]
 }
-```
-
-### Pylance Crash
-
-If you encounter a crash in `pylance`, it is probable that too many files are indexed and you run out of memory.
-A possible solution is to exclude some of omniverse packages that are not used in your project.
-To do so, modify `.vscode/settings.json` and comment out packages under the key `"python.analysis.extraPaths"`
-Some examples of packages that can likely be excluded are:
-
-```json
-"<path-to-isaac-sim>/extscache/omni.anim.*"         // Animation packages
-"<path-to-isaac-sim>/extscache/omni.kit.*"          // Kit UI tools
-"<path-to-isaac-sim>/extscache/omni.graph.*"        // Graph UI tools
-"<path-to-isaac-sim>/extscache/omni.services.*"     // Services tools
-...
 ```
 
 ## Citation
