@@ -88,6 +88,7 @@ class FFTAIGR1T1RoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         self.rewards.joint_vel_limits.weight = 0
         self.rewards.joint_power.weight = 0
         self.rewards.stand_still_without_cmd.weight = 0
+        self.rewards.joint_pos_penalty.weight = -1.0
 
         # Action penalties
         self.rewards.action_rate_l2.weight = -0.005
