@@ -88,6 +88,7 @@ class FFTAIGR1T2RoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         self.rewards.joint_vel_limits.weight = 0
         self.rewards.joint_power.weight = 0
         self.rewards.stand_still_without_cmd.weight = 0
+        self.rewards.joint_pos_penalty.weight = -1.0
 
         # Action penalties
         self.rewards.action_rate_l2.weight = -0.005
@@ -112,6 +113,7 @@ class FFTAIGR1T2RoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         self.rewards.feet_slide.weight = -0.25
         self.rewards.feet_slide.params["sensor_cfg"].body_names = [self.foot_link_name]
         self.rewards.feet_slide.params["asset_cfg"].body_names = [self.foot_link_name]
+        self.rewards.upward.weight = 1.0
 
         # If the weight of rewards is 0, set rewards to None
         if self.__class__.__name__ == "FFTAIGR1T2RoughEnvCfg":
