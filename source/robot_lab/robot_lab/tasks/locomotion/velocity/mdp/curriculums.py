@@ -35,7 +35,7 @@ def command_levels_vel(
     if not hasattr(env, "delta_lin_vel"):
         env.delta_lin_vel = torch.tensor(0.0, device=env.device)
     # If the tracking reward is above 80% of the maximum, increase the range of commands
-    if torch.mean(episode_sums[env_ids]) / env.max_episode_length_s > 0.8 * reward_term_cfg.weight:
+    if torch.mean(episode_sums[env_ids]) / env.max_episode_length > 0.8 * reward_term_cfg.weight:
         lin_vel_x = torch.tensor(base_velocity_ranges.lin_vel_x, device=env.device)
         lin_vel_y = torch.tensor(base_velocity_ranges.lin_vel_y, device=env.device)
         base_velocity_ranges.lin_vel_x = torch.clamp(lin_vel_x + delta_range, -max_curriculum, max_curriculum).tolist()
