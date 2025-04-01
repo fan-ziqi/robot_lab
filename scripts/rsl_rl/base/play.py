@@ -155,14 +155,21 @@ def main():
 
     # export policy to onnx/jit
     export_model_dir = os.path.join(os.path.dirname(resume_path), "exported")
+    
+    # Check if actor_critic is available in ppo_runner.alg
+    if hasattr(ppo_runner.alg, "actor_critic"):
+        policy_model = ppo_runner.alg.actor_critic
+    else:
+        policy_model = ppo_runner.alg.policy
+    
     export_policy_as_onnx(
-        actor_critic=ppo_runner.alg.actor_critic,
+        actor_critic=policy_model,
         normalizer=ppo_runner.obs_normalizer,
         path=export_model_dir,
         filename="policy.onnx",
     )
     export_policy_as_jit(
-        actor_critic=ppo_runner.alg.actor_critic,
+        actor_critic=policy_model,
         normalizer=ppo_runner.obs_normalizer,
         path=export_model_dir,
         filename="policy.pt",
