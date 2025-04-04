@@ -122,16 +122,12 @@ class UnitreeG1RoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         self.rewards.stand_still_without_cmd.weight = 0
         self.rewards.joint_pos_penalty.weight = -1.0
         self.rewards.joint_mirror.weight = 0
-        self.rewards.joint_mirror.params["mirror_joints"] = [
-            ["left_(hip|knee|ankle).*", "right_(hip|knee|ankle).*"]
-        ]
+        self.rewards.joint_mirror.params["mirror_joints"] = [["left_(hip|knee|ankle).*", "right_(hip|knee|ankle).*"]]
 
         # Action penalties
         self.rewards.action_rate_l2.weight = -0.005
         self.rewards.action_mirror.weight = 0
-        self.rewards.action_mirror.params["mirror_joints"] = [
-            ["left_(hip|knee|ankle).*", "right_(hip|knee|ankle).*"]
-        ]
+        self.rewards.action_mirror.params["mirror_joints"] = [["left_(hip|knee|ankle).*", "right_(hip|knee|ankle).*"]]
 
         # Contact sensor
         self.rewards.undesired_contacts.weight = 0

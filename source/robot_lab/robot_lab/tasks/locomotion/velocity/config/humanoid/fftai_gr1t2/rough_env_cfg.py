@@ -58,7 +58,7 @@ class FFTAIGR1T2RoughEnvCfg(LocomotionVelocityRoughEnvCfg):
 
         # ------------------------------Actions------------------------------
         # reduce action scale
-        elf.actions.joint_pos.scale = 0.25
+        self.actions.joint_pos.scale = 0.25
         self.actions.joint_pos.clip = {".*": (-100.0, 100.0)}
         # self.actions.joint_pos.joint_names = self.joint_names
 
@@ -79,7 +79,7 @@ class FFTAIGR1T2RoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         self.rewards.base_height_l2.params["target_height"] = 0
         self.rewards.base_height_l2.params["asset_cfg"].body_names = [self.base_link_name]
         self.rewards.body_lin_acc_l2.weight = 0
-        self.rewards.body_lin_acc_l2.params["asset_cfg"].body_names = [self.base_link_name
+        self.rewards.body_lin_acc_l2.params["asset_cfg"].body_names = [self.base_link_name]
 
         # Joint penaltie
         self.rewards.joint_torques_l2.weight = 0
@@ -99,16 +99,12 @@ class FFTAIGR1T2RoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         self.rewards.stand_still_without_cmd.weight = 0
         self.rewards.joint_pos_penalty.weight = -1.0
         self.rewards.joint_mirror.weight = 0
-        self.rewards.joint_mirror.params["mirror_joints"] = [
-            ["", ""]
-        ]
+        self.rewards.joint_mirror.params["mirror_joints"] = [["", ""]]
 
         # Action penalties
         self.rewards.action_rate_l2.weight = -0.005
         self.rewards.action_mirror.weight = 0
-        self.rewards.action_mirror.params["mirror_joints"] = [
-            ["", ""]
-        ]
+        self.rewards.action_mirror.params["mirror_joints"] = [["", ""]]
 
         # Contact sensor
         self.rewards.undesired_contacts.weight = 0
