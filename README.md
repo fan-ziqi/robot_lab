@@ -267,6 +267,14 @@ python scripts/rsl_rl/base/train.py --task RobotLab-Isaac-Velocity-Rough-Unitree
 python scripts/rsl_rl/base/play.py --task RobotLab-Isaac-Velocity-Rough-Unitree-G1-v0
 ```
 
+#### Booster T1
+```bash
+# Train
+python scripts/rsl_rl/base/train.py --task RobotLab-Isaac-Velocity-Rough-Booster-T1-v0 --headless
+# Play
+python scripts/rsl_rl/base/play.py --task RobotLab-Isaac-Velocity-Rough-Booster-T1-v0
+```
+
 ### AMP for Quadruped
 
 The code for AMP training refers to [AMP_for_hardware](https://github.com/Alescontrela/AMP_for_hardware)
