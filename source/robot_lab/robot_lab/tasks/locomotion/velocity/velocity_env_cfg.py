@@ -471,6 +471,15 @@ class RewardsCfg:
         },
     )
 
+    action_mirror = RewTerm(
+        func=mdp.action_mirror,
+        weight=0.0,
+        params={
+            "asset_cfg": SceneEntityCfg("robot"),
+            "mirror_joints": [["FR.*", "RL.*"], ["FL.*", "RR.*"]],
+        },
+    )
+
     # Action penalties
     applied_torque_limits = RewTerm(
         func=mdp.applied_torque_limits,
@@ -612,13 +621,7 @@ class RewardsCfg:
     #     },
     # )
 
-    upward = RewTerm(
-        func=mdp.upward,
-        weight=0.0,
-        params={
-            "std": math.sqrt(0.5),
-        },
-    )
+    upward = RewTerm(func=mdp.upward, weight=0.0)
 
 
 @configclass

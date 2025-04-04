@@ -29,7 +29,6 @@ class UnitreeB2RoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         super().__post_init__()
 
         # ------------------------------Sence------------------------------
-        # switch robot to unitree b2
         self.scene.robot = UNITREE_B2_CFG.replace(prim_path="{ENV_REGEX_NS}/Robot")
         self.scene.height_scanner.prim_path = "{ENV_REGEX_NS}/Robot/" + self.base_link_name
         self.scene.height_scanner_base.prim_path = "{ENV_REGEX_NS}/Robot/" + self.base_link_name

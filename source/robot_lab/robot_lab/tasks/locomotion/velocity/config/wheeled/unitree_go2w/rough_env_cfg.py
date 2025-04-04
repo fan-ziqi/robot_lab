@@ -67,7 +67,6 @@ class UnitreeGo2WRoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         super().__post_init__()
 
         # ------------------------------Sence------------------------------
-        # switch robot to unitree go2w
         self.scene.robot = UNITREE_GO2W_CFG.replace(prim_path="{ENV_REGEX_NS}/Robot")
         self.scene.height_scanner.prim_path = "{ENV_REGEX_NS}/Robot/" + self.base_link_name
         self.scene.height_scanner_base.prim_path = "{ENV_REGEX_NS}/Robot/" + self.base_link_name
@@ -160,7 +159,6 @@ class UnitreeGo2WRoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         self.rewards.stand_still_without_cmd.params["asset_cfg"].joint_names = [f"^(?!{self.wheel_joint_name}).*"]
         self.rewards.joint_pos_penalty.weight = -1.0  # TODO
         self.rewards.joint_pos_penalty.params["asset_cfg"].joint_names = [f"^(?!{self.wheel_joint_name}).*"]
-        self.rewards.joint_pos_penalty.params["velocity_threshold"] = 100
         self.rewards.wheel_vel_penalty.weight = 0
         self.rewards.wheel_vel_penalty.params["sensor_cfg"].body_names = [self.foot_link_name]
         self.rewards.wheel_vel_penalty.params["asset_cfg"].joint_names = [self.wheel_joint_name]

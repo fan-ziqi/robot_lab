@@ -32,7 +32,6 @@ class UnitreeA1RoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         super().__post_init__()
 
         # ------------------------------Sence------------------------------
-        # switch robot to unitree a1
         self.scene.robot = UNITREE_A1_CFG.replace(prim_path="{ENV_REGEX_NS}/Robot")
         self.scene.height_scanner.prim_path = "{ENV_REGEX_NS}/Robot/" + self.base_link_name
         self.scene.height_scanner_base.prim_path = "{ENV_REGEX_NS}/Robot/" + self.base_link_name
@@ -112,7 +111,7 @@ class UnitreeA1RoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         # Contact sensor
         self.rewards.undesired_contacts.weight = -1.0
         self.rewards.undesired_contacts.params["sensor_cfg"].body_names = [f"^(?!.*{self.foot_link_name}).*"]
-        self.rewards.contact_forces.weight = -1e-3
+        self.rewards.contact_forces.weight = -1.5e-4
         self.rewards.contact_forces.params["sensor_cfg"].body_names = [self.foot_link_name]
 
         # Velocity-tracking rewards
@@ -139,14 +138,14 @@ class UnitreeA1RoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         self.rewards.feet_height_body.params["asset_cfg"].body_names = [self.foot_link_name]
         self.rewards.feet_gait.weight = 0
         self.rewards.feet_gait.params["synced_feet_pair_names"] = (("FL_foot", "RR_foot"), ("FR_foot", "RL_foot"))
-        self.rewards.upward.weight = 3.0
+        self.rewards.upward.weight = 1.0
 
         # If the weight of rewards is 0, set rewards to None
         if self.__class__.__name__ == "UnitreeA1RoughEnvCfg":
             self.disable_zero_weight_rewards()
 
         # ------------------------------Terminations------------------------------
-        self.terminations.illegal_contact.params["sensor_cfg"].body_names = [self.base_link_name]
-        # self.terminations.illegal_contact = None
+        # self.terminations.illegal_contact.params["sensor_cfg"].body_names = [self.base_link_name]
+        self.terminations.illegal_contact = None
 
         # ------------------------------Commands------------------------------
