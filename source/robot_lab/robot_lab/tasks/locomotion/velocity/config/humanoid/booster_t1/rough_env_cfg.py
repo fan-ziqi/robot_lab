@@ -91,12 +91,12 @@ class BoosterT1RoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         self.rewards.stand_still_without_cmd.weight = 0
         self.rewards.joint_pos_penalty.weight = -1.0
         self.rewards.joint_mirror.weight = 0
-        self.rewards.joint_mirror.params["mirror_joints"] = [["Left_(Hip|Knee|Ankle).*", "Light_(Hip|Knee|Ankle).*"]]
+        self.rewards.joint_mirror.params["mirror_joints"] = [["Left_(Hip|Knee|Ankle).*", "Right_(Hip|Knee|Ankle).*"]]
 
         # Action penalties
         self.rewards.action_rate_l2.weight = -0.075
         self.rewards.action_mirror.weight = 0
-        self.rewards.action_mirror.params["mirror_joints"] = [["Left_(Hip|Knee|Ankle).*", "Light_(Hip|Knee|Ankle).*"]]
+        self.rewards.action_mirror.params["mirror_joints"] = [["Left_(Hip|Knee|Ankle).*", "Right_(Hip|Knee|Ankle).*"]]
 
         # Contact sensor
         self.rewards.undesired_contacts.weight = 0

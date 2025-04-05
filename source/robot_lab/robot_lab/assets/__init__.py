@@ -32,3 +32,4 @@ __version__ = ISAACLAB_ASSETS_METADATA["package"]["version"]
 from .fftai import *
 from .unitree import *
 from .booster import *
+from .robotera import *
