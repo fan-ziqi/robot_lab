@@ -84,7 +84,7 @@ class FFTAIGR1T1RoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         # Joint penaltie
         self.rewards.joint_torques_l2.weight = 0
         self.rewards.joint_vel_l2.weight = 0
-        self.rewards.joint_acc_l2.weight = -1.25e-7
+        self.rewards.joint_acc_l2.weight = -1e-7
         self.rewards.create_joint_deviation_l1_rewterm(
             "joint_deviation_other_l1",
             -0.2,
@@ -93,7 +93,7 @@ class FFTAIGR1T1RoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         self.rewards.create_joint_deviation_l1_rewterm("joint_deviation_torso_l1", -0.4, [".*waist_.*"])
         self.rewards.create_joint_deviation_l1_rewterm("joint_deviation_elbow_l1", -0.05, [".*_elbow_pitch"])
         self.rewards.create_joint_deviation_l1_rewterm("joint_deviation_knee_l1", -0.1, [".*_knee_pitch"])
-        self.rewards.joint_pos_limits.weight = -1.0
+        self.rewards.joint_pos_limits.weight = -0.5
         self.rewards.joint_vel_limits.weight = 0
         self.rewards.joint_power.weight = 0
         self.rewards.stand_still_without_cmd.weight = 0
@@ -113,9 +113,9 @@ class FFTAIGR1T1RoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         self.rewards.contact_forces.params["sensor_cfg"].body_names = [self.foot_link_name]
 
         # Velocity-tracking rewards
-        self.rewards.track_lin_vel_xy_exp.weight = 2.0
+        self.rewards.track_lin_vel_xy_exp.weight = 3.0
         self.rewards.track_lin_vel_xy_exp.func = mdp.track_lin_vel_xy_yaw_frame_exp
-        self.rewards.track_ang_vel_z_exp.weight = 2.0
+        self.rewards.track_ang_vel_z_exp.weight = 3.0
         self.rewards.track_ang_vel_z_exp.func = mdp.track_ang_vel_z_world_exp
 
         # Others
@@ -137,7 +137,7 @@ class FFTAIGR1T1RoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         self.rewards.feet_height_body.weight = 0
         self.rewards.feet_height_body.params["target_height"] = -0.2
         self.rewards.feet_height_body.params["asset_cfg"].body_names = [self.foot_link_name]
-        self.rewards.upward.weight = 1.0
+        self.rewards.upward.weight = 3.0
 
         # If the weight of rewards is 0, set rewards to None
         if self.__class__.__name__ == "FFTAIGR1T1RoughEnvCfg":
