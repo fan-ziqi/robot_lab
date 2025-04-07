@@ -15,7 +15,7 @@ Guidelines for modifications:
 
 ## Contributors
 
-* Zhenbiao Huang
+* [Zhenbiao Huang](https://github.com/legubiao)
 
 
 ## Acknowledgements
