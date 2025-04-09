@@ -25,6 +25,7 @@ class HighTorquePiRewardsCfg(RewardsCfg):
         },
     )
 
+
 @configclass
 class HighTorquePiRoughEnvCfg(LocomotionVelocityRoughEnvCfg):
     rewards: HighTorquePiRewardsCfg = HighTorquePiRewardsCfg()
@@ -56,6 +57,7 @@ class HighTorquePiRoughEnvCfg(LocomotionVelocityRoughEnvCfg):
 
         # ------------------------------Events------------------------------
         self.events.randomize_rigid_body_mass.params["asset_cfg"].body_names = [self.base_link_name]
+        self.events.randomize_rigid_body_mass.params["mass_distribution_params"] = (0, 0.5)
         self.events.randomize_com_positions.params["asset_cfg"].body_names = [self.base_link_name]
         self.events.randomize_apply_external_force_torque.params["asset_cfg"].body_names = [self.base_link_name]
 
@@ -74,12 +76,13 @@ class HighTorquePiRoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         self.rewards.body_lin_acc_l2.params["asset_cfg"].body_names = [self.base_link_name]
 
         # Joint penalties
-        self.rewards.joint_torques_l2.weight = -3.e-7
+        self.rewards.joint_torques_l2.weight = -1.e-9
         self.rewards.joint_torques_l2.params["asset_cfg"].joint_names = [".*_hip_.*", ".*_thigh_.*", ".*_calf_.*"]
         self.rewards.joint_vel_l2.weight = 0
-        self.rewards.joint_acc_l2.weight = -1.25e-7
+        self.rewards.joint_acc_l2.weight = -1.25e-9
         self.rewards.joint_acc_l2.params["asset_cfg"].joint_names = [".*_hip_.*", ".*_thigh_.*", ".*_calf_.*"]
-        self.rewards.create_joint_deviation_l1_rewterm("joint_deviation_hip_l1", -0.01, [".*_hip_roll_joint", ".*_thigh_joint"])
+        self.rewards.create_joint_deviation_l1_rewterm("joint_deviation_hip_l1", -0.0005,
+                                                       [".*_hip_roll_joint", ".*_thigh_joint"])
         self.rewards.joint_pos_limits.weight = -1.0
         self.rewards.joint_vel_limits.weight = 0
         self.rewards.joint_power.weight = 0
@@ -89,32 +92,32 @@ class HighTorquePiRoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         self.rewards.joint_mirror.params["mirror_joints"] = [["l_(hip|thigh|calf).*", "r_(hip|thigh|calf).*"]]
 
         # Action penalties
-        self.rewards.action_rate_l2.weight = -0.075
+        self.rewards.action_rate_l2.weight = -0.05
         self.rewards.action_mirror.weight = 0
         self.rewards.action_mirror.params["mirror_joints"] = [["l_(hip|thigh|calf).*", "r_(hip|thigh|calf).*"]]
 
         # Contact sensor
-        self.rewards.undesired_contacts.weight = 0
+        self.rewards.undesired_contacts.weight = -.05
         self.rewards.undesired_contacts.params["sensor_cfg"].body_names = [f"^(?!.*{self.foot_link_name}).*"]
         self.rewards.contact_forces.weight = 0
         self.rewards.contact_forces.params["sensor_cfg"].body_names = [self.foot_link_name]
 
         # Velocity-tracking rewards
-        self.rewards.track_lin_vel_xy_exp.weight = 4.5
+        self.rewards.track_lin_vel_xy_exp.weight = 5.
         self.rewards.track_lin_vel_xy_exp.func = mdp.track_lin_vel_xy_yaw_frame_exp
-        self.rewards.track_ang_vel_z_exp.weight = 2.5
+        self.rewards.track_ang_vel_z_exp.weight = 5.
         self.rewards.track_ang_vel_z_exp.func = mdp.track_ang_vel_z_world_exp
 
         # Others
         self.rewards.feet_air_time_biped.weight = 2.
         self.rewards.feet_air_time_biped.params["sensor_cfg"].body_names = [self.foot_link_name]
-        self.rewards.feet_contact.weight = 0
+        self.rewards.feet_contact.weight = .1
         self.rewards.feet_contact.params["sensor_cfg"].body_names = [self.foot_link_name]
         self.rewards.feet_contact_without_cmd.weight = 0
         self.rewards.feet_contact_without_cmd.params["sensor_cfg"].body_names = [self.foot_link_name]
         self.rewards.feet_stumble.weight = 0
         self.rewards.feet_stumble.params["sensor_cfg"].body_names = [self.foot_link_name]
-        self.rewards.feet_slide.weight = -0.4
+        self.rewards.feet_slide.weight = -1.
         self.rewards.feet_slide.params["sensor_cfg"].body_names = [self.foot_link_name]
         self.rewards.feet_slide.params["asset_cfg"].body_names = [self.foot_link_name]
         self.rewards.feet_height.weight = 0
@@ -130,9 +133,10 @@ class HighTorquePiRoughEnvCfg(LocomotionVelocityRoughEnvCfg):
             self.disable_zero_weight_rewards()
 
         # ------------------------------Terminations------------------------------
-        self.terminations.illegal_contact.params["sensor_cfg"].body_names = [self.base_link_name, ".*_hip_pitch_link"]
+        self.terminations.illegal_contact.params["sensor_cfg"].body_names = [self.base_link_name, ".*_hip_pitch_link",".*_hip_roll_link",
+                                                                             ".*_ankle_pitch_link", ".*_thigh_link"]
 
         # Commands
-        self.commands.base_velocity.ranges.lin_vel_x = (-1.0, 1.0)
-        self.commands.base_velocity.ranges.lin_vel_y = (-1.0, 1.0)
-        self.commands.base_velocity.ranges.ang_vel_z = (-1.0, 1.0)
+        self.commands.base_velocity.ranges.lin_vel_x = (-.3, .6)
+        self.commands.base_velocity.ranges.lin_vel_y = (0., 0.)
+        self.commands.base_velocity.ranges.ang_vel_z = (-.3, .3)
