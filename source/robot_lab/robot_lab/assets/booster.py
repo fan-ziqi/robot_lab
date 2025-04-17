@@ -1,3 +1,6 @@
+# Copyright (c) 2024-2025 Ziqi Fan
+# SPDX-License-Identifier: Apache-2.0
+
 import isaaclab.sim as sim_utils
 from isaaclab.actuators import ImplicitActuatorCfg
 from isaaclab.assets.articulation import ArticulationCfg
@@ -27,7 +30,6 @@ BOOSTER_T1_CFG = ArticulationCfg(
             # Head
             "AAHead_yaw": 0.0,
             "Head_pitch": 0.0,
-
             # Arm
             ".*_Shoulder_Pitch": 0.2,
             "Left_Shoulder_Roll": -1.35,
@@ -35,10 +37,8 @@ BOOSTER_T1_CFG = ArticulationCfg(
             ".*_Elbow_Pitch": 0.0,
             "Left_Elbow_Yaw": -0.5,
             "Right_Elbow_Yaw": 0.5,
-
             # Waist
             "Waist": 0.0,
-
             # Leg
             ".*_Hip_Pitch": -0.20,
             ".*_Hip_Roll": 0.0,
@@ -78,17 +78,9 @@ BOOSTER_T1_CFG = ArticulationCfg(
             armature=0.01,
         ),
         "feet": ImplicitActuatorCfg(
-            joint_names_expr=[
-                ".*_Ankle_Pitch",
-                ".*_Ankle_Roll"],
-            effort_limit={
-                ".*_Ankle_Pitch": 24,
-                ".*_Ankle_Roll": 15
-            },
-            velocity_limit={
-                ".*_Ankle_Pitch": 18.8,
-                ".*_Ankle_Roll": 12.4
-            },
+            joint_names_expr=[".*_Ankle_Pitch", ".*_Ankle_Roll"],
+            effort_limit={".*_Ankle_Pitch": 24, ".*_Ankle_Roll": 15},
+            velocity_limit={".*_Ankle_Pitch": 18.8, ".*_Ankle_Roll": 12.4},
             stiffness=50.0,
             damping=1.0,
             armature=0.01,

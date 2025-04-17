@@ -28,6 +28,7 @@ class RobotEraXbotRewardsCfg(RewardsCfg):
         },
     )
 
+
 @configclass
 class RobotEraXbotRoughEnvCfg(LocomotionVelocityRoughEnvCfg):
     rewards: RobotEraXbotRewardsCfg = RobotEraXbotRewardsCfg()
@@ -77,13 +78,17 @@ class RobotEraXbotRoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         self.rewards.body_lin_acc_l2.params["asset_cfg"].body_names = [self.base_link_name]
 
         # Joint penalties
-        self.rewards.joint_torques_l2.weight = -1.e-8
+        self.rewards.joint_torques_l2.weight = -1.0e-8
         self.rewards.joint_torques_l2.params["asset_cfg"].joint_names = [".*_leg_.*", ".*_knee_.*", ".*_ankle_.*"]
         self.rewards.joint_vel_l2.weight = 0
         self.rewards.joint_acc_l2.weight = -1.25e-7
         self.rewards.joint_acc_l2.params["asset_cfg"].joint_names = [".*_leg_.*", ".*_knee_.*"]
-        self.rewards.create_joint_deviation_l1_rewterm("joint_deviation_hip_l1", -0.01, [".*_leg_yaw_joint", ".*_leg_roll_joint"])
-        self.rewards.create_joint_deviation_l1_rewterm("joint_deviation_arms_l1", -0.05, [".*_shoulder_.*",".*_elbow_.*",".*_arm_.*",".*_wrist_.*"])
+        self.rewards.create_joint_deviation_l1_rewterm(
+            "joint_deviation_hip_l1", -0.01, [".*_leg_yaw_joint", ".*_leg_roll_joint"]
+        )
+        self.rewards.create_joint_deviation_l1_rewterm(
+            "joint_deviation_arms_l1", -0.05, [".*_shoulder_.*", ".*_elbow_.*", ".*_arm_.*", ".*_wrist_.*"]
+        )
         self.rewards.create_joint_deviation_l1_rewterm("joint_deviation_torso_l1", -0.1, ["waist_.*"])
         self.rewards.joint_pos_limits.weight = -1.0
         self.rewards.joint_vel_limits.weight = 0
@@ -105,13 +110,13 @@ class RobotEraXbotRoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         self.rewards.contact_forces.params["sensor_cfg"].body_names = [self.foot_link_name]
 
         # Velocity-tracking rewards
-        self.rewards.track_lin_vel_xy_exp.weight = 2.
+        self.rewards.track_lin_vel_xy_exp.weight = 2.0
         self.rewards.track_lin_vel_xy_exp.func = mdp.track_lin_vel_xy_yaw_frame_exp
-        self.rewards.track_ang_vel_z_exp.weight = 2.
+        self.rewards.track_ang_vel_z_exp.weight = 2.0
         self.rewards.track_ang_vel_z_exp.func = mdp.track_ang_vel_z_world_exp
 
         # Others
-        self.rewards.feet_air_time_biped.weight = 2.
+        self.rewards.feet_air_time_biped.weight = 2.0
         self.rewards.feet_air_time_biped.params["sensor_cfg"].body_names = [self.foot_link_name]
         self.rewards.feet_contact.weight = 0
         self.rewards.feet_contact.params["sensor_cfg"].body_names = [self.foot_link_name]
@@ -138,10 +143,10 @@ class RobotEraXbotRoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         self.terminations.illegal_contact.params["sensor_cfg"].body_names = [
             self.base_link_name,
             "left_leg_pitch_link",
-            "right_leg_pitch_link"
+            "right_leg_pitch_link",
         ]
 
-        # Commands
+        # ------------------------------Commands------------------------------
         self.commands.base_velocity.ranges.lin_vel_x = (-1.0, 1.0)
         self.commands.base_velocity.ranges.lin_vel_y = (-1.0, 1.0)
         self.commands.base_velocity.ranges.ang_vel_z = (-1.0, 1.0)

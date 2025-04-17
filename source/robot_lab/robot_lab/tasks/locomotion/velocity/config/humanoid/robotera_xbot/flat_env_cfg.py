@@ -1,7 +1,6 @@
 # Copyright (c) 2024-2025 Ziqi Fan
 # SPDX-License-Identifier: Apache-2.0
 
-from isaaclab.managers import SceneEntityCfg
 from isaaclab.utils import configclass
 
 from .rough_env_cfg import RobotEraXbotRoughEnvCfg
@@ -28,6 +27,6 @@ class RobotEraXbotFlatEnvCfg(RobotEraXbotRoughEnvCfg):
         # Rewards
         self.rewards.lin_vel_z_l2.weight = -0.2
 
-        # If the weight of rewards is 0, set rewards to None8888888888888888
+        # If the weight of rewards is 0, set rewards to None
         if self.__class__.__name__ == "RobotEraXbotFlatEnvCfg":
             self.disable_zero_weight_rewards()

@@ -1,3 +1,6 @@
+# Copyright (c) 2024-2025 Ziqi Fan
+# SPDX-License-Identifier: Apache-2.0
+
 import isaaclab.sim as sim_utils
 from isaaclab.actuators import ImplicitActuatorCfg
 from isaaclab.assets.articulation import ArticulationCfg
@@ -52,11 +55,9 @@ ROBOTERA_XBOT_CFG = ArticulationCfg(
             armature=0.01,
         ),
         "feet": ImplicitActuatorCfg(
-            joint_names_expr=[
-                ".*_ankle_pitch_joint",
-                ".*_ankle_roll_joint"],
+            joint_names_expr=[".*_ankle_pitch_joint", ".*_ankle_roll_joint"],
             effort_limit=100,
-            velocity_limit=12.,
+            velocity_limit=12.0,
             stiffness=15.0,
             damping=10.0,
             armature=0.01,
@@ -64,7 +65,7 @@ ROBOTERA_XBOT_CFG = ArticulationCfg(
         "waist": ImplicitActuatorCfg(
             joint_names_expr=["waist_.*"],
             effort_limit=100,
-            velocity_limit=12.,
+            velocity_limit=12.0,
             stiffness=200.0,
             damping=10.0,
             armature=0.01,

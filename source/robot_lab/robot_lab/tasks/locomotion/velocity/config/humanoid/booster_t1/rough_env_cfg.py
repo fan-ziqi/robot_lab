@@ -28,6 +28,7 @@ class BoosterT1RewardsCfg(RewardsCfg):
         },
     )
 
+
 @configclass
 class BoosterT1RoughEnvCfg(LocomotionVelocityRoughEnvCfg):
     rewards: BoosterT1RewardsCfg = BoosterT1RewardsCfg()
@@ -77,13 +78,15 @@ class BoosterT1RoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         self.rewards.body_lin_acc_l2.params["asset_cfg"].body_names = [self.base_link_name]
 
         # Joint penalties
-        self.rewards.joint_torques_l2.weight = -3.e-7
+        self.rewards.joint_torques_l2.weight = -3.0e-7
         self.rewards.joint_torques_l2.params["asset_cfg"].joint_names = [".*_Hip_.*", ".*_Knee_.*", ".*_Ankle_.*"]
         self.rewards.joint_vel_l2.weight = 0
         self.rewards.joint_acc_l2.weight = -1.25e-7
         self.rewards.joint_acc_l2.params["asset_cfg"].joint_names = [".*_Hip_.*", ".*_Knee_.*"]
         self.rewards.create_joint_deviation_l1_rewterm("joint_deviation_hip_l1", -0.01, [".*_Hip_Yaw", ".*_Hip_Roll"])
-        self.rewards.create_joint_deviation_l1_rewterm("joint_deviation_arms_l1", -0.05, [".*_Shoulder_.*",".*_Elbow_.*"])
+        self.rewards.create_joint_deviation_l1_rewterm(
+            "joint_deviation_arms_l1", -0.05, [".*_Shoulder_.*", ".*_Elbow_.*"]
+        )
         self.rewards.create_joint_deviation_l1_rewterm("joint_deviation_torso_l1", -0.1, ["Waist"])
         self.rewards.joint_pos_limits.weight = -1.0
         self.rewards.joint_vel_limits.weight = 0
@@ -111,7 +114,7 @@ class BoosterT1RoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         self.rewards.track_ang_vel_z_exp.func = mdp.track_ang_vel_z_world_exp
 
         # Others
-        self.rewards.feet_air_time_biped.weight = 2.
+        self.rewards.feet_air_time_biped.weight = 2.0
         self.rewards.feet_air_time_biped.params["sensor_cfg"].body_names = [self.foot_link_name]
         self.rewards.feet_contact.weight = 0
         self.rewards.feet_contact.params["sensor_cfg"].body_names = [self.foot_link_name]
@@ -137,7 +140,7 @@ class BoosterT1RoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         # ------------------------------Terminations------------------------------
         self.terminations.illegal_contact.params["sensor_cfg"].body_names = [self.base_link_name]
 
-        # Commands
+        # ------------------------------Commands------------------------------
         self.commands.base_velocity.ranges.lin_vel_x = (-1.0, 1.0)
         self.commands.base_velocity.ranges.lin_vel_y = (-1.0, 1.0)
         self.commands.base_velocity.ranges.ang_vel_z = (-1.0, 1.0)
