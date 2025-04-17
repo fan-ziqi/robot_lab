@@ -29,5 +29,7 @@ ISAACLAB_ASSETS_METADATA = toml.load(os.path.join(ISAACLAB_ASSETS_EXT_DIR, "conf
 __version__ = ISAACLAB_ASSETS_METADATA["package"]["version"]
 
 
+from .booster import *
 from .fftai import *
+from .robotera import *
 from .unitree import *
