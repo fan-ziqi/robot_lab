@@ -650,13 +650,13 @@ class CurriculumCfg:
 
     terrain_levels = CurrTerm(func=mdp.terrain_levels_vel)
 
-    command_levels = CurrTerm(
-        func=mdp.command_levels_vel,
-        params={
-            "reward_term_name": "track_lin_vel_xy_exp",
-            "max_curriculum": 1.5,
-        },
-    )
+    # command_levels = CurrTerm(
+    #     func=mdp.command_levels_vel,
+    #     params={
+    #         "reward_term_name": "track_lin_vel_xy_exp",
+    #         "max_curriculum": 1.5,
+    #     },
+    # )
 
 
 ##
