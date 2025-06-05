@@ -288,12 +288,11 @@ class EventCfg:
     )
 
     randomize_com_positions = EventTerm(
-        func=mdp.randomize_com_positions,
+        func=mdp.randomize_rigid_body_com,
         mode="startup",
         params={
-            "asset_cfg": SceneEntityCfg("robot", body_names=""),
-            "com_distribution_params": (-0.1, 0.1),
-            "operation": "add",
+            "asset_cfg": SceneEntityCfg("robot", body_names=".*"),
+            "com_range": {"x": (-0.05, 0.05), "y": (-0.05, 0.05), "z": (-0.05, 0.05)},
         },
     )
 
