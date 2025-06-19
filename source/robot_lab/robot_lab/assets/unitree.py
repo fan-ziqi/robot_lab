@@ -17,6 +17,8 @@ from isaaclab.assets.articulation import ArticulationCfg
 
 from robot_lab.assets import ISAACLAB_ASSETS_DATA_DIR
 
+from .usd_converter import mjcf_to_usd, urdf_to_usd, xacro_to_usd  # noqa: F401
+
 ##
 # Configuration
 ##
@@ -24,7 +26,11 @@ from robot_lab.assets import ISAACLAB_ASSETS_DATA_DIR
 
 UNITREE_A1_CFG = ArticulationCfg(
     spawn=sim_utils.UsdFileCfg(
-        usd_path=f"{ISAACLAB_ASSETS_DATA_DIR}/Robots/Unitree/A1/a1.usd",
+        usd_path=urdf_to_usd(
+            file_path=f"{ISAACLAB_ASSETS_DATA_DIR}/Robots/Unitree/a1_description/urdf/a1.xacro",
+            merge_joints=True,
+            fix_base=False,
+        ),
         activate_contact_sensors=True,
         rigid_props=sim_utils.RigidBodyPropertiesCfg(
             disable_gravity=False,
@@ -70,7 +76,11 @@ Note: Specifications taken from: https://www.trossenrobotics.com/a1-quadruped#sp
 
 UNITREE_GO2_CFG = ArticulationCfg(
     spawn=sim_utils.UsdFileCfg(
-        usd_path=f"{ISAACLAB_ASSETS_DATA_DIR}/Robots/Unitree/Go2/go2.usd",
+        usd_path=urdf_to_usd(
+            file_path=f"{ISAACLAB_ASSETS_DATA_DIR}/Robots/Unitree/go2_description/urdf/go2_description.urdf",
+            merge_joints=True,
+            fix_base=False,
+        ),
         activate_contact_sensors=True,
         rigid_props=sim_utils.RigidBodyPropertiesCfg(
             disable_gravity=False,
@@ -114,7 +124,11 @@ UNITREE_GO2_CFG = ArticulationCfg(
 
 UNITREE_GO2W_CFG = ArticulationCfg(
     spawn=sim_utils.UsdFileCfg(
-        usd_path=f"{ISAACLAB_ASSETS_DATA_DIR}/Robots/Unitree/Go2W/go2w.usd",
+        usd_path=urdf_to_usd(
+            file_path=f"{ISAACLAB_ASSETS_DATA_DIR}/Robots/Unitree/go2w_description/urdf/go2w_description.urdf",
+            merge_joints=True,
+            fix_base=False,
+        ),
         activate_contact_sensors=True,
         rigid_props=sim_utils.RigidBodyPropertiesCfg(
             disable_gravity=False,
@@ -168,7 +182,11 @@ UNITREE_GO2W_CFG = ArticulationCfg(
 
 UNITREE_B2_CFG = ArticulationCfg(
     spawn=sim_utils.UsdFileCfg(
-        usd_path=f"{ISAACLAB_ASSETS_DATA_DIR}/Robots/Unitree/B2/b2.usd",
+        usd_path=urdf_to_usd(
+            file_path=f"{ISAACLAB_ASSETS_DATA_DIR}/Robots/Unitree/b2_description/urdf/b2_description.urdf",
+            merge_joints=True,
+            fix_base=False,
+        ),
         activate_contact_sensors=True,
         rigid_props=sim_utils.RigidBodyPropertiesCfg(
             disable_gravity=False,
@@ -231,7 +249,11 @@ UNITREE_B2_CFG = ArticulationCfg(
 
 UNITREE_B2W_CFG = ArticulationCfg(
     spawn=sim_utils.UsdFileCfg(
-        usd_path=f"{ISAACLAB_ASSETS_DATA_DIR}/Robots/Unitree/B2W/b2w.usd",
+        usd_path=urdf_to_usd(
+            file_path=f"{ISAACLAB_ASSETS_DATA_DIR}/Robots/Unitree/b2w_description/urdf/b2_description.urdf",
+            merge_joints=True,
+            fix_base=False,
+        ),
         activate_contact_sensors=True,
         rigid_props=sim_utils.RigidBodyPropertiesCfg(
             disable_gravity=False,
