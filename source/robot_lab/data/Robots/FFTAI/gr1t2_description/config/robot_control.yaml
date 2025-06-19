@@ -1,0 +1,50 @@
+# Copyright (c) 2024-2025 Ziqi Fan
+# SPDX-License-Identifier: Apache-2.0
+
+gr1t2_gazebo:
+    # Publish all joint states -----------------------------------
+    joint_state_controller:
+        type: joint_state_controller/JointStateController
+        publish_rate: 1000
+
+    # left leg Controllers ---------------------------------------
+    l_hip_roll_controller:
+        type: robot_joint_controller/RobotJointController
+        joint: l_hip_roll
+
+    l_hip_yaw_controller:
+        type: robot_joint_controller/RobotJointController
+        joint: l_hip_yaw
+
+    l_hip_pitch_controller:
+        type: robot_joint_controller/RobotJointController
+        joint: l_hip_pitch
+
+    l_knee_pitch_controller:
+        type: robot_joint_controller/RobotJointController
+        joint: l_knee_pitch
+
+    l_ankle_pitch_controller:
+        type: robot_joint_controller/RobotJointController
+        joint: l_ankle_pitch
+
+    # right leg Controllers ---------------------------------------
+    r_hip_roll_controller:
+        type: robot_joint_controller/RobotJointController
+        joint: r_hip_roll
+
+    r_hip_yaw_controller:
+        type: robot_joint_controller/RobotJointController
+        joint: r_hip_yaw
+
+    r_hip_pitch_controller:
+        type: robot_joint_controller/RobotJointController
+        joint: r_hip_pitch
+
+    r_knee_pitch_controller:
+        type: robot_joint_controller/RobotJointController
+        joint: r_knee_pitch
+
+    r_ankle_pitch_controller:
+        type: robot_joint_controller/RobotJointController
+        joint: r_ankle_pitch
