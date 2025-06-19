@@ -7,13 +7,13 @@ from isaaclab.app import AppLauncher
 
 # add argparse arguments
 parser = argparse.ArgumentParser(description="Utility to check robot model.")
-parser.add_argument("--path", type=str, help="The path to the input URDF file.")
 parser.add_argument(
-    "--type",
+    "type",
     type=str,
     choices=["urdf", "mjcf", "xacro"],
     help="The type of the input file.",
 )
+parser.add_argument("path", type=str, help="The path to the input URDF file.")
 # append AppLauncher cli args
 AppLauncher.add_app_launcher_args(parser)
 # parse the arguments
