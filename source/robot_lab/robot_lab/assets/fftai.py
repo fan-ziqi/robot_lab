@@ -141,11 +141,13 @@ FFTAI_GR1T1_CFG = ArticulationCfg(
 
 
 FFTAI_GR1T1_LOWER_LIMB_CFG = FFTAI_GR1T1_CFG.copy()
-FFTAI_GR1T1_LOWER_LIMB_CFG.spawn.usd_path = xacro_to_usd(
-    file_path=f"{ISAACLAB_ASSETS_DATA_DIR}/Robots/FFTAI/gr1t1_description/urdf/GR1T1_lower_limb.urdf",
-    merge_joints=True,
-    fix_base=False,
-),
+FFTAI_GR1T1_LOWER_LIMB_CFG.spawn.usd_path = (
+    xacro_to_usd(
+        file_path=f"{ISAACLAB_ASSETS_DATA_DIR}/Robots/FFTAI/gr1t1_description/urdf/GR1T1_lower_limb.urdf",
+        merge_joints=True,
+        fix_base=False,
+    ),
+)
 FFTAI_GR1T1_LOWER_LIMB_CFG.actuators = (
     {
         "actuators": ImplicitActuatorCfg(
@@ -171,18 +173,22 @@ FFTAI_GR1T1_LOWER_LIMB_CFG.actuators = (
 
 
 FFTAI_GR1T2_CFG = FFTAI_GR1T1_CFG.copy()
-FFTAI_GR1T2_CFG.spawn.usd_path = xacro_to_usd(
-    file_path=f"{ISAACLAB_ASSETS_DATA_DIR}/Robots/FFTAI/gr1t2_description/urdf/GR1T2.urdf",
-    merge_joints=True,
-    fix_base=False,
-),
+FFTAI_GR1T2_CFG.spawn.usd_path = (
+    xacro_to_usd(
+        file_path=f"{ISAACLAB_ASSETS_DATA_DIR}/Robots/FFTAI/gr1t2_description/urdf/GR1T2.urdf",
+        merge_joints=True,
+        fix_base=False,
+    ),
+)
 """Configuration for the FFTAI GR1T1 Humanoid robot."""
 
 
 FFTAI_GR1T2_LOWER_LIMB_CFG = FFTAI_GR1T1_LOWER_LIMB_CFG.copy()
-FFTAI_GR1T2_LOWER_LIMB_CFG.spawn.usd_path = xacro_to_usd(
-    file_path=f"{ISAACLAB_ASSETS_DATA_DIR}/Robots/FFTAI/gr1t2_description/urdf/GR1T2_lower_limb.urdf",
-    merge_joints=True,
-    fix_base=False,
-),
+FFTAI_GR1T2_LOWER_LIMB_CFG.spawn.usd_path = (
+    xacro_to_usd(
+        file_path=f"{ISAACLAB_ASSETS_DATA_DIR}/Robots/FFTAI/gr1t2_description/urdf/GR1T2_lower_limb.urdf",
+        merge_joints=True,
+        fix_base=False,
+    ),
+)
 """Configuration for the FFTAI GR1T2 Humanoid robot with fixed upper limb."""
