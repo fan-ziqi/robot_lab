@@ -392,7 +392,7 @@ class RewardsCfg:
         params={"asset_cfg": SceneEntityCfg("robot", body_names="")},
     )
 
-    # Joint penaltie
+    # Joint penalties
     joint_torques_l2 = RewTerm(
         func=mdp.joint_torques_l2, weight=0.0, params={"asset_cfg": SceneEntityCfg("robot", joint_names=".*")}
     )

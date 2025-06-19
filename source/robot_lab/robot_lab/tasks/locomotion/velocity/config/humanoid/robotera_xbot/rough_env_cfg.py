@@ -33,7 +33,7 @@ class RobotEraXbotRewardsCfg(RewardsCfg):
 class RobotEraXbotRoughEnvCfg(LocomotionVelocityRoughEnvCfg):
     rewards: RobotEraXbotRewardsCfg = RobotEraXbotRewardsCfg()
 
-    base_link_name = "base_link"
+    base_link_name = "base"
     foot_link_name = ".*_ankle_roll_link"
 
     def __post_init__(self):

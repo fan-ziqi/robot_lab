@@ -1,10 +1,10 @@
 # Copyright (c) 2024-2025 Ziqi Fan
 # SPDX-License-Identifier: Apache-2.0
 
-# Copyright (c) 2022-2025, The Isaac Lab Project Developers.
+# Copyright (c) 2024-2025, The Isaac Lab Project Developers.
 # All rights reserved.
 #
-# SPDX-License-Identifier: BSD-3-Clause
+# SPDX-License-Identifier: Apache-2.0
 
 """Script to play a checkpoint if an RL agent from RSL-RL."""
 
@@ -58,7 +58,7 @@ import torch
 import rsl_rl_utils
 from rsl_rl.runners import OnPolicyRunner
 
-from isaaclab.devices import Se2Keyboard
+from isaaclab.devices import Se2Keyboard, Se2KeyboardCfg
 from isaaclab.envs import DirectMARLEnv, multi_agent_to_single_agent
 from isaaclab.managers import ObservationTermCfg as ObsTerm
 from isaaclab.utils.assets import retrieve_file_path
@@ -80,6 +80,7 @@ def main():
 
     # make a smaller scene for play
     env_cfg.scene.num_envs = 50
+    env_cfg.viewer.resolution = (640, 360)
     # spawn the robot randomly in the grid (instead of their terrain levels)
     env_cfg.scene.terrain.max_init_terrain_level = None
     # reduce the number of terrains to save memory
@@ -98,11 +99,12 @@ def main():
         env_cfg.scene.num_envs = 1
         env_cfg.terminations.time_out = None
         env_cfg.commands.base_velocity.debug_vis = False
-        controller = Se2Keyboard(
+        config = Se2KeyboardCfg(
             v_x_sensitivity=env_cfg.commands.base_velocity.ranges.lin_vel_x[1],
             v_y_sensitivity=env_cfg.commands.base_velocity.ranges.lin_vel_y[1],
             omega_z_sensitivity=env_cfg.commands.base_velocity.ranges.ang_vel_z[1],
         )
+        controller = Se2Keyboard(config)
         env_cfg.observations.policy.velocity_commands = ObsTerm(
             func=lambda env: torch.tensor(controller.advance(), dtype=torch.float32).unsqueeze(0).to(env.device),
         )

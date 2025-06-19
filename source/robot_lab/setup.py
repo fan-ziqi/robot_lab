@@ -24,6 +24,7 @@ INSTALL_REQUIRES = [
     # "pyquaternion",
     "pyqt5",
     "pin",
+    "xacrodoc",
 ]
 
 # Installation operation
