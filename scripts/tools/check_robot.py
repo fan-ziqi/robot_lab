@@ -76,7 +76,7 @@ def main():
     # Simulate scene (if not headless)
     if local_gui or livestream_gui:
         # Open the stage with USD
-        stage_utils.open_stage(usd_path)
+        stage_utils.open_stage(str(usd_path))
         # Reinitialize the simulation
         app = omni.kit.app.get_app_interface()
         # Run simulation

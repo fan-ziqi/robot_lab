@@ -16,7 +16,7 @@ from isaaclab.assets.articulation import ArticulationCfg
 
 from robot_lab.assets import ISAACLAB_ASSETS_DATA_DIR
 
-from .usd_converter import mjcf_to_usd, urdf_to_usd, xacro_to_usd  # noqa: F401
+from .usd_converter import mjcf_to_usd, spawn_from_lazy_usd, urdf_to_usd, xacro_to_usd  # noqa: F401
 
 ##
 # Configuration
@@ -25,6 +25,7 @@ from .usd_converter import mjcf_to_usd, urdf_to_usd, xacro_to_usd  # noqa: F401
 
 FFTAI_GR1T1_CFG = ArticulationCfg(
     spawn=sim_utils.UsdFileCfg(
+        func=spawn_from_lazy_usd,
         usd_path=xacro_to_usd(
             file_path=f"{ISAACLAB_ASSETS_DATA_DIR}/Robots/FFTAI/gr1t1_description/urdf/GR1T1.urdf",
             merge_joints=True,

@@ -13,7 +13,7 @@
 **robot_lab** is a RL extension library for robots, based on IsaacLab. It allows you to develop in an isolated environment, outside of the core Isaac Lab repository.
 
 > [!IMPORTANT]
-> This repository currently depends on **IsaacLab v2.0.0** or higher. If you prefer to use **IsaacLab v1.4.1**, please use it with **[v1.1](https://github.com/fan-ziqi/robot_lab/releases/tag/v1.1)** of this repository.
+> This repository currently depends on **IsaacLab v2.2.0** or higher. If you prefer to use **IsaacLab v1.4.1**, please use it with **[v1.1](https://github.com/fan-ziqi/robot_lab/releases/tag/v1.1)** of this repository.
 >
 > Since rsl_rl is updated too frequently, the new version is no longer compatible with AMP_for_hardware. Please use the historical version.
 
@@ -317,19 +317,22 @@ This repository supports direct import of URDF, XACRO, and MJCF robot models wit
 YOUR_ROBOT_CFG = ArticulationCfg(
     spawn=sim_utils.UsdFileCfg(
         # for urdf
+        func=spawn_from_lazy_usd,
         usd_path=urdf_to_usd(
             file_path=f"{ISAACLAB_ASSETS_DATA_DIR}/Robots/your_robot/your_robot.urdf",
             merge_joints=True,
             fix_base=False,
         ),
         # for xacro
-        usd_path = xacro_to_usd(
+        func=spawn_from_lazy_usd,
+        usd_path=xacro_to_usd(
             file_path=f"{ISAACLAB_ASSETS_DATA_DIR}/Robots/your_robot/your_robot.xacro",
             merge_joints=True,
             fix_base=False,
         ),
         # for mjcf
-        usd_path = mjcf_to_usd(
+        func=spawn_from_lazy_usd,
+        usd_path=mjcf_to_usd(
             file_path=f"{ISAACLAB_ASSETS_DATA_DIR}/Robots/your_robot/your_robot.xml",
             import_sites=True,
             fix_base=False,

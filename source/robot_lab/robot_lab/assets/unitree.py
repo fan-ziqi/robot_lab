@@ -17,7 +17,7 @@ from isaaclab.assets.articulation import ArticulationCfg
 
 from robot_lab.assets import ISAACLAB_ASSETS_DATA_DIR
 
-from .usd_converter import mjcf_to_usd, urdf_to_usd, xacro_to_usd  # noqa: F401
+from .usd_converter import mjcf_to_usd, spawn_from_lazy_usd, urdf_to_usd, xacro_to_usd  # noqa: F401
 
 ##
 # Configuration
@@ -26,8 +26,9 @@ from .usd_converter import mjcf_to_usd, urdf_to_usd, xacro_to_usd  # noqa: F401
 
 UNITREE_A1_CFG = ArticulationCfg(
     spawn=sim_utils.UsdFileCfg(
+        func=spawn_from_lazy_usd,
         usd_path=urdf_to_usd(
-            file_path=f"{ISAACLAB_ASSETS_DATA_DIR}/Robots/Unitree/a1_description/urdf/a1.xacro",
+            file_path=f"{ISAACLAB_ASSETS_DATA_DIR}/Robots/Unitree/a1_description/urdf/a1.urdf",
             merge_joints=True,
             fix_base=False,
         ),
@@ -76,6 +77,7 @@ Note: Specifications taken from: https://www.trossenrobotics.com/a1-quadruped#sp
 
 UNITREE_GO2_CFG = ArticulationCfg(
     spawn=sim_utils.UsdFileCfg(
+        func=spawn_from_lazy_usd,
         usd_path=urdf_to_usd(
             file_path=f"{ISAACLAB_ASSETS_DATA_DIR}/Robots/Unitree/go2_description/urdf/go2_description.urdf",
             merge_joints=True,
@@ -124,6 +126,7 @@ UNITREE_GO2_CFG = ArticulationCfg(
 
 UNITREE_GO2W_CFG = ArticulationCfg(
     spawn=sim_utils.UsdFileCfg(
+        func=spawn_from_lazy_usd,
         usd_path=urdf_to_usd(
             file_path=f"{ISAACLAB_ASSETS_DATA_DIR}/Robots/Unitree/go2w_description/urdf/go2w_description.urdf",
             merge_joints=True,
@@ -182,6 +185,7 @@ UNITREE_GO2W_CFG = ArticulationCfg(
 
 UNITREE_B2_CFG = ArticulationCfg(
     spawn=sim_utils.UsdFileCfg(
+        func=spawn_from_lazy_usd,
         usd_path=urdf_to_usd(
             file_path=f"{ISAACLAB_ASSETS_DATA_DIR}/Robots/Unitree/b2_description/urdf/b2_description.urdf",
             merge_joints=True,
@@ -249,8 +253,9 @@ UNITREE_B2_CFG = ArticulationCfg(
 
 UNITREE_B2W_CFG = ArticulationCfg(
     spawn=sim_utils.UsdFileCfg(
+        func=spawn_from_lazy_usd,
         usd_path=urdf_to_usd(
-            file_path=f"{ISAACLAB_ASSETS_DATA_DIR}/Robots/Unitree/b2w_description/urdf/b2_description.urdf",
+            file_path=f"{ISAACLAB_ASSETS_DATA_DIR}/Robots/Unitree/b2w_description/urdf/b2w_description.urdf",
             merge_joints=True,
             fix_base=False,
         ),
