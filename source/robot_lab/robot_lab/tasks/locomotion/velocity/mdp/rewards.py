@@ -12,7 +12,7 @@ from isaaclab.managers import ManagerTermBase
 from isaaclab.managers import RewardTermCfg as RewTerm
 from isaaclab.managers import SceneEntityCfg
 from isaaclab.sensors import ContactSensor, RayCaster
-from isaaclab.utils.math import quat_rotate_inverse, yaw_quat
+from isaaclab.utils.math import quat_apply_inverse, yaw_quat
 
 if TYPE_CHECKING:
     from isaaclab.envs import ManagerBasedRLEnv
@@ -53,7 +53,7 @@ def track_lin_vel_xy_yaw_frame_exp(
     """Reward tracking of linear velocity commands (xy axes) in the gravity aligned robot frame using exponential kernel."""
     # extract the used quantities (to enable type-hinting)
     asset = env.scene[asset_cfg.name]
-    vel_yaw = quat_rotate_inverse(yaw_quat(asset.data.root_quat_w), asset.data.root_lin_vel_w[:, :3])
+    vel_yaw = quat_apply_inverse(yaw_quat(asset.data.root_quat_w), asset.data.root_lin_vel_w[:, :3])
     lin_vel_error = torch.sum(
         torch.square(env.command_manager.get_command(command_name)[:, :2] - vel_yaw[:, :2]), dim=1
     )
@@ -301,6 +301,40 @@ def action_mirror(env: ManagerBasedRLEnv, asset_cfg: SceneEntityCfg, mirror_join
     return reward
 
 
+def action_sync(env: ManagerBasedRLEnv, asset_cfg: SceneEntityCfg, joint_groups: list[list[str]]) -> torch.Tensor:
+    # extract the used quantities (to enable type-hinting)
+    asset: Articulation = env.scene[asset_cfg.name]
+
+    # Cache joint indices if not already done
+    if not hasattr(env, "action_sync_joint_cache") or env.action_sync_joint_cache is None:
+        env.action_sync_joint_cache = [
+            [asset.find_joints(joint_name) for joint_name in joint_group] for joint_group in joint_groups
+        ]
+
+    reward = torch.zeros(env.num_envs, device=env.device)
+    # Iterate over each joint group
+    for joint_group in env.action_sync_joint_cache:
+        if len(joint_group) < 2:
+            continue  # need at least 2 joints to compare
+
+        # Get absolute actions for all joints in this group
+        actions = torch.stack(
+            [torch.abs(env.action_manager.action[:, joint[0]]) for joint in joint_group], dim=1
+        )  # shape: (num_envs, num_joints_in_group)
+
+        # Calculate mean action for each environment
+        mean_actions = torch.mean(actions, dim=1, keepdim=True)
+
+        # Calculate variance from mean for each joint
+        variance = torch.mean(torch.square(actions - mean_actions), dim=1)
+
+        # Add to reward (we want to minimize this variance)
+        reward += variance.squeeze()
+    reward *= 1 / len(joint_groups) if len(joint_groups) > 0 else 0
+    reward *= torch.clamp(-env.scene["robot"].data.projected_gravity_b[:, 2], 0, 0.7) / 0.7
+    return reward
+
+
 def feet_air_time(
     env: ManagerBasedRLEnv,
     command_name: str,
@@ -330,8 +364,9 @@ def feet_air_time(
         torch.where(t_max < mode_time, t_min, 0),
         stance_cmd_reward,
     )
+    reward = torch.sum(reward, dim=1)
     reward *= torch.clamp(-env.scene["robot"].data.projected_gravity_b[:, 2], 0, 0.7) / 0.7
-    return torch.sum(reward, dim=1)
+    return reward
 
 
 def feet_air_time_positive_biped(env, command_name: str, threshold: float, sensor_cfg: SceneEntityCfg) -> torch.Tensor:
@@ -497,10 +532,10 @@ def feet_height_body(
     ].unsqueeze(1)
     footvel_in_body_frame = torch.zeros(env.num_envs, len(asset_cfg.body_ids), 3, device=env.device)
     for i in range(len(asset_cfg.body_ids)):
-        footpos_in_body_frame[:, i, :] = math_utils.quat_rotate_inverse(
+        footpos_in_body_frame[:, i, :] = math_utils.quat_apply_inverse(
             asset.data.root_quat_w, cur_footpos_translated[:, i, :]
         )
-        footvel_in_body_frame[:, i, :] = math_utils.quat_rotate_inverse(
+        footvel_in_body_frame[:, i, :] = math_utils.quat_apply_inverse(
             asset.data.root_quat_w, cur_footvel_translated[:, i, :]
         )
     foot_z_target_error = torch.square(footpos_in_body_frame[:, :, 2] - target_height).view(env.num_envs, -1)
@@ -533,7 +568,7 @@ def feet_slide(
     ].unsqueeze(1)
     footvel_in_body_frame = torch.zeros(env.num_envs, len(asset_cfg.body_ids), 3, device=env.device)
     for i in range(len(asset_cfg.body_ids)):
-        footvel_in_body_frame[:, i, :] = math_utils.quat_rotate_inverse(
+        footvel_in_body_frame[:, i, :] = math_utils.quat_apply_inverse(
             asset.data.root_quat_w, cur_footvel_translated[:, i, :]
         )
     foot_leteral_vel = torch.sqrt(torch.sum(torch.square(footvel_in_body_frame[:, :, :2]), dim=2)).view(
