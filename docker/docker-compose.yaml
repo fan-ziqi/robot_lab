@@ -1,5 +1,7 @@
 x-default-robot-lab-environment: &default-robot-lab-environment
-  - OMNI_KIT_ALLOW_ROOT=1
+  OMNI_KIT_ALLOW_ROOT: 1
+  DISPLAY: $DISPLAY
+  XAUTHORITY: /root/.Xauthority
 
 x-default-robot-lab-deploy: &default-robot-lab-deploy
   resources:
@@ -7,7 +9,7 @@ x-default-robot-lab-deploy: &default-robot-lab-deploy
       devices:
         - driver: nvidia
           count: all
-          capabilities: [ gpu ]
+          capabilities: [gpu]
 
 services:
   robot-lab:
@@ -16,18 +18,21 @@ services:
       context: ../
       dockerfile: docker/Dockerfile
       args:
-        - ISAACLAB_BASE_IMAGE_ARG=${ISAACLAB_BASE_IMAGE}
-        - DOCKER_ISAACLAB_EXTENSION_TEMPLATE_PATH_ARG=${DOCKER_ISAACLAB_EXTENSION_TEMPLATE_PATH}
+        ISAACLAB_BASE_IMAGE_ARG: ${ISAACLAB_BASE_IMAGE}
+        DOCKER_ISAACLAB_EXTENSION_TEMPLATE_PATH_ARG: ${DOCKER_ISAACLAB_EXTENSION_TEMPLATE_PATH}
     image: robot-lab
     container_name: robot-lab
     volumes:
       - type: bind
         source: ../
         target: ${DOCKER_ISAACLAB_EXTENSION_TEMPLATE_PATH}
+      - /tmp/.X11-unix:/tmp/.X11-unix
+      - $XAUTHORITY:/root/.Xauthority
     network_mode: host
-    environment: *default-robot-lab-environment
-    deploy: *default-robot-lab-deploy
-    # This is the entrypoint for the container
+    environment:
+      <<: *default-robot-lab-environment
+    deploy:
+      <<: *default-robot-lab-deploy
     entrypoint: bash
     stdin_open: true
     tty: true
