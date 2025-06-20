@@ -33,6 +33,7 @@ UNITREE_A1_CFG = ArticulationCfg(
         func=spawn_from_lazy_usd,
         usd_path=urdf_to_usd(
             file_path=f"{ISAACLAB_ASSETS_DATA_DIR}/Robots/Unitree/a1_description/urdf/a1.urdf",
+            output_usd_path=f"{ISAACLAB_ASSETS_DATA_DIR}/Robots/Unitree/a1_description/usd/a1.usd",
             merge_joints=True,
             fix_base=False,
         ),
@@ -84,6 +85,7 @@ UNITREE_GO2_CFG = ArticulationCfg(
         func=spawn_from_lazy_usd,
         usd_path=urdf_to_usd(
             file_path=f"{ISAACLAB_ASSETS_DATA_DIR}/Robots/Unitree/go2_description/urdf/go2_description.urdf",
+            output_usd_path=f"{ISAACLAB_ASSETS_DATA_DIR}/Robots/Unitree/go2_description/usd/go2.usd",
             merge_joints=True,
             fix_base=False,
         ),
@@ -133,6 +135,7 @@ UNITREE_GO2W_CFG = ArticulationCfg(
         func=spawn_from_lazy_usd,
         usd_path=urdf_to_usd(
             file_path=f"{ISAACLAB_ASSETS_DATA_DIR}/Robots/Unitree/go2w_description/urdf/go2w_description.urdf",
+            output_usd_path=f"{ISAACLAB_ASSETS_DATA_DIR}/Robots/Unitree/go2w_description/usd/go2w_description.usd",
             merge_joints=True,
             fix_base=False,
         ),
@@ -192,6 +195,7 @@ UNITREE_B2_CFG = ArticulationCfg(
         func=spawn_from_lazy_usd,
         usd_path=urdf_to_usd(
             file_path=f"{ISAACLAB_ASSETS_DATA_DIR}/Robots/Unitree/b2_description/urdf/b2_description.urdf",
+            output_usd_path=f"{ISAACLAB_ASSETS_DATA_DIR}/Robots/Unitree/b2_description/usd/b2_description.usd",
             merge_joints=True,
             fix_base=False,
         ),
@@ -260,6 +264,7 @@ UNITREE_B2W_CFG = ArticulationCfg(
         func=spawn_from_lazy_usd,
         usd_path=urdf_to_usd(
             file_path=f"{ISAACLAB_ASSETS_DATA_DIR}/Robots/Unitree/b2w_description/urdf/b2w_description.urdf",
+            output_usd_path=f"{ISAACLAB_ASSETS_DATA_DIR}/Robots/Unitree/b2w_description/usd/b2w_description.usd",
             merge_joints=True,
             fix_base=False,
         ),

@@ -30,8 +30,9 @@ from robot_lab.assets.utils.usd_converter import (  # noqa: F401
 FFTAI_GR1T1_CFG = ArticulationCfg(
     spawn=sim_utils.UsdFileCfg(
         func=spawn_from_lazy_usd,
-        usd_path=xacro_to_usd(
+        usd_path=urdf_to_usd(
             file_path=f"{ISAACLAB_ASSETS_DATA_DIR}/Robots/FFTAI/gr1t1_description/urdf/GR1T1.urdf",
+            output_usd_path=f"{ISAACLAB_ASSETS_DATA_DIR}/Robots/FFTAI/gr1t1_description/usd/GR1T1.usd",
             merge_joints=True,
             fix_base=False,
         ),
@@ -147,8 +148,9 @@ FFTAI_GR1T1_CFG = ArticulationCfg(
 
 FFTAI_GR1T1_LOWER_LIMB_CFG = FFTAI_GR1T1_CFG.copy()
 FFTAI_GR1T1_LOWER_LIMB_CFG.spawn.usd_path = (
-    xacro_to_usd(
+    urdf_to_usd(
         file_path=f"{ISAACLAB_ASSETS_DATA_DIR}/Robots/FFTAI/gr1t1_description/urdf/GR1T1_lower_limb.urdf",
+        output_usd_path=f"{ISAACLAB_ASSETS_DATA_DIR}/Robots/FFTAI/gr1t1_description/usd/GR1T1_lower_limb.usd",
         merge_joints=True,
         fix_base=False,
     ),
@@ -179,8 +181,9 @@ FFTAI_GR1T1_LOWER_LIMB_CFG.actuators = (
 
 FFTAI_GR1T2_CFG = FFTAI_GR1T1_CFG.copy()
 FFTAI_GR1T2_CFG.spawn.usd_path = (
-    xacro_to_usd(
+    urdf_to_usd(
         file_path=f"{ISAACLAB_ASSETS_DATA_DIR}/Robots/FFTAI/gr1t2_description/urdf/GR1T2.urdf",
+        output_usd_path=f"{ISAACLAB_ASSETS_DATA_DIR}/Robots/FFTAI/gr1t2_description/usd/GR1T2.usd",
         merge_joints=True,
         fix_base=False,
     ),
@@ -190,8 +193,9 @@ FFTAI_GR1T2_CFG.spawn.usd_path = (
 
 FFTAI_GR1T2_LOWER_LIMB_CFG = FFTAI_GR1T1_LOWER_LIMB_CFG.copy()
 FFTAI_GR1T2_LOWER_LIMB_CFG.spawn.usd_path = (
-    xacro_to_usd(
+    urdf_to_usd(
         file_path=f"{ISAACLAB_ASSETS_DATA_DIR}/Robots/FFTAI/gr1t2_description/urdf/GR1T2_lower_limb.urdf",
+        output_usd_path=f"{ISAACLAB_ASSETS_DATA_DIR}/Robots/FFTAI/gr1t2_description/usd/GR1T2_lower_limb.usd",
         merge_joints=True,
         fix_base=False,
     ),

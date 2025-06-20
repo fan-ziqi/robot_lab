@@ -173,42 +173,70 @@ This stops and removes the containers, but keeps the images.
 > ====================== ========================= ========================
 > ```
 
+* You can change `Rough` to `Flat` in the above configs.
+* Record video of a trained agent (requires installing `ffmpeg`), add `--video --video_length 200`
+* Play/Train with 32 environments, add `--num_envs 32`
+* Play on specific folder or checkpoint, add `--load_run run_folder_name --checkpoint model.pt`
+* Resume training from folder or checkpoint, add `--resume --load_run run_folder_name --checkpoint model.pt`
+
+To train with multiple GPUs, use the following command, where --nproc_per_node represents the number of available GPUs:
+
+```bash
+python -m torch.distributed.run --nnodes=1 --nproc_per_node=2 scripts/rsl_rl/base/train.py --task=TASK_NAME --headless --distributed
+```
+
+To scale up training beyond multiple GPUs on a single machine, it is also possible to train across multiple nodes. To train across multiple nodes/machines, it is required to launch an individual process on each node.
+
+For the master node, use the following command, where --nproc_per_node represents the number of available GPUs, and --nnodes represents the number of nodes:
+
+```bash
+python -m torch.distributed.run --nproc_per_node=2 --nnodes=2 --node_rank=0 --rdzv_id=123 --rdzv_backend=c10d --rdzv_endpoint=localhost:5555 scripts/rsl_rl/base/train.py --task=TASK_NAME --headless --distributed
+```
+
+Note that the port (`5555`) can be replaced with any other available port.
+
+For non-master nodes, use the following command, replacing `--node_rank` with the index of each machine:
+
+```bash
+python -m torch.distributed.run --nproc_per_node=2 --nnodes=2 --node_rank=1 --rdzv_id=123 --rdzv_backend=c10d --rdzv_endpoint=ip_of_master_machine:5555 scripts/rsl_rl/base/train.py --task=TASK_NAME --headless --distributed
+```
+
 ### Quadruped
 
 Unitree A1
 
 ```bash
 # Train
-python scripts/rsl_rl/base/train.py --task RobotLab-Isaac-Velocity-Rough-Unitree-A1-v0 --headless
+python scripts/rsl_rl/base/train.py --task=RobotLab-Isaac-Velocity-Rough-Unitree-A1-v0 --headless
 # Play
-python scripts/rsl_rl/base/play.py --task RobotLab-Isaac-Velocity-Rough-Unitree-A1-v0
+python scripts/rsl_rl/base/play.py --task=RobotLab-Isaac-Velocity-Rough-Unitree-A1-v0
 ```
 
 Unitree Go2
 
 ```bash
 # Train
-python scripts/rsl_rl/base/train.py --task RobotLab-Isaac-Velocity-Rough-Unitree-Go2-v0 --headless
+python scripts/rsl_rl/base/train.py --task=RobotLab-Isaac-Velocity-Rough-Unitree-Go2-v0 --headless
 # Play
-python scripts/rsl_rl/base/play.py --task RobotLab-Isaac-Velocity-Rough-Unitree-Go2-v0
+python scripts/rsl_rl/base/play.py --task=RobotLab-Isaac-Velocity-Rough-Unitree-Go2-v0
 ```
 
 Unitree B2
 
 ```bash
 # Train
-python scripts/rsl_rl/base/train.py --task RobotLab-Isaac-Velocity-Rough-Unitree-B2-v0 --headless
+python scripts/rsl_rl/base/train.py --task=RobotLab-Isaac-Velocity-Rough-Unitree-B2-v0 --headless
 # Play
-python scripts/rsl_rl/base/play.py --task RobotLab-Isaac-Velocity-Rough-Unitree-B2-v0
+python scripts/rsl_rl/base/play.py --task=RobotLab-Isaac-Velocity-Rough-Unitree-B2-v0
 ```
 
 Anymal D
 
 ```bash
 # Train
-python scripts/rsl_rl/base/train.py --task RobotLab-Isaac-Velocity-Rough-Anymal-D-v0 --headless
+python scripts/rsl_rl/base/train.py --task=RobotLab-Isaac-Velocity-Rough-Anymal-D-v0 --headless
 # Play
-python scripts/rsl_rl/base/play.py --task RobotLab-Isaac-Velocity-Rough-Anymal-D-v0
+python scripts/rsl_rl/base/play.py --task=RobotLab-Isaac-Velocity-Rough-Anymal-D-v0
 ```
 
 ### Wheeled
@@ -217,18 +245,18 @@ Unitree Go2W
 
 ```bash
 # Train
-python scripts/rsl_rl/base/train.py --task RobotLab-Isaac-Velocity-Rough-Unitree-Go2W-v0 --headless
+python scripts/rsl_rl/base/train.py --task=RobotLab-Isaac-Velocity-Rough-Unitree-Go2W-v0 --headless
 # Play
-python scripts/rsl_rl/base/play.py --task RobotLab-Isaac-Velocity-Rough-Unitree-Go2W-v0
+python scripts/rsl_rl/base/play.py --task=RobotLab-Isaac-Velocity-Rough-Unitree-Go2W-v0
 ```
 
 Unitree B2W
 
 ```bash
 # Train
-python scripts/rsl_rl/base/train.py --task RobotLab-Isaac-Velocity-Rough-Unitree-B2W-v0 --headless
+python scripts/rsl_rl/base/train.py --task=RobotLab-Isaac-Velocity-Rough-Unitree-B2W-v0 --headless
 # Play
-python scripts/rsl_rl/base/play.py --task RobotLab-Isaac-Velocity-Rough-Unitree-B2W-v0
+python scripts/rsl_rl/base/play.py --task=RobotLab-Isaac-Velocity-Rough-Unitree-B2W-v0
 ```
 
 ### Humanoid
@@ -237,54 +265,54 @@ FFTAI GR1T1
 
 ```bash
 # Train
-python scripts/rsl_rl/base/train.py --task RobotLab-Isaac-Velocity-Rough-FFTAI-GR1T1-v0 --headless
+python scripts/rsl_rl/base/train.py --task=RobotLab-Isaac-Velocity-Rough-FFTAI-GR1T1-v0 --headless
 # Play
-python scripts/rsl_rl/base/play.py --task RobotLab-Isaac-Velocity-Rough-FFTAI-GR1T1-v0
+python scripts/rsl_rl/base/play.py --task=RobotLab-Isaac-Velocity-Rough-FFTAI-GR1T1-v0
 ```
 
 FFTAI GR1T2
 
 ```bash
 # Train
-python scripts/rsl_rl/base/train.py --task RobotLab-Isaac-Velocity-Rough-FFTAI-GR1T2-v0 --headless
+python scripts/rsl_rl/base/train.py --task=RobotLab-Isaac-Velocity-Rough-FFTAI-GR1T2-v0 --headless
 # Play
-python scripts/rsl_rl/base/play.py --task RobotLab-Isaac-Velocity-Rough-FFTAI-GR1T2-v0
+python scripts/rsl_rl/base/play.py --task=RobotLab-Isaac-Velocity-Rough-FFTAI-GR1T2-v0
 ```
 
 Unitree H1
 
 ```bash
 # Train
-python scripts/rsl_rl/base/train.py --task RobotLab-Isaac-Velocity-Rough-Unitree-H1-v0 --headless
+python scripts/rsl_rl/base/train.py --task=RobotLab-Isaac-Velocity-Rough-Unitree-H1-v0 --headless
 # Play
-python scripts/rsl_rl/base/play.py --task RobotLab-Isaac-Velocity-Rough-Unitree-H1-v0
+python scripts/rsl_rl/base/play.py --task=RobotLab-Isaac-Velocity-Rough-Unitree-H1-v0
 ```
 
 Unitree G1
 
 ```bash
 # Train
-python scripts/rsl_rl/base/train.py --task RobotLab-Isaac-Velocity-Rough-Unitree-G1-v0 --headless
+python scripts/rsl_rl/base/train.py --task=RobotLab-Isaac-Velocity-Rough-Unitree-G1-v0 --headless
 # Play
-python scripts/rsl_rl/base/play.py --task RobotLab-Isaac-Velocity-Rough-Unitree-G1-v0
+python scripts/rsl_rl/base/play.py --task=RobotLab-Isaac-Velocity-Rough-Unitree-G1-v0
 ```
 
 Booster T1
 
 ```bash
 # Train
-python scripts/rsl_rl/base/train.py --task RobotLab-Isaac-Velocity-Rough-Booster-T1-v0 --headless
+python scripts/rsl_rl/base/train.py --task=RobotLab-Isaac-Velocity-Rough-Booster-T1-v0 --headless
 # Play
-python scripts/rsl_rl/base/play.py --task RobotLab-Isaac-Velocity-Rough-Booster-T1-v0
+python scripts/rsl_rl/base/play.py --task=RobotLab-Isaac-Velocity-Rough-Booster-T1-v0
 ```
 
 RobotEra Xbot
 
 ```bash
 # Train
-python scripts/rsl_rl/base/train.py --task RobotLab-Isaac-Velocity-Rough-RobotEra-Xbot-v0 --headless
+python scripts/rsl_rl/base/train.py --task=RobotLab-Isaac-Velocity-Rough-RobotEra-Xbot-v0 --headless
 # Play
-python scripts/rsl_rl/base/play.py --task RobotLab-Isaac-Velocity-Rough-RobotEra-Xbot-v0
+python scripts/rsl_rl/base/play.py --task=RobotLab-Isaac-Velocity-Rough-RobotEra-Xbot-v0
 ```
 
 
@@ -296,18 +324,10 @@ Unitree A1
 
 ```bash
 # Train
-python scripts/rsl_rl/base/train.py --task RobotLab-Isaac-Velocity-Flat-HandStand-Unitree-A1-v0 --headless
+python scripts/rsl_rl/base/train.py --task=RobotLab-Isaac-Velocity-Flat-HandStand-Unitree-A1-v0 --headless
 # Play
-python scripts/rsl_rl/base/play.py --task RobotLab-Isaac-Velocity-Flat-HandStand-Unitree-A1-v0
+python scripts/rsl_rl/base/play.py --task=RobotLab-Isaac-Velocity-Flat-HandStand-Unitree-A1-v0
 ```
-
-**Note**
-
-* You can change `Rough` to `Flat` in the above configs.
-* Record video of a trained agent (requires installing `ffmpeg`), add `--video --video_length 200`
-* Play/Train with 32 environments, add `--num_envs 32`
-* Play on specific folder or checkpoint, add `--load_run run_folder_name --checkpoint model.pt`
-* Resume training from folder or checkpoint, add `--resume --load_run run_folder_name --checkpoint model.pt`
 
 ## Add your own robot
 
