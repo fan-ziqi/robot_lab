@@ -176,7 +176,7 @@ The table below lists all available environments:
     <tr>
       <th style="text-align:center;">Category</th>
       <th>Robot Model</th>
-      <th>Environment Name (task name)</th>
+      <th>Environment Name (ID)</th>
     </tr>
   </thead>
   <tbody>
