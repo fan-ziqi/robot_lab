@@ -314,7 +314,12 @@ python scripts/rsl_rl/base/play.py --task RobotLab-Isaac-Velocity-Flat-HandStand
 This repository supports direct import of URDF, XACRO, and MJCF robot models without requiring pre-conversion to USD format.
 
 ```python
-from robot_lab.assets.utils.usd_converter import mjcf_to_usd, spawn_from_lazy_usd, urdf_to_usd, xacro_to_usd  # noqa: F401
+from robot_lab.assets.utils.usd_converter import (  # noqa: F401
+    mjcf_to_usd,
+    spawn_from_lazy_usd,
+    urdf_to_usd,
+    xacro_to_usd,
+)
 
 YOUR_ROBOT_CFG = ArticulationCfg(
     spawn=sim_utils.UsdFileCfg(
