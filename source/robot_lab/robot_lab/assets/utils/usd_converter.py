@@ -11,9 +11,12 @@ which is useful for improving performance when dealing with large numbers of ass
 from __future__ import annotations
 
 import atexit
+import contextlib
+import fcntl
 import numpy as np
 import os
 import tempfile
+import time
 from typing import Any, Literal
 
 from pxr import Usd
@@ -168,6 +171,28 @@ class UsdConverter:
         else:
             raise ValueError(f"Unsupported conversion type: {self.conversion_type}")
 
+    @contextlib.contextmanager
+    def file_lock(self, lock_path, timeout=60):
+        start = time.time()
+        # Ensure the parent directory of the lock file exists
+        lock_dir = os.path.dirname(lock_path)
+        if lock_dir:
+            os.makedirs(lock_dir, exist_ok=True)
+        
+        with open(lock_path, "w") as lock_file:
+            while True:
+                try:
+                    fcntl.flock(lock_file, fcntl.LOCK_EX | fcntl.LOCK_NB)
+                    break
+                except BlockingIOError:
+                    if time.time() - start > timeout:
+                        raise TimeoutError(f"Timeout waiting for lock on {lock_path}")
+                    time.sleep(0.1)
+            try:
+                yield lock_file
+            finally:
+                fcntl.flock(lock_file, fcntl.LOCK_UN)
+
     def _convert_urdf(
         self,
         file_path: str,
@@ -187,35 +212,40 @@ class UsdConverter:
         is_temp_file = output_usd_path is None
         usd_path = output_usd_path if not is_temp_file else tempfile.mktemp(suffix=".usd")
 
-        try:
-            if not is_temp_file and output_usd_path is not None:
-                os.makedirs(os.path.dirname(output_usd_path), exist_ok=True)
+        # Ensure the output directory exists (if output path is specified)
+        if not is_temp_file and output_usd_path is not None:
+            os.makedirs(os.path.dirname(output_usd_path), exist_ok=True)
 
-            converter_cfg = UrdfConverterCfg(
-                asset_path=file_path,
-                usd_dir=os.path.dirname(usd_path),
-                usd_file_name=os.path.basename(usd_path),
-                fix_base=fix_base,
-                merge_fixed_joints=merge_joints,
-                force_usd_conversion=True,
-                joint_drive=UrdfConverterCfg.JointDriveCfg(
-                    gains=UrdfConverterCfg.JointDriveCfg.PDGainsCfg(stiffness=joint_stiffness, damping=joint_damping),
-                    target_type=joint_target_type,
-                ),
-            )
+        lock_path = usd_path + ".lock"
+        with self.file_lock(lock_path):
+            try:
+                converter_cfg = UrdfConverterCfg(
+                    asset_path=file_path,
+                    usd_dir=os.path.dirname(usd_path),
+                    usd_file_name=os.path.basename(usd_path),
+                    fix_base=fix_base,
+                    merge_fixed_joints=merge_joints,
+                    force_usd_conversion=True,
+                    joint_drive=UrdfConverterCfg.JointDriveCfg(
+                        gains=UrdfConverterCfg.JointDriveCfg.PDGainsCfg(
+                            stiffness=joint_stiffness, damping=joint_damping
+                        ),
+                        target_type=joint_target_type,
+                    ),
+                )
 
-            UrdfConverter(converter_cfg)
+                UrdfConverter(converter_cfg)
 
-            if is_temp_file:
-                atexit.register(lambda: os.unlink(usd_path) if os.path.exists(usd_path) else None)
+                if is_temp_file:
+                    atexit.register(lambda: os.unlink(usd_path) if os.path.exists(usd_path) else None)
 
-            print(f"USD file generated at: {usd_path}")
-            return usd_path
+                print(f"USD file generated at: {usd_path}")
+                return usd_path
 
-        except Exception as e:
-            if is_temp_file and os.path.exists(usd_path):
-                os.unlink(usd_path)
-            raise RuntimeError(f"URDF conversion failed: {str(e)}") from e
+            except Exception as e:
+                if is_temp_file and os.path.exists(usd_path):
+                    os.unlink(usd_path)
+                raise RuntimeError(f"URDF conversion failed: {str(e)}") from e
 
     def _convert_xacro(
         self,
@@ -256,32 +286,35 @@ class UsdConverter:
         is_temp_file = output_usd_path is None
         usd_path = output_usd_path if not is_temp_file else tempfile.mktemp(suffix=".usd")
 
-        try:
-            if not is_temp_file and output_usd_path is not None:
-                os.makedirs(os.path.dirname(output_usd_path), exist_ok=True)
+        # Ensure the output directory exists (if output path is specified)
+        if not is_temp_file and output_usd_path is not None:
+            os.makedirs(os.path.dirname(output_usd_path), exist_ok=True)
 
-            converter_cfg = MjcfConverterCfg(
-                asset_path=file_path,
-                usd_dir=os.path.dirname(usd_path),
-                usd_file_name=os.path.basename(usd_path),
-                fix_base=fix_base,
-                import_sites=import_sites,
-                make_instanceable=make_instanceable,
-                force_usd_conversion=True,
-            )
+        lock_path = usd_path + ".lock"
+        with self.file_lock(lock_path):
+            try:
+                converter_cfg = MjcfConverterCfg(
+                    asset_path=file_path,
+                    usd_dir=os.path.dirname(usd_path),
+                    usd_file_name=os.path.basename(usd_path),
+                    fix_base=fix_base,
+                    import_sites=import_sites,
+                    make_instanceable=make_instanceable,
+                    force_usd_conversion=True,
+                )
 
-            MjcfConverter(converter_cfg)
+                MjcfConverter(converter_cfg)
 
-            if is_temp_file:
-                atexit.register(lambda: os.unlink(usd_path) if os.path.exists(usd_path) else None)
+                if is_temp_file:
+                    atexit.register(lambda: os.unlink(usd_path) if os.path.exists(usd_path) else None)
 
-            print(f"USD file generated at: {usd_path}")
-            return usd_path
+                print(f"USD file generated at: {usd_path}")
+                return usd_path
 
-        except Exception as e:
-            if is_temp_file and os.path.exists(usd_path):
-                os.unlink(usd_path)
-            raise RuntimeError(f"MJCF conversion failed: {str(e)}") from e
+            except Exception as e:
+                if is_temp_file and os.path.exists(usd_path):
+                    os.unlink(usd_path)
+                raise RuntimeError(f"MJCF conversion failed: {str(e)}") from e
 
 
 # Convenience functions that maintain backward compatibility
