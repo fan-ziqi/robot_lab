@@ -181,7 +181,7 @@ The table below lists all available environments:
   </thead>
   <tbody>
     <tr>
-      <td style="text-align:center;" rowspan="5">Quadruped</td>
+      <td style="text-align:center;" rowspan="7">Quadruped</td>
       <td>Anymal D</td>
       <td>RobotLab-Isaac-Velocity-Rough-Anymal-D-v0</td>
     </tr>
@@ -202,13 +202,25 @@ The table below lists all available environments:
       <td>RobotLab-Isaac-Velocity-Flat-HandStand-Unitree-A1-v0</td>
     </tr>
     <tr>
-      <td style="text-align:center;" rowspan="2">Wheeled</td>
+      <td>Deeprobotics Lite3</td>
+      <td>RobotLab-Isaac-Velocity-Rough-Deeprobotics-Lite3-v0</td>
+    </tr>
+    <tr>
+      <td>Deeprobotics X30</td>
+      <td>RobotLab-Isaac-Velocity-Rough-Deeprobotics-X30-v0</td>
+    </tr>
+    <tr>
+      <td style="text-align:center;" rowspan="3">Wheeled</td>
       <td>Unitree Go2W</td>
       <td>RobotLab-Isaac-Velocity-Rough-Unitree-Go2W-v0</td>
     </tr>
     <tr>
       <td>Unitree B2W</td>
       <td>RobotLab-Isaac-Velocity-Rough-Unitree-B2W-v0</td>
+    </tr>
+    <tr>
+      <td>Deeprobotics M20</td>
+      <td>RobotLab-Isaac-Velocity-Rough-Deeprobotics-M20-v0</td>
     </tr>
     <tr>
       <td style="text-align:center;" rowspan="7">Humanoid</td>
