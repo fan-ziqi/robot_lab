@@ -1,5 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- This URDF was automatically created by SolidWorks to URDF Exporter! Originally created by Stephen Brawner (brawner@gmail.com) 
+     Commit Version: 1.6.0-4-g7f85cfe  Build Version: 1.6.7995.38578
+     For more information, please see http://wiki.ros.org/sw_urdf_exporter -->
 <robot name="X30">
+    <mujoco>
+        <compiler meshdir="../meshes/" balanceinertia="false" discardvisual="false"/>
+    </mujoco>
   <!-- <link name="base_link">
     <inertial>
       <origin xyz="0.0 0.0 0.0"/>
@@ -17,7 +23,7 @@
     <visual>
       <origin xyz="0 0 0" rpy="0 0 0" />
       <geometry>
-        <mesh filename="../meshes/torso.dae" />
+        <mesh filename="../meshes/torso.STL"/>
       </geometry>
     </visual>
     <collision>
@@ -42,7 +48,7 @@
     <visual>
       <origin xyz="0 0 0" rpy="0 0 0" />
       <geometry>
-        <mesh filename="../meshes/hip.dae" />
+        <mesh filename="../meshes/fl_hip.STL"/>
       </geometry>
     </visual>
   </link>
@@ -65,7 +71,7 @@
     <visual>
       <origin xyz="0 0 0" rpy="0 0 0" />
       <geometry>
-        <mesh filename="../meshes/l_thigh.dae" />
+        <mesh filename="../meshes/fl_thigh.STL"/>
       </geometry>
     </visual>
     <collision>
@@ -94,14 +100,13 @@
     <visual>
       <origin xyz="0 0 0" rpy="0 0 0" />
       <geometry>
-        <mesh filename="../meshes/shank.dae" />
+        <mesh filename="../meshes/fl_shank.STL"/>
       </geometry>
     </visual>
     <collision>
       <origin xyz="0.00 0 -0.155" />
       <geometry>
         <cylinder length="0.22" radius="0.025"/>
-        <!-- <mesh filename="../meshes/shank.dae" /> -->
       </geometry>
     </collision>
   </link>
@@ -142,7 +147,7 @@
     <visual>
       <origin xyz="0 0 0" rpy="0 0 0" />
       <geometry>
-        <mesh filename="../meshes/hip.dae" />
+        <mesh filename="../meshes/fr_hip.STL"/>
       </geometry>
     </visual>
   </link>
@@ -165,7 +170,7 @@
     <visual>
       <origin xyz="0 0 0" rpy="0 0 0" />
       <geometry>
-        <mesh filename="../meshes/r_thigh.dae" />
+        <mesh filename="../meshes/fr_thigh.STL"/>
       </geometry>
     </visual>
     <collision>
@@ -194,7 +199,7 @@
     <visual>
       <origin xyz="0 0 0" rpy="0 0 0" />
       <geometry>
-        <mesh filename="../meshes/shank.dae" />
+        <mesh filename="../meshes/fr_shank.STL"/>
       </geometry>
     </visual>
     <collision>
@@ -242,7 +247,7 @@
     <visual>
       <origin xyz="0 0 0" rpy="0 0 0" />
       <geometry>
-        <mesh filename="../meshes/hip.dae" />
+        <mesh filename="../meshes/hl_hip.STL"/>
       </geometry>
     </visual>
   </link>
@@ -265,7 +270,7 @@
     <visual>
       <origin xyz="0 0 0" rpy="0 0 0" />
       <geometry>
-        <mesh filename="../meshes/l_thigh.dae" />
+        <mesh filename="../meshes/hl_thigh.STL"/>
       </geometry>
     </visual>
     <collision>
@@ -294,7 +299,7 @@
     <visual>
       <origin xyz="0 0 0" rpy="0 0 0" />
       <geometry>
-        <mesh filename="../meshes/shank.dae" />
+        <mesh filename="../meshes/hl_shank.STL"/>
       </geometry>
     </visual>
     <collision>
@@ -341,7 +346,7 @@
     <visual>
       <origin xyz="0 0 0" rpy="0 0 0" />
       <geometry>
-        <mesh filename="../meshes/hip.dae" />
+        <mesh filename="../meshes/hr_hip.STL"/>
       </geometry>
     </visual>
   </link>
@@ -364,7 +369,7 @@
     <visual>
       <origin xyz="0 0 0" rpy="0 0 0" />
       <geometry>
-        <mesh filename="../meshes/r_thigh.dae" />
+        <mesh filename="../meshes/hr_thigh.STL"/>
       </geometry>
     </visual>
     <collision>
@@ -393,7 +398,7 @@
     <visual>
       <origin xyz="0 0 0" rpy="0 0 0" />
       <geometry>
-        <mesh filename="../meshes/shank.dae" />
+        <mesh filename="../meshes/hr_shank.STL" />
       </geometry>
     </visual>
     <collision>
