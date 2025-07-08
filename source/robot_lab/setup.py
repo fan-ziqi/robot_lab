@@ -20,10 +20,10 @@ INSTALL_REQUIRES = [
     # "lxml",
     # "transformations",
     # "pybullet",
-    # "colorama",
+    "colorama",
     # "pyquaternion",
-    "pyqt5",
-    "pin",
+    # "pyqt5",
+    # "pin",
     "xacrodoc",
 ]
 
