@@ -254,6 +254,15 @@ The table below lists all available environments:
   </tbody>
 </table>
 
+Train AMP for Unitree G1
+```bash
+# Train
+python scripts/skrl/train.py --task RobotLab-Isaac-G1-AMP-Dance-Direct-v0 --algorithm AMP --headless
+
+# Play
+python scripts/skrl/play.py --task RobotLab-Isaac-G1-AMP-Dance-Direct-v0 --algorithm AMP --num_envs 32
+```
+
 
 > [!NOTE]
 > If you want to control a **SINGLE ROBOT** with the keyboard during playback, add `--keyboard` at the end of the play script.
@@ -351,7 +360,7 @@ itself. However, its various instances are included in directories within the en
 This looks like as follows:
 
 ```tree
-source/robot_lab/tasks/locomotion/
+source/robot_lab/tasks/manager_based/locomotion/
 ├── __init__.py
 └── velocity
     ├── config
@@ -364,7 +373,7 @@ source/robot_lab/tasks/locomotion/
     └── velocity_env_cfg.py  # <- this is the base task configuration
 ```
 
-The environments are then registered in the `source/robot_lab/tasks/locomotion/velocity/config/unitree_a1/__init__.py`:
+The environments are then registered in the `source/robot_lab/tasks/manager_based/locomotion/velocity/config/unitree_a1/__init__.py`:
 
 ```python
 gym.register(
@@ -445,3 +454,9 @@ Please cite the following if you use this code or parts of it:
   year = {2024}
 }
 ```
+
+## Acknowledgements
+
+The project uses some code from the following open-source code repositories:
+
+- [linden713/humanoid_amp](https://github.com/linden713/humanoid_amp)
