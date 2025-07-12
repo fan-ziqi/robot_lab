@@ -6,7 +6,11 @@ from isaaclab.managers import SceneEntityCfg
 from isaaclab.utils import configclass
 
 import robot_lab.tasks.manager_based.locomotion.velocity.mdp as mdp
-from robot_lab.tasks.manager_based.locomotion.velocity.velocity_env_cfg import ActionsCfg, LocomotionVelocityRoughEnvCfg, RewardsCfg
+from robot_lab.tasks.manager_based.locomotion.velocity.velocity_env_cfg import (
+    ActionsCfg,
+    LocomotionVelocityRoughEnvCfg,
+    RewardsCfg,
+)
 
 ##
 # Pre-defined configs
@@ -179,7 +183,7 @@ class UnitreeGo2WRoughEnvCfg(LocomotionVelocityRoughEnvCfg):
 
         # Velocity-tracking rewards
         self.rewards.track_lin_vel_xy_exp.weight = 3.0
-        self.rewards.track_ang_vel_z_exp.weight = 2.0
+        self.rewards.track_ang_vel_z_exp.weight = 1.5
 
         # Others
         self.rewards.feet_air_time.weight = 0

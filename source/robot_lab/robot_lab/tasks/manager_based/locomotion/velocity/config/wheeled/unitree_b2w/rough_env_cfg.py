@@ -6,7 +6,11 @@ from isaaclab.managers import SceneEntityCfg
 from isaaclab.utils import configclass
 
 import robot_lab.tasks.manager_based.locomotion.velocity.mdp as mdp
-from robot_lab.tasks.manager_based.locomotion.velocity.velocity_env_cfg import ActionsCfg, LocomotionVelocityRoughEnvCfg, RewardsCfg
+from robot_lab.tasks.manager_based.locomotion.velocity.velocity_env_cfg import (
+    ActionsCfg,
+    LocomotionVelocityRoughEnvCfg,
+    RewardsCfg,
+)
 
 ##
 # Pre-defined configs

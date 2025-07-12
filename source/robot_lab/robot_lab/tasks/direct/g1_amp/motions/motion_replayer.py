@@ -1,3 +1,6 @@
+# Copyright (c) 2024-2025 Ziqi Fan
+# SPDX-License-Identifier: Apache-2.0
+
 """
 Motion Replayer for G1 Humanoid Robot
 
@@ -21,13 +24,16 @@ Example:
     python motion_replayer.py --motion G1_dance.npz --record --output my_recording.npz
 """
 
-import sys
 import os
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+import sys
+
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 import argparse
-from isaaclab.app import AppLauncher
+
 from record_data import MotionRecorder
+
+from isaaclab.app import AppLauncher
 
 # Command line arguments
 parser = argparse.ArgumentParser()
@@ -42,11 +48,12 @@ app_launcher = AppLauncher(args_cli)
 simulation_app = app_launcher.app
 
 import torch
+
+from g1_cfg import G1_CFG
+from motion_loader import MotionLoader
+
 import isaaclab.sim as sim_utils
 from isaaclab.scene import InteractiveScene, InteractiveSceneCfg
-from motion_loader import MotionLoader
-from g1_cfg import G1_CFG
-from record_data import MotionRecorder
 
 # Load motion data and get dt
 motion = MotionLoader(args_cli.motion, device=args_cli.device)
@@ -56,7 +63,7 @@ print(f"motion.dt: {motion.dt}")
 # Find the index for the root body, typically 'pelvis'
 try:
     print(f"Searching for 'pelvis' in the following list of body names: {motion.body_names}")
-    root_idx = motion.body_names.index('pelvis')
+    root_idx = motion.body_names.index("pelvis")
     print(f"Found root body 'pelvis' at index: {root_idx}")
 except (ValueError, AttributeError):
     print("\nError: Could not find 'pelvis' in the motion file's body_names.")
@@ -68,34 +75,30 @@ except (ValueError, AttributeError):
 
 
 sim_cfg = sim_utils.SimulationCfg(
-    dt=motion.dt, 
+    dt=motion.dt,
     device=args_cli.device,
     gravity=(0.0, 0.0, -9.81),  # Explicitly set gravity
-    render_interval=1,          # Render every physics step
+    render_interval=1,  # Render every physics step
     enable_scene_query_support=True,
     use_fabric=True,
     physx=sim_utils.PhysxCfg(
-        solver_type=1,                    # TGS solver
-        min_position_iteration_count=8,    # Increase solver iterations
+        solver_type=1,  # TGS solver
+        min_position_iteration_count=8,  # Increase solver iterations
         max_position_iteration_count=8,
-        min_velocity_iteration_count=4,    # Add velocity iterations
+        min_velocity_iteration_count=4,  # Add velocity iterations
         max_velocity_iteration_count=4,
-        enable_ccd=True,                  # Enable continuous collision detection
-        enable_stabilization=True,        # Enable additional stabilization
-        bounce_threshold_velocity=0.2,    # Lower threshold for more stable contacts
-        friction_offset_threshold=0.04,   # Increase friction threshold
-        friction_correlation_distance=0.025  # Increase correlation distance
+        enable_ccd=True,  # Enable continuous collision detection
+        enable_stabilization=True,  # Enable additional stabilization
+        bounce_threshold_velocity=0.2,  # Lower threshold for more stable contacts
+        friction_offset_threshold=0.04,  # Increase friction threshold
+        friction_correlation_distance=0.025,  # Increase correlation distance
     ),
-
 )
 sim = sim_utils.SimulationContext(sim_cfg)
 sim.set_camera_view([3.0, 3.0, 3.0], [0.0, 0.0, 0.0])
 
 # Configure scene
-scene_cfg = InteractiveSceneCfg(
-    num_envs=1, 
-    env_spacing=2.0
-)
+scene_cfg = InteractiveSceneCfg(num_envs=1, env_spacing=2.0)
 scene_cfg.robot = G1_CFG.replace(prim_path="/World/Robot")
 scene = InteractiveScene(scene_cfg)
 
@@ -104,13 +107,13 @@ light_cfg = sim_utils.DomeLightCfg(intensity=2000.0, color=(0.75, 0.75, 0.75))
 light_cfg.func("/World/Light", light_cfg)
 
 # Add black ground plane at -0.5m
-ground_cfg = sim_utils.GroundPlaneCfg(color=(0.0, 0.0,-0.5))
+ground_cfg = sim_utils.GroundPlaneCfg(color=(0.0, 0.0, -0.5))
 # ground_cfg.func("/World/ground", ground_cfg)
 
 ground_cfg.func(
     "/World/ground",
     ground_cfg,
-    translation=(0.0, 0.0, -0.5),   # 这里是 (x, y, z)
+    translation=(0.0, 0.0, -0.5),  # 这里是 (x, y, z)
 )
 # Reset simulation
 sim.reset()
@@ -123,10 +126,7 @@ motion_dof_indices = motion.get_dof_index(robot.joint_names)
 # Initialize data recorder
 # We want to record the robot's state, so we pass the robot's joint names
 recorder = MotionRecorder(
-    robot,
-    dof_names_to_record=robot.joint_names,
-    fps=int(round(1.0 / motion.dt)),
-    device=args_cli.device
+    robot, dof_names_to_record=robot.joint_names, fps=int(round(1.0 / motion.dt)), device=args_cli.device
 )
 
 if args_cli.record:
@@ -143,7 +143,7 @@ try:
         for i in range(num_frames):
             if not simulation_app.is_running():
                 break
-                
+
             # Get current frame's joint and root states (aligned order!)
             joint_pos = motion.dof_positions[i, motion_dof_indices].unsqueeze(0)
             joint_vel = motion.dof_velocities[i, motion_dof_indices].unsqueeze(0)
@@ -162,7 +162,7 @@ try:
             scene.update(dt=sim.get_physics_dt())
             scene.write_data_to_sim()
             sim.step(render=True)
-            
+
             # Record data
             recorder.record_frame(i)
             # Show progress
@@ -181,7 +181,7 @@ try:
         for i in range(num_frames):
             if not simulation_app.is_running():
                 break
-                
+
             # Get current frame's joint and root states (aligned order!)
             joint_pos = motion.dof_positions[i, motion_dof_indices].unsqueeze(0)
             joint_vel = motion.dof_velocities[i, motion_dof_indices].unsqueeze(0)
@@ -205,4 +205,4 @@ except KeyboardInterrupt:
     print("\nProgram interrupted by user")
 
 finally:
-    simulation_app.close() 
+    simulation_app.close()

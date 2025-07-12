@@ -1,7 +1,8 @@
-# Copyright (c) 2022-2025, The Isaac Lab Project Developers (https://github.com/isaac-sim/IsaacLab/blob/main/CONTRIBUTORS.md).
-# All rights reserved.
-#
-# SPDX-License-Identifier: BSD-3-Clause
+# Copyright (c) 2024-2025 Ziqi Fan
+# SPDX-License-Identifier: Apache-2.0
+
+# Copyright (c) 2025 Linden
+# SPDX-License-Identifier: BSD 3-Clause
 
 from __future__ import annotations
 
@@ -45,7 +46,7 @@ class G1AmpEnv(DirectRLEnv):
             "right_rubber_hand",
             "left_rubber_hand",
             "right_ankle_roll_link",
-            "left_ankle_roll_link"
+            "left_ankle_roll_link",
         ]
         self.ref_body_index = self.robot.data.body_names.index(self.cfg.reference_body)
         self.key_body_indexes = [self.robot.data.body_names.index(name) for name in key_body_names]
@@ -267,6 +268,7 @@ def compute_obs(
     )
     return obs
 
+
 @torch.jit.script
 def compute_rewards(
     rew_scale_termination: float,
@@ -284,8 +286,8 @@ def compute_rewards(
     rew_termination = rew_scale_termination * reset_terminated.float()
     rew_action_l2 = rew_scale_action_l2 * torch.sum(torch.square(actions), dim=1)
 
-    out_of_limits = -(joint_pos - soft_joint_pos_limits[:,:,0]).clip(max=0.0)
-    out_of_limits += (joint_pos - soft_joint_pos_limits[:,:,1]).clip(min=0.0)
+    out_of_limits = -(joint_pos - soft_joint_pos_limits[:, :, 0]).clip(max=0.0)
+    out_of_limits += (joint_pos - soft_joint_pos_limits[:, :, 1]).clip(min=0.0)
     rew_joint_pos_limits = rew_scale_joint_pos_limits * torch.sum(out_of_limits, dim=1)
 
     rew_joint_acc_l2 = rew_scale_joint_acc_l2 * torch.sum(torch.square(joint_acc), dim=1)
@@ -298,5 +300,5 @@ def compute_rewards(
         "rew_joint_pos_limits": (rew_joint_pos_limits).mean(),
         "rew_joint_acc_l2": (rew_joint_acc_l2).mean(),
         "rew_joint_vel_l2": (rew_joint_vel_l2).mean(),
-        }
+    }
     return total_reward, log

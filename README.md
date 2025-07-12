@@ -254,7 +254,8 @@ The table below lists all available environments:
   </tbody>
 </table>
 
-Train AMP for Unitree G1
+Train AMP for Unitree G1 (The training effect has not been verified, and the issues in this environment will not be answered)
+
 ```bash
 # Train
 python scripts/skrl/train.py --task RobotLab-Isaac-G1-AMP-Dance-Direct-v0 --algorithm AMP --headless
@@ -262,7 +263,6 @@ python scripts/skrl/train.py --task RobotLab-Isaac-G1-AMP-Dance-Direct-v0 --algo
 # Play
 python scripts/skrl/play.py --task RobotLab-Isaac-G1-AMP-Dance-Direct-v0 --algorithm AMP --num_envs 32
 ```
-
 
 > [!NOTE]
 > If you want to control a **SINGLE ROBOT** with the keyboard during playback, add `--keyboard` at the end of the play script.
