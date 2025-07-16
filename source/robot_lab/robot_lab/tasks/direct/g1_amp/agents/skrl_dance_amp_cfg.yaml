@@ -89,7 +89,7 @@ agent:
   value_loss_scale: 2.5
   discriminator_loss_scale: 5.0
   amp_batch_size: 512
-  task_reward_weight: 0.0
+  task_reward_weight: 1.0
   style_reward_weight: 1.0
   discriminator_batch_size: 4096
   discriminator_reward_scale: 2.0
@@ -103,12 +103,12 @@ agent:
     directory: "g1_amp_dance"
     experiment_name: ""
     write_interval: auto
-    checkpoint_interval: 10000
+    checkpoint_interval: 100000
 
 
 # Sequential trainer
 # https://skrl.readthedocs.io/en/latest/api/trainers/sequential.html
 trainer:
   class: SequentialTrainer
-  timesteps: 100000
+  timesteps: 1000000
   environment_info: log

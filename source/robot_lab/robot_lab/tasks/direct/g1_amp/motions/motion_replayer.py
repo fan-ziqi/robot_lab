@@ -38,7 +38,7 @@ from isaaclab.app import AppLauncher
 # Command line arguments
 parser = argparse.ArgumentParser()
 AppLauncher.add_app_launcher_args(parser)
-parser.add_argument("--motion", type=str, default="G1_dance.npz")
+parser.add_argument("--motion", type=str, default="g1_dance.npz")
 parser.add_argument("--record", action="store_true", help="Enable recording of simulation data")
 parser.add_argument("--output", type=str, default="recorded_motion.npz", help="Output filename for recorded data")
 args_cli = parser.parse_args()
@@ -49,7 +49,7 @@ simulation_app = app_launcher.app
 
 import torch
 
-from g1_cfg import G1_CFG
+from robot_lab.assets.unitree import UNITREE_G1_29DOF_CFG
 from motion_loader import MotionLoader
 
 import isaaclab.sim as sim_utils
@@ -99,7 +99,7 @@ sim.set_camera_view([3.0, 3.0, 3.0], [0.0, 0.0, 0.0])
 
 # Configure scene
 scene_cfg = InteractiveSceneCfg(num_envs=1, env_spacing=2.0)
-scene_cfg.robot = G1_CFG.replace(prim_path="/World/Robot")
+scene_cfg.robot = UNITREE_G1_29DOF_CFG.replace(prim_path="/World/Robot")
 scene = InteractiveScene(scene_cfg)
 
 # Add DomeLight for illumination

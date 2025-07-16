@@ -37,17 +37,21 @@ class G1AmpEnv(DirectRLEnv):
 
         # DOF and key body indexes
         key_body_names = [
-            "left_shoulder_pitch_link",
-            "right_shoulder_pitch_link",
+            "left_shoulder_yaw_link",
+            "right_shoulder_yaw_link",
             "left_elbow_link",
             "right_elbow_link",
-            "right_hip_yaw_link",
-            "left_hip_yaw_link",
             "right_rubber_hand",
             "left_rubber_hand",
             "right_ankle_roll_link",
             "left_ankle_roll_link",
+            "torso_link",
+            "right_hip_yaw_link",
+            "left_hip_yaw_link",
+            "right_knee_link",
+            "left_knee_link",
         ]
+
         self.ref_body_index = self.robot.data.body_names.index(self.cfg.reference_body)
         self.key_body_indexes = [self.robot.data.body_names.index(name) for name in key_body_names]
         self.motion_dof_indexes = self._motion_loader.get_dof_index(self.robot.data.joint_names)
@@ -95,14 +99,21 @@ class G1AmpEnv(DirectRLEnv):
 
     def _get_observations(self) -> dict:
         # build task observation
+
+        # calculate progress: current episode step / max step, shape [num_envs, 1]
+        progress = (self.episode_length_buf.squeeze(-1).float() / (self.max_episode_length - 1)).unsqueeze(-1)
+        # convert to relative coordinates, keep consistent with reference action observation
+        root_pos_relative = self.robot.data.body_pos_w[:, self.ref_body_index] - self.scene.env_origins
+        key_body_pos_relative = self.robot.data.body_pos_w[:, self.key_body_indexes] - self.scene.env_origins.unsqueeze(1)
         obs = compute_obs(
             self.robot.data.joint_pos,
             self.robot.data.joint_vel,
-            self.robot.data.body_pos_w[:, self.ref_body_index],
+            root_pos_relative,
             self.robot.data.body_quat_w[:, self.ref_body_index],
-            self.robot.data.body_lin_vel_w[:, self.ref_body_index],
-            self.robot.data.body_ang_vel_w[:, self.ref_body_index],
-            self.robot.data.body_pos_w[:, self.key_body_indexes],
+            # self.robot.data.body_lin_vel_w[:, self.ref_body_index],
+            # self.robot.data.body_ang_vel_w[:, self.ref_body_index],
+            key_body_pos_relative,
+            progress,
         )
 
         # update AMP observation history
@@ -115,8 +126,55 @@ class G1AmpEnv(DirectRLEnv):
         return {"policy": obs}
 
     def _get_rewards(self) -> torch.Tensor:
-        # return torch.ones((self.num_envs,), dtype=torch.float32, device=self.sim.device)
-        total_reward, reward_log = compute_rewards(
+        # ================= imitation reward ==========================
+        with torch.no_grad():
+            # get reference action at current time
+            current_times = (self.episode_length_buf * self.physics_dt).cpu().numpy()
+            # sample reference action data
+            (
+                ref_dof_positions,
+                ref_dof_velocities,
+                ref_body_positions,
+                ref_body_rotations,
+                _,
+                _,
+            ) = self._motion_loader.sample(num_samples=self.num_envs, times=current_times)
+
+            # get reference joint angles and velocities
+            ref_joint_pos = ref_dof_positions[:, self.motion_dof_indexes]
+            ref_joint_vel = ref_dof_velocities[:, self.motion_dof_indexes]
+
+            # get body point position and root orientation
+            ref_root_pos = ref_body_positions[:, self.motion_ref_body_index]
+            ref_root_quat = ref_body_rotations[:, self.motion_ref_body_index]
+
+        # 1. joint angle imitation reward
+        joint_pos_error = torch.square(self.robot.data.joint_pos - ref_joint_pos).sum(dim=-1)
+        rew_joint_pos = exp_reward_with_floor(joint_pos_error, self.cfg.rew_imitation_joint_pos, self.cfg.imitation_sigma_joint_pos, floor=4.0)
+        rew_joint_pos = torch.clamp(rew_joint_pos, min=-1.0)  # avoid joint position over-penalty
+
+        # 2. joint velocity imitation reward
+        joint_vel_error = torch.square(self.robot.data.joint_vel - ref_joint_vel).sum(dim=-1)
+        rew_joint_vel = exp_reward_with_floor(joint_vel_error, self.cfg.rew_imitation_joint_vel, self.cfg.imitation_sigma_joint_vel, floor=6.0)
+        rew_joint_vel = torch.clamp(rew_joint_vel, min=-1.0)  # avoid over-penalty, minimum -2.0
+
+        # 3. root position imitation reward
+        # convert robot current position to relative position to environment origin, compare with reference position
+        current_relative_pos = self.robot.data.body_pos_w[:, self.ref_body_index] - self.scene.env_origins
+        pos_err = torch.square(current_relative_pos - ref_root_pos).sum(dim=-1)
+        rew_pos = exp_reward_with_floor(pos_err, self.cfg.rew_imitation_pos, self.cfg.imitation_sigma_pos, floor=4.0)
+        rew_pos = torch.clamp(rew_pos, min=-1.0)  # avoid position error over-penalty
+
+        # 4. root orientation imitation reward
+        quat_dot = torch.abs(torch.sum(self.robot.data.body_quat_w[:, self.ref_body_index] * ref_root_quat, dim=-1))
+        ang_err = 2 * torch.arccos(torch.clamp(quat_dot, -1.0, 1.0))
+        rew_rot = self.cfg.rew_imitation_rot * torch.exp(-torch.square(ang_err) / (self.cfg.imitation_sigma_rot ** 2))
+
+        # 5. total imitation reward
+        imitation_reward = rew_joint_pos + rew_joint_vel + rew_pos + rew_rot
+
+        # ================= basic reward (call the original compute_rewards function) ==========================
+        basic_reward, basic_reward_log = compute_rewards(
             self.cfg.rew_termination,
             self.cfg.rew_action_l2,
             self.cfg.rew_joint_pos_limits,
@@ -129,7 +187,43 @@ class G1AmpEnv(DirectRLEnv):
             self.robot.data.joint_acc,
             self.robot.data.joint_vel,
         )
-        self.extras["log"] = reward_log
+
+        # ================= total reward ==========================
+        total_reward = imitation_reward + basic_reward
+
+        # ============== log ================================
+        log_dict = {
+            # imitation learning reward
+            "rew_imitation": imitation_reward.mean().item(),
+            "rew_joint_pos": rew_joint_pos.mean().item(),
+            "rew_joint_vel": rew_joint_vel.mean().item(),
+            "rew_pos": rew_pos.mean().item(),
+            "rew_rot": rew_rot.mean().item(),
+            "error_joint_pos": joint_pos_error.mean().item(),
+            "error_joint_vel": joint_vel_error.mean().item(),
+            "error_root_pos": pos_err.mean().item(),
+            "error_ang": ang_err.mean().item(),
+            "total_reward": total_reward.mean().item(),
+        }
+
+        # add basic reward log
+        for key, value in basic_reward_log.items():
+            if isinstance(value, torch.Tensor):
+                log_dict[key] = value.mean().item()
+            else:
+                log_dict[key] = float(value)
+
+        self.extras["log"] = log_dict
+
+        # directly record to TensorBoard (if agent is available)
+        if hasattr(self, '_skrl_agent') and getattr(self, '_skrl_agent', None) is not None:
+            try:
+                agent = getattr(self, '_skrl_agent')
+                for k, v in log_dict.items():
+                    agent.track_data(f"Reward / {k}", v)
+            except Exception:
+                pass
+
         return total_reward
 
     def _get_dones(self) -> tuple[torch.Tensor, torch.Tensor]:
@@ -221,14 +315,16 @@ class G1AmpEnv(DirectRLEnv):
             body_angular_velocities,
         ) = self._motion_loader.sample(num_samples=num_samples, times=times)
         # compute AMP observation
+        progress = torch.as_tensor(times, device=dof_positions.device, dtype=dof_positions.dtype).unsqueeze(-1) / self._motion_loader.duration
         amp_observation = compute_obs(
             dof_positions[:, self.motion_dof_indexes],
             dof_velocities[:, self.motion_dof_indexes],
             body_positions[:, self.motion_ref_body_index],
             body_rotations[:, self.motion_ref_body_index],
-            body_linear_velocities[:, self.motion_ref_body_index],
-            body_angular_velocities[:, self.motion_ref_body_index],
+            # body_linear_velocities[:, self.motion_ref_body_index],
+            # body_angular_velocities[:, self.motion_ref_body_index],
             body_positions[:, self.motion_key_body_indexes],
+            progress,
         )
         return amp_observation.view(-1, self.amp_observation_size)
 
@@ -250,9 +346,10 @@ def compute_obs(
     dof_velocities: torch.Tensor,
     root_positions: torch.Tensor,
     root_rotations: torch.Tensor,
-    root_linear_velocities: torch.Tensor,
-    root_angular_velocities: torch.Tensor,
+    # root_linear_velocities: torch.Tensor,
+    # root_angular_velocities: torch.Tensor,
     key_body_positions: torch.Tensor,
+    progress: torch.Tensor,
 ) -> torch.Tensor:
     obs = torch.cat(
         (
@@ -260,9 +357,10 @@ def compute_obs(
             dof_velocities,
             root_positions[:, 2:3],  # root body height
             quaternion_to_tangent_and_normal(root_rotations),
-            root_linear_velocities,
-            root_angular_velocities,
+            # root_linear_velocities,
+            # root_angular_velocities,
             (key_body_positions - root_positions.unsqueeze(-2)).view(key_body_positions.shape[0], -1),
+            progress,
         ),
         dim=-1,
     )
@@ -295,10 +393,41 @@ def compute_rewards(
     total_reward = rew_termination + rew_action_l2 + rew_joint_pos_limits + rew_joint_acc_l2 + rew_joint_vel_l2
 
     log = {
-        "rew_termination": (rew_termination).mean(),
-        "rew_action_l2": (rew_action_l2).mean(),
-        "rew_joint_pos_limits": (rew_joint_pos_limits).mean(),
-        "rew_joint_acc_l2": (rew_joint_acc_l2).mean(),
-        "rew_joint_vel_l2": (rew_joint_vel_l2).mean(),
+        "pub_termination": (rew_termination).mean(),
+        "pub_action_l2": (rew_action_l2).mean(),
+        "pub_joint_pos_limits": (rew_joint_pos_limits).mean(),
+        "pub_joint_acc_l2": (rew_joint_acc_l2).mean(),
+        "pub_joint_vel_l2": (rew_joint_vel_l2).mean(),
     }
     return total_reward, log
+
+
+@torch.jit.script
+def exp_reward_with_floor(error: torch.Tensor, weight: float, sigma: float, floor: float = 3.0) -> torch.Tensor:
+    """
+    piecewise exponential reward function: large error region use linear, small error region use exponential
+
+    Args:
+        error: error value (already squared error)
+        weight: reward weight
+        sigma: standard deviation parameter of exponential function
+        floor: threshold, unit is sigma² multiple
+
+    Returns:
+        piecewise exponential reward value
+    """
+    sigma_sq = sigma * sigma
+    threshold = floor * sigma_sq
+
+    # exponential part at threshold and gradient
+    exp_val_at_threshold = weight * torch.exp(-floor)
+    linear_slope = weight / sigma_sq * torch.exp(-floor)  # ensure first-order continuous
+
+    # large error region: use linear penalty (keep negative slope)
+    linear_reward = exp_val_at_threshold - linear_slope * (error - threshold)
+
+    # small error region: use exponential reward
+    exp_reward = weight * torch.exp(-error / sigma_sq)
+
+    # choose the corresponding reward function based on the error size
+    return torch.where(error > threshold, linear_reward, exp_reward)

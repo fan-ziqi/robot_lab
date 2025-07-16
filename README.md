@@ -254,7 +254,7 @@ The table below lists all available environments:
   </tbody>
 </table>
 
-Train AMP for Unitree G1 (The training effect has not been verified, and the issues in this environment will not be answered)
+Train AMP Dance for Unitree G1
 
 ```bash
 # Train
