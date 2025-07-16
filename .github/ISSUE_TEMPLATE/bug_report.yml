@@ -9,6 +9,7 @@ body:
 
       * Please ensure that:
         * The issue hasn't already been reported by using the [issue search](https://github.com/fan-ziqi/robot_lab/search?q=is%3Aissue&type=issues).
+        * The issue is not listed in the Isaac Lab's[Known Issues](https://isaac-sim.github.io/IsaacLab/main/source/refs/issues.html) documentation.
         * The issue is not listed in the Isaac Sim's [Known Issues](https://docs.isaacsim.omniverse.nvidia.com/latest/overview/known_issues.html) documentation.
       * For questions, please consider [open a discussion](https://github.com/fan-ziqi/robot_lab/discussions).
       <br>
@@ -28,21 +29,21 @@ body:
 
 - type: input
   attributes:
-    label: Isaac Lab version 
+    label: Isaac Lab version
     description: It can be found in the `VERSION` file located in either the repository or the build folder.
     placeholder: e.g. 2.2.0
   validations:
     required: true
 - type: input
   attributes:
-    label: Isaac Sim version 
+    label: Isaac Sim version
     description: It can be found in the `VERSION` file located in either the repository or the build folder.
     placeholder: e.g. 5.0.0
   validations:
     required: true
 - type: input
   attributes:
-    label: Operating System (OS) 
+    label: Operating System (OS)
     placeholder: e.g. Ubuntu 24.04
   validations:
     required: true
@@ -64,8 +65,8 @@ body:
   attributes:
     label: Logs
     description: |
-      Include the relevant log files. See the *Common Path Locations* in Isaac Sim's
-      [Setup Tips](https://docs.isaacsim.omniverse.nvidia.com/latest/installation/install_faq.html)
+      Include the relevant log files. See the *Checking the internal logs from the simulator* in Isaac Lab's
+      [Tricks and Troubleshooting](https://isaac-sim.github.io/IsaacLab/main/source/refs/troubleshooting.html)
       documentation for details about the locations of the log files.
     placeholder: |
       Paste the log content here or attach the log files.
