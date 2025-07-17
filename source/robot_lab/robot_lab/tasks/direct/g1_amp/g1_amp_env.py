@@ -4,6 +4,11 @@
 # Copyright (c) 2025 Linden
 # SPDX-License-Identifier: BSD 3-Clause
 
+# Copyright (c) 2022-2025, The Isaac Lab Project Developers (https://github.com/isaac-sim/IsaacLab/blob/main/CONTRIBUTORS.md).
+# All rights reserved.
+#
+# SPDX-License-Identifier: BSD-3-Clause
+
 from __future__ import annotations
 
 import gymnasium as gym
@@ -34,6 +39,7 @@ class G1AmpEnv(DirectRLEnv):
 
         # load motion
         self._motion_loader = MotionLoader(motion_file=self.cfg.motion_file, device=self.device)
+        self._motion_loader.resample(self.cfg.sim.dt, kind="linear")
 
         # DOF and key body indexes
         key_body_names = [
@@ -104,7 +110,9 @@ class G1AmpEnv(DirectRLEnv):
         progress = (self.episode_length_buf.squeeze(-1).float() / (self.max_episode_length - 1)).unsqueeze(-1)
         # convert to relative coordinates, keep consistent with reference action observation
         root_pos_relative = self.robot.data.body_pos_w[:, self.ref_body_index] - self.scene.env_origins
-        key_body_pos_relative = self.robot.data.body_pos_w[:, self.key_body_indexes] - self.scene.env_origins.unsqueeze(1)
+        key_body_pos_relative = self.robot.data.body_pos_w[:, self.key_body_indexes] - self.scene.env_origins.unsqueeze(
+            1
+        )
         obs = compute_obs(
             self.robot.data.joint_pos,
             self.robot.data.joint_vel,
@@ -150,12 +158,16 @@ class G1AmpEnv(DirectRLEnv):
 
         # 1. joint angle imitation reward
         joint_pos_error = torch.square(self.robot.data.joint_pos - ref_joint_pos).sum(dim=-1)
-        rew_joint_pos = exp_reward_with_floor(joint_pos_error, self.cfg.rew_imitation_joint_pos, self.cfg.imitation_sigma_joint_pos, floor=4.0)
+        rew_joint_pos = exp_reward_with_floor(
+            joint_pos_error, self.cfg.rew_imitation_joint_pos, self.cfg.imitation_sigma_joint_pos, floor=4.0
+        )
         rew_joint_pos = torch.clamp(rew_joint_pos, min=-1.0)  # avoid joint position over-penalty
 
         # 2. joint velocity imitation reward
         joint_vel_error = torch.square(self.robot.data.joint_vel - ref_joint_vel).sum(dim=-1)
-        rew_joint_vel = exp_reward_with_floor(joint_vel_error, self.cfg.rew_imitation_joint_vel, self.cfg.imitation_sigma_joint_vel, floor=6.0)
+        rew_joint_vel = exp_reward_with_floor(
+            joint_vel_error, self.cfg.rew_imitation_joint_vel, self.cfg.imitation_sigma_joint_vel, floor=6.0
+        )
         rew_joint_vel = torch.clamp(rew_joint_vel, min=-1.0)  # avoid over-penalty, minimum -2.0
 
         # 3. root position imitation reward
@@ -168,7 +180,7 @@ class G1AmpEnv(DirectRLEnv):
         # 4. root orientation imitation reward
         quat_dot = torch.abs(torch.sum(self.robot.data.body_quat_w[:, self.ref_body_index] * ref_root_quat, dim=-1))
         ang_err = 2 * torch.arccos(torch.clamp(quat_dot, -1.0, 1.0))
-        rew_rot = self.cfg.rew_imitation_rot * torch.exp(-torch.square(ang_err) / (self.cfg.imitation_sigma_rot ** 2))
+        rew_rot = self.cfg.rew_imitation_rot * torch.exp(-torch.square(ang_err) / (self.cfg.imitation_sigma_rot**2))
 
         # 5. total imitation reward
         imitation_reward = rew_joint_pos + rew_joint_vel + rew_pos + rew_rot
@@ -216,9 +228,9 @@ class G1AmpEnv(DirectRLEnv):
         self.extras["log"] = log_dict
 
         # directly record to TensorBoard (if agent is available)
-        if hasattr(self, '_skrl_agent') and getattr(self, '_skrl_agent', None) is not None:
+        if hasattr(self, "_skrl_agent") and getattr(self, "_skrl_agent", None) is not None:
             try:
-                agent = getattr(self, '_skrl_agent')
+                agent = getattr(self, "_skrl_agent")
                 for k, v in log_dict.items():
                     agent.track_data(f"Reward / {k}", v)
             except Exception:
@@ -315,7 +327,10 @@ class G1AmpEnv(DirectRLEnv):
             body_angular_velocities,
         ) = self._motion_loader.sample(num_samples=num_samples, times=times)
         # compute AMP observation
-        progress = torch.as_tensor(times, device=dof_positions.device, dtype=dof_positions.dtype).unsqueeze(-1) / self._motion_loader.duration
+        progress = (
+            torch.as_tensor(times, device=dof_positions.device, dtype=dof_positions.dtype).unsqueeze(-1)
+            / self._motion_loader.duration
+        )
         amp_observation = compute_obs(
             dof_positions[:, self.motion_dof_indexes],
             dof_velocities[:, self.motion_dof_indexes],

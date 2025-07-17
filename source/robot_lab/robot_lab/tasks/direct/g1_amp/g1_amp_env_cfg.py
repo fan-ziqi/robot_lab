@@ -4,6 +4,11 @@
 # Copyright (c) 2025 Linden
 # SPDX-License-Identifier: BSD 3-Clause
 
+# Copyright (c) 2022-2025, The Isaac Lab Project Developers (https://github.com/isaac-sim/IsaacLab/blob/main/CONTRIBUTORS.md).
+# All rights reserved.
+#
+# SPDX-License-Identifier: BSD-3-Clause
+
 from __future__ import annotations
 
 import os
@@ -42,7 +47,8 @@ class G1AmpEnvCfg(DirectRLEnvCfg):
 
     # env
     episode_length_s = 10.0
-    decimation = 4
+    decimation = 1
+    dt = 0.005
 
     # spaces
     observation_space = 71 + 3 * (8 + 5) - 6 + 1
@@ -66,7 +72,7 @@ class G1AmpEnvCfg(DirectRLEnvCfg):
 
     # simulation
     sim: SimulationCfg = SimulationCfg(
-        dt=0.005,
+        dt=dt,
         render_interval=decimation,
         physx=PhysxCfg(
             gpu_found_lost_pairs_capacity=2**23,
@@ -83,4 +89,4 @@ class G1AmpEnvCfg(DirectRLEnvCfg):
 
 @configclass
 class G1AmpDanceEnvCfg(G1AmpEnvCfg):
-    motion_file = os.path.join(MOTIONS_DIR, "g1_dance.npz")
+    motion_file = os.path.join(MOTIONS_DIR, "g1_dance1_subject2_30.npz")

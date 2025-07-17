@@ -1,8 +1,10 @@
 # Copyright (c) 2024-2025 Ziqi Fan
 # SPDX-License-Identifier: Apache-2.0
 
-# Copyright (c) 2025 Linden
-# SPDX-License-Identifier: BSD 3-Clause
+# Copyright (c) 2022-2025, The Isaac Lab Project Developers (https://github.com/isaac-sim/IsaacLab/blob/main/CONTRIBUTORS.md).
+# All rights reserved.
+#
+# SPDX-License-Identifier: BSD-3-Clause
 
 import matplotlib
 import matplotlib.animation
@@ -41,6 +43,7 @@ class MotionViewer:
 
         # load motions
         self._motion_loader = MotionLoader(motion_file=motion_file, device=device)
+        self._motion_loader.resample(0.005, kind="cubic")
 
         self._num_frames = self._motion_loader.num_frames
         self._current_frame = 0

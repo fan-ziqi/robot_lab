@@ -1,8 +1,10 @@
 # Copyright (c) 2024-2025 Ziqi Fan
 # SPDX-License-Identifier: Apache-2.0
 
-# Copyright (c) 2025 Linden
-# SPDX-License-Identifier: BSD 3-Clause
+# Copyright (c) 2022-2025, The Isaac Lab Project Developers (https://github.com/isaac-sim/IsaacLab/blob/main/CONTRIBUTORS.md).
+# All rights reserved.
+#
+# SPDX-License-Identifier: BSD-3-Clause
 
 import numpy as np
 import os
@@ -262,6 +264,55 @@ class MotionLoader:
             assert name in self._body_names, f"The specified body name ({name}) doesn't exist: {self._body_names}"
             indexes.append(self._body_names.index(name))
         return indexes
+
+    def resample(self, target_dt: float, kind: str = "linear"):
+        """
+        以目标dt重采样（插值）所有随时间变化的数据。
+        kind: "linear" 或 "cubic"，决定插值类型
+        """
+        import numpy as np
+        import torch
+        from scipy.interpolate import interp1d
+        from scipy.spatial.transform import Rotation as R
+        from scipy.spatial.transform import Slerp
+
+        orig_num_frames = self.num_frames
+        orig_dt = self.dt
+        orig_times = np.arange(orig_num_frames) * orig_dt
+        target_num_frames = int(self.duration / target_dt) + 1
+        target_times = np.linspace(0, self.duration, target_num_frames)
+
+        def interp_tensor(data, kind="linear"):
+            # data: [num_frames, ...]
+            data_np = data.cpu().numpy()
+            data_interp = interp1d(orig_times, data_np, axis=0, kind=kind)(target_times)
+            return torch.from_numpy(data_interp.astype(np.float32)).to(data.device)
+
+        # 线性/三次样条插值
+        self.dof_positions = interp_tensor(self.dof_positions, kind)
+        self.dof_velocities = interp_tensor(self.dof_velocities, kind)
+        self.body_positions = interp_tensor(self.body_positions, kind)
+        self.body_linear_velocities = interp_tensor(self.body_linear_velocities, kind)
+        self.body_angular_velocities = interp_tensor(self.body_angular_velocities, kind)
+
+        # 四元数slerp插值
+        # 假设body_rotations为 [N, B, 4] (wxyz)
+        body_rot_np = self.body_rotations.cpu().numpy()
+        N, B, _ = body_rot_np.shape
+        body_rot_interp = np.zeros((target_num_frames, B, 4), dtype=np.float32)
+        for j in range(B):
+            # scipy要求四元数为xyzw
+            r = R.from_quat(body_rot_np[:, j, [1, 2, 3, 0]])
+            slerp = Slerp(orig_times, r)
+            interp_r = slerp(target_times)
+            body_rot_interp[:, j, :] = interp_r.as_quat()[:, [3, 0, 1, 2]]  # 转回wxyz
+        self.body_rotations = torch.from_numpy(body_rot_interp.astype(np.float32)).to(self.body_rotations.device)
+
+        # 更新属性
+        self.dt = target_dt
+        self.num_frames = target_num_frames
+        self.duration = self.dt * (self.num_frames - 1)
+        print(f"Motion resampled: duration: {self.duration} sec, frames: {self.num_frames}, dt: {self.dt}")
 
 
 if __name__ == "__main__":

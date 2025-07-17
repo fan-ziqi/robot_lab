@@ -23,8 +23,10 @@ INSTALL_REQUIRES = [
     "colorama",
     # "pyquaternion",
     # "pyqt5",
-    # "pin",
     "xacrodoc",
+    "numpy",  # for amp
+    "pandas",  # for amp
+    "pinocchio",  # for amp
 ]
 
 # Installation operation
