@@ -26,8 +26,8 @@ MOTIONS_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "motions"
 
 
 @configclass
-class G1AmpEnvCfg(DirectRLEnvCfg):
-    """Humanoid AMP environment config (base class)."""
+class G1AmpDanceEnvCfg(DirectRLEnvCfg):
+    """G1 AMP environment config."""
 
     # basic reward
     rew_termination = -0
@@ -48,7 +48,7 @@ class G1AmpEnvCfg(DirectRLEnvCfg):
     # env
     episode_length_s = 10.0
     decimation = 1
-    dt = 0.005
+    dt = 1 / 60
 
     # spaces
     observation_space = 71 + 3 * (8 + 5) - 6 + 1
@@ -60,7 +60,7 @@ class G1AmpEnvCfg(DirectRLEnvCfg):
     early_termination = True
     termination_height = 0.5
 
-    motion_file: str = MISSING
+    motion_file = os.path.join(MOTIONS_DIR, "g1_dance1_subject2_30.npz")
     reference_body = "pelvis"
     reset_strategy = "random-start"  # default, random, random-start
     """Strategy to be followed when resetting each environment (humanoid's pose and joint states).
@@ -85,8 +85,3 @@ class G1AmpEnvCfg(DirectRLEnvCfg):
 
     # robot
     robot: ArticulationCfg = UNITREE_G1_29DOF_CFG.replace(prim_path="/World/envs/env_.*/Robot")
-
-
-@configclass
-class G1AmpDanceEnvCfg(G1AmpEnvCfg):
-    motion_file = os.path.join(MOTIONS_DIR, "g1_dance1_subject2_30.npz")

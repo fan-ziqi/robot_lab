@@ -21,14 +21,14 @@ from isaaclab.envs import DirectRLEnv
 from isaaclab.sim.spawners.from_files import GroundPlaneCfg, spawn_ground_plane
 from isaaclab.utils.math import quat_apply
 
-from .g1_amp_env_cfg import G1AmpEnvCfg
+from .g1_amp_env_cfg import G1AmpDanceEnvCfg
 from .motions import MotionLoader
 
 
 class G1AmpEnv(DirectRLEnv):
-    cfg: G1AmpEnvCfg
+    cfg: G1AmpDanceEnvCfg
 
-    def __init__(self, cfg: G1AmpEnvCfg, render_mode: str | None = None, **kwargs):
+    def __init__(self, cfg: G1AmpDanceEnvCfg, render_mode: str | None = None, **kwargs):
         super().__init__(cfg, render_mode, **kwargs)
 
         # action offset and scale
@@ -39,7 +39,7 @@ class G1AmpEnv(DirectRLEnv):
 
         # load motion
         self._motion_loader = MotionLoader(motion_file=self.cfg.motion_file, device=self.device)
-        self._motion_loader.resample(self.cfg.sim.dt, kind="linear")
+        # self._motion_loader.resample(self.cfg.sim.dt, kind="linear")
 
         # DOF and key body indexes
         key_body_names = [
