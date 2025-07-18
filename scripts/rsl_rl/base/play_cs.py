@@ -113,6 +113,7 @@ def main():
     env_cfg.commands.base_velocity.ranges.lin_vel_y = (-2.0, 2.0)
     env_cfg.commands.base_velocity.ranges.ang_vel_z = (-1.5, 1.5)
     env_cfg.curriculum.terrain_levels = None
+    env_cfg.curriculum.command_levels = None
     env_cfg.terminations.illegal_contact = None
     env_cfg.terminations.terrain_out_of_bounds = None
 

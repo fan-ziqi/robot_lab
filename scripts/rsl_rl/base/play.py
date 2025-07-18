@@ -94,6 +94,7 @@ def main():
     # remove random pushing
     env_cfg.events.randomize_apply_external_force_torque = None
     env_cfg.events.push_robot = None
+    env_cfg.curriculum.command_levels = None
 
     if args_cli.keyboard:
         env_cfg.scene.num_envs = 1

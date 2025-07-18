@@ -329,18 +329,6 @@ class EventCfg:
         },
     )
 
-    # randomize_joint_limits = EventTerm(
-    #     func=mdp.randomize_joint_parameters,
-    #     mode="reset",
-    #     params={
-    #         "asset_cfg": SceneEntityCfg("robot", joint_names=".*"),
-    #         "lower_limit_distribution_params": (0.00, 0.01),
-    #         "upper_limit_distribution_params": (0.00, 0.01),
-    #         "operation": "add",
-    #         "distribution": "gaussian",
-    #     },
-    # )
-
     randomize_reset_base = EventTerm(
         func=mdp.reset_root_state_uniform,
         mode="reset",
@@ -539,6 +527,12 @@ class RewardsCfg:
         },
     )
 
+    feet_air_time_variance = RewTerm(
+        func=mdp.feet_air_time_variance_penalty,
+        weight=0,
+        params={"sensor_cfg": SceneEntityCfg("contact_forces", body_names="")},
+    )
+
     feet_gait = RewTerm(
         func=mdp.GaitReward,
         weight=0.0,
@@ -662,13 +656,13 @@ class CurriculumCfg:
 
     terrain_levels = CurrTerm(func=mdp.terrain_levels_vel)
 
-    # command_levels = CurrTerm(
-    #     func=mdp.command_levels_vel,
-    #     params={
-    #         "reward_term_name": "track_lin_vel_xy_exp",
-    #         "max_curriculum": 1.5,
-    #     },
-    # )
+    command_levels = CurrTerm(
+        func=mdp.command_levels_vel,
+        params={
+            "reward_term_name": "track_lin_vel_xy_exp",
+            "range_multiplier": (0.1, 1.0),
+        },
+    )
 
 
 ##

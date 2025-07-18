@@ -97,7 +97,7 @@ class DeeproboticsX30RoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         self.rewards.joint_vel_limits.weight = 0
         self.rewards.joint_power.weight = -1e-5
         self.rewards.stand_still_without_cmd.weight = -2.0
-        self.rewards.joint_pos_penalty.weight = -1.0
+        self.rewards.joint_pos_penalty.weight = -0.5
         self.rewards.joint_mirror.weight = -0.05
         self.rewards.joint_mirror.params["mirror_joints"] = [
             ["FL_(HipX|HipY|Knee).*", "HR_(HipX|HipY|Knee).*"],
@@ -132,7 +132,7 @@ class DeeproboticsX30RoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         self.rewards.feet_height.weight = 0
         self.rewards.feet_height.params["target_height"] = 0.05
         self.rewards.feet_height.params["asset_cfg"].body_names = [self.foot_link_name]
-        self.rewards.feet_height_body.weight = -5.0
+        self.rewards.feet_height_body.weight = 0
         self.rewards.feet_height_body.params["target_height"] = -0.4
         self.rewards.feet_height_body.params["asset_cfg"].body_names = [self.foot_link_name]
         self.rewards.feet_gait.weight = 0
@@ -147,7 +147,11 @@ class DeeproboticsX30RoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         # self.terminations.illegal_contact.params["sensor_cfg"].body_names = [self.base_link_name, ".*_HIP"]
         self.terminations.illegal_contact = None
 
+        # ------------------------------Curriculums------------------------------
+        # self.curriculum.command_levels.params["range_multiplier"] = (0.2, 1.0)
+        self.curriculum.command_levels = None
+
         # ------------------------------Commands------------------------------
-        self.commands.base_velocity.ranges.lin_vel_x = (-2.0, 2.0)
-        self.commands.base_velocity.ranges.lin_vel_y = (-1.0, 1.0)
-        self.commands.base_velocity.ranges.ang_vel_z = (-1.5, 1.5)
+        # self.commands.base_velocity.ranges.lin_vel_x = (-2.0, 2.0)
+        # self.commands.base_velocity.ranges.lin_vel_y = (-1.0, 1.0)
+        # self.commands.base_velocity.ranges.ang_vel_z = (-1.5, 1.5)
