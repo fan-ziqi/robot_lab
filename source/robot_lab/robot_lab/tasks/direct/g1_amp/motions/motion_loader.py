@@ -267,8 +267,8 @@ class MotionLoader:
 
     def resample(self, target_dt: float, kind: str = "linear"):
         """
-        以目标dt重采样（插值）所有随时间变化的数据。
-        kind: "linear" 或 "cubic"，决定插值类型
+        Resample (interpolate) all time-varying data to a target dt.
+        kind: "linear" or "cubic", determines the type of interpolation
         """
         import numpy as np
         import torch
@@ -283,32 +283,26 @@ class MotionLoader:
         target_times = np.linspace(0, self.duration, target_num_frames)
 
         def interp_tensor(data, kind="linear"):
-            # data: [num_frames, ...]
             data_np = data.cpu().numpy()
             data_interp = interp1d(orig_times, data_np, axis=0, kind=kind)(target_times)
             return torch.from_numpy(data_interp.astype(np.float32)).to(data.device)
 
-        # 线性/三次样条插值
         self.dof_positions = interp_tensor(self.dof_positions, kind)
         self.dof_velocities = interp_tensor(self.dof_velocities, kind)
         self.body_positions = interp_tensor(self.body_positions, kind)
         self.body_linear_velocities = interp_tensor(self.body_linear_velocities, kind)
         self.body_angular_velocities = interp_tensor(self.body_angular_velocities, kind)
 
-        # 四元数slerp插值
-        # 假设body_rotations为 [N, B, 4] (wxyz)
         body_rot_np = self.body_rotations.cpu().numpy()
         N, B, _ = body_rot_np.shape
         body_rot_interp = np.zeros((target_num_frames, B, 4), dtype=np.float32)
         for j in range(B):
-            # scipy要求四元数为xyzw
-            r = R.from_quat(body_rot_np[:, j, [1, 2, 3, 0]])
+            r = R.from_quat(body_rot_np[:, j, [1, 2, 3, 0]])  # convert to xyzw
             slerp = Slerp(orig_times, r)
             interp_r = slerp(target_times)
-            body_rot_interp[:, j, :] = interp_r.as_quat()[:, [3, 0, 1, 2]]  # 转回wxyz
+            body_rot_interp[:, j, :] = interp_r.as_quat()[:, [3, 0, 1, 2]]  # back to wxyz
         self.body_rotations = torch.from_numpy(body_rot_interp.astype(np.float32)).to(self.body_rotations.device)
 
-        # 更新属性
         self.dt = target_dt
         self.num_frames = target_num_frames
         self.duration = self.dt * (self.num_frames - 1)
