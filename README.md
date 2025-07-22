@@ -231,6 +231,15 @@ python scripts/rsl_rl/base/train.py --task RobotLab-Isaac-Velocity-Rough-Unitree
 python scripts/rsl_rl/base/play.py --task RobotLab-Isaac-Velocity-Rough-Unitree-B2W-v0
 ```
 
+DDT Tita
+
+```bash
+# Train
+python scripts/rsl_rl/base/train.py --task RobotLab-Isaac-Velocity-Rough-DDT-Tita-v0 --headless
+# Play
+python scripts/rsl_rl/base/play.py --task RobotLab-Isaac-Velocity-Rough-DDT-Tita-v0
+```
+
 ### Humanoid
 
 FFTAI GR1T1
