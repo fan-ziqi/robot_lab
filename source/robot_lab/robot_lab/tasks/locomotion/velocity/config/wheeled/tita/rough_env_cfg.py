@@ -7,11 +7,37 @@ from isaaclab.utils import configclass
 
 import robot_lab.tasks.locomotion.velocity.mdp as mdp
 from robot_lab.tasks.locomotion.velocity.velocity_env_cfg import ActionsCfg, LocomotionVelocityRoughEnvCfg, RewardsCfg
-
+import isaaclab.terrains as terrain_gen
 ##
 # Pre-defined configs
 ##
 from robot_lab.assets.ddt import DDT_TITA_CFG  # isort: skip
+
+# use other terrain
+Rough_ROAD_CFG = terrain_gen.TerrainGeneratorCfg(
+    size=(8.0, 8.0),
+    border_width=20.0,
+    num_rows=10,
+    num_cols=20,
+    horizontal_scale=0.1,
+    vertical_scale=0.005,
+    slope_threshold=0.75,
+    difficulty_range=(0.0, 1.0),
+    use_cache=False,
+    sub_terrains={
+        "flat": terrain_gen.MeshPlaneTerrainCfg(
+            proportion=0.2,
+        ),
+        "random_rough": terrain_gen.HfRandomUniformTerrainCfg(
+            proportion=0.4,
+            noise_range=(0.01, 0.05),
+            noise_step=0.02,
+            border_width=0.25
+        ),
+
+
+    },
+)
 
 
 @configclass
@@ -71,10 +97,12 @@ class DDTTitaRoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         self.scene.robot = DDT_TITA_CFG.replace(prim_path="{ENV_REGEX_NS}/Robot")
         self.scene.height_scanner.prim_path = "{ENV_REGEX_NS}/Robot/" + self.base_link_name
         self.scene.height_scanner_base.prim_path = "{ENV_REGEX_NS}/Robot/" + self.base_link_name
+        self.scene.terrain.terrain_type = "generator"
+        self.scene.terrain.terrain_generator = Rough_ROAD_CFG
         # scale down the terrains because the robot is small
-        self.scene.terrain.terrain_generator.sub_terrains["boxes"].grid_height_range = (0.025, 0.1)
-        self.scene.terrain.terrain_generator.sub_terrains["random_rough"].noise_range = (0.01, 0.06)
-        self.scene.terrain.terrain_generator.sub_terrains["random_rough"].noise_step = 0.01
+        # self.scene.terrain.terrain_generator.sub_terrains["boxes"].grid_height_range = (0.025, 0.1)
+        # self.scene.terrain.terrain_generator.sub_terrains["random_rough"].noise_range = (0.01, 0.06)
+        # self.scene.terrain.terrain_generator.sub_terrains["random_rough"].noise_step = 0.01
 
         # ------------------------------Observations------------------------------
         self.observations.policy.joint_pos.func = mdp.joint_pos_rel_without_wheel
@@ -107,38 +135,20 @@ class DDTTitaRoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         self.actions.joint_vel.joint_names = self.joint_names[6:]
 
         # ------------------------------Events------------------------------
-        # self.events.randomize_reset_base.params = {
-        #     "pose_range": {
-        #         "x": (-0.5, 0.5),
-        #         "y": (-0.5, 0.5),
-        #         "z": (0.0, 0.2),
-        #         "roll": (-3.14, 3.14),
-        #         "pitch": (-3.14, 3.14),
-        #         "yaw": (-3.14, 3.14),
-        #     },
-        #     "velocity_range": {
-        #         "x": (-0.5, 0.5),
-        #         "y": (-0.5, 0.5),
-        #         "z": (-0.5, 0.5),
-        #         "roll": (-0.5, 0.5),
-        #         "pitch": (-0.5, 0.5),
-        #         "yaw": (-0.5, 0.5),
-        #     },
-        # }
         self.events.randomize_rigid_body_mass.params["asset_cfg"].body_names = [self.base_link_name]
         self.events.randomize_com_positions.params["asset_cfg"].body_names = [self.base_link_name]
         self.events.randomize_apply_external_force_torque.params["asset_cfg"].body_names = [self.base_link_name]
 
         # ------------------------------Rewards------------------------------
         # General
-        self.rewards.is_terminated.weight = -200.0
+        self.rewards.is_terminated.weight = -200
 
         # Root penalties
         self.rewards.lin_vel_z_l2.weight = -2.0
         self.rewards.ang_vel_xy_l2.weight = -0.05
         self.rewards.flat_orientation_l2.weight = 0
-        self.rewards.base_height_l2.weight = -10.0
-        self.rewards.base_height_l2.params["target_height"] = 0.30
+        self.rewards.base_height_l2.weight = -2.0
+        self.rewards.base_height_l2.params["target_height"] = 0.35
         self.rewards.base_height_l2.params["asset_cfg"].body_names = [self.base_link_name]
         self.rewards.body_lin_acc_l2.weight = 0
         self.rewards.body_lin_acc_l2.params["asset_cfg"].body_names = [self.base_link_name]
@@ -157,7 +167,7 @@ class DDTTitaRoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         self.rewards.joint_acc_wheel_l2.weight = -2.5e-9
         self.rewards.joint_acc_wheel_l2.params["asset_cfg"].joint_names = [self.wheel_joint_name]
         # self.rewards.create_joint_deviation_l1_rewterm("joint_deviation_hip_l1", -0.2, [".*_hip_joint"])
-        self.rewards.joint_pos_limits.weight = -5.0
+        self.rewards.joint_pos_limits.weight = -1.0
         self.rewards.joint_pos_limits.params["asset_cfg"].joint_names = [f"^(?!{self.wheel_joint_name}).*"]
         self.rewards.joint_vel_limits.weight = 0
         self.rewards.joint_vel_limits.params["asset_cfg"].joint_names = [self.wheel_joint_name]
@@ -165,7 +175,7 @@ class DDTTitaRoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         self.rewards.joint_power.params["asset_cfg"].joint_names = [f"^(?!{self.wheel_joint_name}).*"]
         self.rewards.stand_still_without_cmd.weight = -2.0
         self.rewards.stand_still_without_cmd.params["asset_cfg"].joint_names = [f"^(?!{self.wheel_joint_name}).*"]
-        self.rewards.joint_pos_penalty.weight = -1.0
+        self.rewards.joint_pos_penalty.weight = -0.5
         self.rewards.joint_pos_penalty.params["asset_cfg"].joint_names = [f"^(?!{self.wheel_joint_name}).*"]
         self.rewards.joint_pos_penalty.params["velocity_threshold"] = 100
         self.rewards.wheel_vel_penalty.weight = -0.01
@@ -186,8 +196,8 @@ class DDTTitaRoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         self.rewards.contact_forces.params["sensor_cfg"].body_names = [self.foot_link_name]
 
         # Velocity-tracking rewards
-        self.rewards.track_lin_vel_xy_exp.weight = 3.0
-        self.rewards.track_ang_vel_z_exp.weight = 1.5
+        self.rewards.track_lin_vel_xy_exp.weight = 6.5
+        self.rewards.track_ang_vel_z_exp.weight = 4.5
 
         # Others
         self.rewards.feet_air_time.weight = 0
@@ -218,9 +228,9 @@ class DDTTitaRoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         # ------------------------------Terminations------------------------------
         # self.terminations.illegal_contact.params["sensor_cfg"].body_names = [self.base_link_name, ".*_hip"]
         # self.terminations.illegal_contact = None
-        self.terminations.illegal_contact.params["sensor_cfg"].body_names = [self.base_link_name]
+        self.terminations.illegal_contact.params["sensor_cfg"].body_names = [self.base_link_name , ".*_leg_3"]
 
         # ------------------------------Commands------------------------------
         self.commands.base_velocity.ranges.lin_vel_x = (-1.0, 1.0)
-        self.commands.base_velocity.ranges.lin_vel_y = (-1.0, 1.0)
+        self.commands.base_velocity.ranges.lin_vel_y = (0.0, 0.0)
         self.commands.base_velocity.ranges.ang_vel_z = (-1.0, 1.0)
