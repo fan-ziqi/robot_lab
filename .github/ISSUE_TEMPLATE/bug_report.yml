@@ -1,0 +1,81 @@
+name: Bug report
+description: File a bug report for the repository
+
+body:
+- type: markdown
+  attributes:
+    value: |
+      **Your help in making robot_lab better is greatly appreciated!**
+
+      * Please ensure that:
+        * The issue hasn't already been reported by using the [issue search](https://github.com/fan-ziqi/robot_lab/search?q=is%3Aissue&type=issues).
+        * The issue is not listed in the Isaac Lab's[Known Issues](https://isaac-sim.github.io/IsaacLab/main/source/refs/issues.html) documentation.
+        * The issue is not listed in the Isaac Sim's [Known Issues](https://docs.isaacsim.omniverse.nvidia.com/latest/overview/known_issues.html) documentation.
+      * For questions, please consider [open a discussion](https://github.com/fan-ziqi/robot_lab/discussions).
+      <br>
+
+- type: textarea
+  attributes:
+    label: Description
+    description: A clear and concise description of the bug/issue. Try to provide a minimal example to reproduce it.
+    placeholder: |
+      Markdown formatting might be applied to the text.
+
+      ```python
+      # use triple backticks for code blocks or terminal output/error messages
+      ```
+  validations:
+    required: true
+
+- type: input
+  attributes:
+    label: Isaac Lab version
+    description: It can be found in the `VERSION` file located in either the repository or the build folder.
+    placeholder: e.g. 2.2.0
+  validations:
+    required: true
+- type: input
+  attributes:
+    label: Isaac Sim version
+    description: It can be found in the `VERSION` file located in either the repository or the build folder.
+    placeholder: e.g. 5.0.0
+  validations:
+    required: true
+- type: input
+  attributes:
+    label: Operating System (OS)
+    placeholder: e.g. Ubuntu 24.04
+  validations:
+    required: true
+- type: input
+  attributes:
+    label: GPU Name
+    placeholder: e.g. RTX 4090
+  validations:
+    required: true
+- type: input
+  attributes:
+    label: GPU Driver and CUDA versions
+    description: The GPU driver and CUDA versions can be obtained with the command `nvidia-smi`.
+    placeholder: e.g. Driver 550.144.03, CUDA 12.4
+  validations:
+    required: true
+
+- type: textarea
+  attributes:
+    label: Logs
+    description: |
+      Include the relevant log files. See the *Checking the internal logs from the simulator* in Isaac Lab's
+      [Tricks and Troubleshooting](https://isaac-sim.github.io/IsaacLab/main/source/refs/troubleshooting.html)
+      documentation for details about the locations of the log files.
+    placeholder: |
+      Paste the log content here or attach the log files.
+
+      ```txt
+      Use triple backticks to format the pasted log text.
+      ```
+
+- type: textarea
+  attributes:
+    label: Additional information
+    placeholder: Any other information that might be helpful.
