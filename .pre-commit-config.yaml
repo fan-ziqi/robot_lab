@@ -1,3 +1,6 @@
+# Copyright (c) 2024-2025 Ziqi Fan
+# SPDX-License-Identifier: Apache-2.0
+
 repos:
   - repo: https://github.com/python/black
     rev: 23.10.1

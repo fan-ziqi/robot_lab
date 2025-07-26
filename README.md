@@ -319,21 +319,21 @@ YOUR_ROBOT_CFG = ArticulationCfg(
     spawn=sim_utils.UsdFileCfg(
         # for urdf
         func=spawn_from_lazy_usd,
-        usd_path=urdf_to_usd(
+        usd_path=urdf_to_usd(  # type: ignore
             file_path=f"{ISAACLAB_ASSETS_DATA_DIR}/Robots/your_robot/your_robot.urdf",
             merge_joints=True,
             fix_base=False,
         ),
         # for xacro
         func=spawn_from_lazy_usd,
-        usd_path=xacro_to_usd(
+        usd_path=xacro_to_usd(  # type: ignore
             file_path=f"{ISAACLAB_ASSETS_DATA_DIR}/Robots/your_robot/your_robot.xacro",
             merge_joints=True,
             fix_base=False,
         ),
         # for mjcf
         func=spawn_from_lazy_usd,
-        usd_path=mjcf_to_usd(
+        usd_path=mjcf_to_usd(  # type: ignore
             file_path=f"{ISAACLAB_ASSETS_DATA_DIR}/Robots/your_robot/your_robot.xml",
             import_sites=True,
             fix_base=False,

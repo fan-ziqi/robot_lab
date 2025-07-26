@@ -28,7 +28,7 @@ from robot_lab.assets.utils.usd_converter import (  # noqa: F401
 DDTROBOT_TITA_CFG = ArticulationCfg(
     spawn=sim_utils.UsdFileCfg(
         func=spawn_from_lazy_usd,
-        usd_path=urdf_to_usd(
+        usd_path=urdf_to_usd(  # type: ignore
             file_path=f"{ISAACLAB_ASSETS_DATA_DIR}/Robots/ddt/tita_description/urdf/tita.urdf",
             output_usd_path=f"{ISAACLAB_ASSETS_DATA_DIR}/Robots/ddt/tita_description/usd/tita.usd",
             merge_joints=True,
