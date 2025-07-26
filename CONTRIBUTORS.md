@@ -15,7 +15,10 @@ Guidelines for modifications:
 
 ## Contributors
 
+* [Yankai Xiang](https://github.com/cmjang)
 * [Zhenbiao Huang](https://github.com/legubiao)
+
+* [DDT Robot](https://directdrive.com)
 * [Deep Robotics](https://www.deeprobotics.cn/en)
 
 ## Acknowledgements

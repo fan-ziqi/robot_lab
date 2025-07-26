@@ -210,7 +210,7 @@ The table below lists all available environments:
       <td>RobotLab-Isaac-Velocity-Rough-Deeprobotics-X30-v0</td>
     </tr>
     <tr>
-      <td style="text-align:center;" rowspan="3">Wheeled</td>
+      <td style="text-align:center;" rowspan="4">Wheeled</td>
       <td>Unitree Go2W</td>
       <td>RobotLab-Isaac-Velocity-Rough-Unitree-Go2W-v0</td>
     </tr>
@@ -221,6 +221,10 @@ The table below lists all available environments:
     <tr>
       <td>Deeprobotics M20</td>
       <td>RobotLab-Isaac-Velocity-Rough-Deeprobotics-M20-v0</td>
+    </tr>
+    <tr>
+      <td>DDTRobot Tita</td>
+      <td>RobotLab-Isaac-Velocity-Rough-DDTRobot-Tita-v0</td>
     </tr>
     <tr>
       <td style="text-align:center;" rowspan="7">Humanoid</td>
