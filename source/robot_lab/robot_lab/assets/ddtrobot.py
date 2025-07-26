@@ -6,7 +6,7 @@ Reference: https://github.com/DDTRobot
 """
 
 import isaaclab.sim as sim_utils
-from isaaclab.actuators import DCMotorCfg, ImplicitActuatorCfg
+from isaaclab.actuators import DCMotorCfg, ImplicitActuatorCfg  # noqa: F401
 from isaaclab.assets.articulation import ArticulationCfg
 
 from robot_lab.assets import ISAACLAB_ASSETS_DATA_DIR
@@ -16,6 +16,7 @@ from robot_lab.assets.utils.usd_converter import (  # noqa: F401
     urdf_to_usd,
     xacro_to_usd,
 )
+
 ##
 # Configuration
 ##
@@ -24,7 +25,7 @@ from robot_lab.assets.utils.usd_converter import (  # noqa: F401
 """Configuration of DDT TITA using DC motor.
 """
 
-DDT_TITA_CFG = ArticulationCfg(
+DDTROBOT_TITA_CFG = ArticulationCfg(
     spawn=sim_utils.UsdFileCfg(
         func=spawn_from_lazy_usd,
         usd_path=urdf_to_usd(

@@ -1,6 +1,7 @@
 # Copyright (c) 2024-2025 Ziqi Fan
 # SPDX-License-Identifier: Apache-2.0
 
+import isaaclab.terrains as terrain_gen
 from isaaclab.managers import RewardTermCfg as RewTerm
 from isaaclab.managers import SceneEntityCfg
 from isaaclab.utils import configclass
@@ -11,14 +12,14 @@ from robot_lab.tasks.manager_based.locomotion.velocity.velocity_env_cfg import (
     LocomotionVelocityRoughEnvCfg,
     RewardsCfg,
 )
-import isaaclab.terrains as terrain_gen
+
 ##
 # Pre-defined configs
 ##
-from robot_lab.assets.ddt import DDT_TITA_CFG  # isort: skip
+from robot_lab.assets.ddtrobot import DDTROBOT_TITA_CFG  # isort: skip
 
 # use other terrain
-Rough_ROAD_CFG = terrain_gen.TerrainGeneratorCfg(
+ROUGH_ROAD_CFG = terrain_gen.TerrainGeneratorCfg(
     size=(8.0, 8.0),
     border_width=20.0,
     num_rows=10,
@@ -33,19 +34,14 @@ Rough_ROAD_CFG = terrain_gen.TerrainGeneratorCfg(
             proportion=0.2,
         ),
         "random_rough": terrain_gen.HfRandomUniformTerrainCfg(
-            proportion=0.4,
-            noise_range=(0.01, 0.05),
-            noise_step=0.02,
-            border_width=0.25
+            proportion=0.4, noise_range=(0.01, 0.05), noise_step=0.02, border_width=0.25
         ),
-
-
     },
 )
 
 
 @configclass
-class DDTTitaActionsCfg(ActionsCfg):
+class DDTRobotTitaActionsCfg(ActionsCfg):
     """Action specifications for the MDP."""
 
     joint_pos = mdp.JointPositionActionCfg(
@@ -58,7 +54,7 @@ class DDTTitaActionsCfg(ActionsCfg):
 
 
 @configclass
-class DDTTitaRewardsCfg(RewardsCfg):
+class DDTRobotTitaRewardsCfg(RewardsCfg):
     """Reward terms for the MDP."""
 
     joint_vel_wheel_l2 = RewTerm(
@@ -75,9 +71,9 @@ class DDTTitaRewardsCfg(RewardsCfg):
 
 
 @configclass
-class DDTTitaRoughEnvCfg(LocomotionVelocityRoughEnvCfg):
-    actions: DDTTitaActionsCfg = DDTTitaActionsCfg()
-    rewards: DDTTitaRewardsCfg = DDTTitaRewardsCfg()
+class DDTRobotTitaRoughEnvCfg(LocomotionVelocityRoughEnvCfg):
+    actions: DDTRobotTitaActionsCfg = DDTRobotTitaActionsCfg()
+    rewards: DDTRobotTitaRewardsCfg = DDTRobotTitaRewardsCfg()
 
     base_link_name = "base_link"
     foot_link_name = ".*_leg_4"
@@ -85,13 +81,9 @@ class DDTTitaRoughEnvCfg(LocomotionVelocityRoughEnvCfg):
 
     # fmt: off
     joint_names = [
-        "joint_right_leg_1","joint_right_leg_2", "joint_right_leg_3",  #right
-        "joint_left_leg_1","joint_left_leg_2","joint_left_leg_3",  #left
-        "joint_right_leg_4","joint_left_leg_4",
-        # "joint_left_leg_1", "joint_right_leg_1",
-        # "joint_left_leg_2", "joint_right_leg_2",
-        # "joint_left_leg_3", "joint_right_leg_2",
-        # "joint_left_leg_4", "joint_right_leg_4",
+        "joint_right_leg_1", "joint_right_leg_2", "joint_right_leg_3",
+        "joint_left_leg_1", "joint_left_leg_2", "joint_left_leg_3",
+        "joint_right_leg_4", "joint_left_leg_4",
     ]
     # fmt: on
 
@@ -100,16 +92,11 @@ class DDTTitaRoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         super().__post_init__()
 
         # ------------------------------Sence------------------------------
-        # switch robot to tita
-        self.scene.robot = DDT_TITA_CFG.replace(prim_path="{ENV_REGEX_NS}/Robot")
+        self.scene.robot = DDTROBOT_TITA_CFG.replace(prim_path="{ENV_REGEX_NS}/Robot")
         self.scene.height_scanner.prim_path = "{ENV_REGEX_NS}/Robot/" + self.base_link_name
         self.scene.height_scanner_base.prim_path = "{ENV_REGEX_NS}/Robot/" + self.base_link_name
         self.scene.terrain.terrain_type = "generator"
-        self.scene.terrain.terrain_generator = Rough_ROAD_CFG
-        # scale down the terrains because the robot is small
-        # self.scene.terrain.terrain_generator.sub_terrains["boxes"].grid_height_range = (0.025, 0.1)
-        # self.scene.terrain.terrain_generator.sub_terrains["random_rough"].noise_range = (0.01, 0.06)
-        # self.scene.terrain.terrain_generator.sub_terrains["random_rough"].noise_step = 0.01
+        self.scene.terrain.terrain_generator = ROUGH_ROAD_CFG
 
         # ------------------------------Observations------------------------------
         self.observations.policy.joint_pos.func = mdp.joint_pos_rel_without_wheel
@@ -139,7 +126,7 @@ class DDTTitaRoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         self.actions.joint_pos.clip = {".*": (-100.0, 100.0)}
         self.actions.joint_vel.clip = {".*": (-100.0, 100.0)}
         self.actions.joint_pos.joint_names = self.joint_names[:6]
-        self.actions.joint_vel.joint_names =self.joint_names[6:]
+        self.actions.joint_vel.joint_names = self.joint_names[6:]
 
         # ------------------------------Events------------------------------
         # self.events.randomize_reset_base.params = {
@@ -178,7 +165,7 @@ class DDTTitaRoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         self.rewards.body_lin_acc_l2.weight = 0
         self.rewards.body_lin_acc_l2.params["asset_cfg"].body_names = [self.base_link_name]
 
-        # Joint penaltie
+        # Joint penalties
         self.rewards.joint_torques_l2.weight = -2.5e-5
         self.rewards.joint_torques_l2.params["asset_cfg"].joint_names = [f"^(?!{self.wheel_joint_name}).*"]
         self.rewards.joint_torques_wheel_l2.weight = 0
@@ -243,22 +230,20 @@ class DDTTitaRoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         self.rewards.feet_height_body.params["target_height"] = -0.2
         self.rewards.feet_height_body.params["asset_cfg"].body_names = [self.foot_link_name]
         self.rewards.feet_gait.weight = 0
-        self.rewards.feet_gait.params["synced_feet_pair_names"] =  (("joint_left_leg_4", "joint_right_leg_4"),)
+        self.rewards.feet_gait.params["synced_feet_pair_names"] = (("joint_left_leg_4", "joint_right_leg_4"),)
         self.rewards.upward.weight = 1.0
-        # self.rewards.feet_distance_y_exp.weight = 2.0
-        # self.rewards.feet_distance_y_exp.params["stance_width"] = 0.6
-        # self.rewards.feet_distance_y_exp.params["asset_cfg"].body_names = [self.foot_link_name]
-        #
-
 
         # If the weight of rewards is 0, set rewards to None
-        if self.__class__.__name__ == "DDTTitaRoughEnvCfg":
+        if self.__class__.__name__ == "DDTRobotTitaRoughEnvCfg":
             self.disable_zero_weight_rewards()
 
         # ------------------------------Terminations------------------------------
-        # self.terminations.illegal_contact.params["sensor_cfg"].body_names = [self.base_link_name, ".*_hip"]
+        self.terminations.illegal_contact.params["sensor_cfg"].body_names = [self.base_link_name, ".*_leg_3"]
         # self.terminations.illegal_contact = None
-        self.terminations.illegal_contact.params["sensor_cfg"].body_names = [self.base_link_name , ".*_leg_3"]
+
+        # ------------------------------Curriculums------------------------------
+        # self.curriculum.command_levels.params["range_multiplier"] = (0.2, 1.0)
+        self.curriculum.command_levels = None
 
         # ------------------------------Commands------------------------------
         self.commands.base_velocity.ranges.lin_vel_x = (-1.0, 1.0)

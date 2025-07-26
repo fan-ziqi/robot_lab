@@ -1,10 +1,10 @@
-# Copyright (c) 2024-2025 Yankai Xiang
+# Copyright (c) 2024-2025 Ziqi Fan
 # SPDX-License-Identifier: Apache-2.0
 
+import isaaclab.terrains as terrain_gen
 from isaaclab.utils import configclass
 
-from .rough_env_cfg import DDTTitaRoughEnvCfg
-import isaaclab.terrains as terrain_gen
+from .rough_env_cfg import DDTRobotTitaRoughEnvCfg
 
 COBBLESTONE_ROAD_CFG = terrain_gen.TerrainGeneratorCfg(
     size=(8.0, 8.0),
@@ -22,8 +22,10 @@ COBBLESTONE_ROAD_CFG = terrain_gen.TerrainGeneratorCfg(
         ),
     },
 )
+
+
 @configclass
-class DDTTitaFlatEnvCfg(DDTTitaRoughEnvCfg):
+class DDTRobotTitaFlatEnvCfg(DDTRobotTitaRoughEnvCfg):
     def __post_init__(self):
         # post init of parent
         super().__post_init__()
@@ -41,5 +43,5 @@ class DDTTitaFlatEnvCfg(DDTTitaRoughEnvCfg):
         self.curriculum.terrain_levels = None
 
         # If the weight of rewards is 0, set rewards to None
-        if self.__class__.__name__ == "DDTTitaFlatEnvCfg":
+        if self.__class__.__name__ == "DDTRobotTitaFlatEnvCfg":
             self.disable_zero_weight_rewards()

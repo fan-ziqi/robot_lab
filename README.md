@@ -224,7 +224,7 @@ The table below lists all available environments:
     </tr>
     <tr>
       <td>DDTRobot Tita</td>
-      <td>RobotLab-Isaac-Velocity-Rough-DDT-Tita-v0</td>
+      <td>RobotLab-Isaac-Velocity-Rough-DDTRobot-Tita-v0</td>
     </tr>
     <tr>
       <td style="text-align:center;" rowspan="7">Humanoid</td>
