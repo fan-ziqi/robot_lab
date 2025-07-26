@@ -6,10 +6,22 @@ from isaaclab.actuators import ImplicitActuatorCfg
 from isaaclab.assets.articulation import ArticulationCfg
 
 from robot_lab.assets import ISAACLAB_ASSETS_DATA_DIR
+from robot_lab.assets.utils.usd_converter import (  # noqa: F401
+    mjcf_to_usd,
+    spawn_from_lazy_usd,
+    urdf_to_usd,
+    xacro_to_usd,
+)
 
 BOOSTER_T1_CFG = ArticulationCfg(
     spawn=sim_utils.UsdFileCfg(
-        usd_path=f"{ISAACLAB_ASSETS_DATA_DIR}/Robots/Booster/T1/t1.usd",
+        func=spawn_from_lazy_usd,
+        usd_path=urdf_to_usd(  # type: ignore
+            file_path=f"{ISAACLAB_ASSETS_DATA_DIR}/Robots/booster/t1_description/urdf/robot.urdf",
+            output_usd_path=f"{ISAACLAB_ASSETS_DATA_DIR}/Robots/booster/t1_description/usd/robot.usd",
+            merge_joints=True,
+            fix_base=False,
+        ),
         activate_contact_sensors=True,
         rigid_props=sim_utils.RigidBodyPropertiesCfg(
             disable_gravity=False,
@@ -59,14 +71,14 @@ BOOSTER_T1_CFG = ArticulationCfg(
                 ".*_Knee_Pitch",
                 "Waist",
             ],
-            effort_limit={
+            effort_limit_sim={
                 ".*_Hip_Pitch": 45.0,
                 ".*_Hip_Roll": 30.0,
                 ".*_Hip_Yaw": 30.0,
                 ".*_Knee_Pitch": 60.0,
                 "Waist": 30.0,
             },
-            velocity_limit={
+            velocity_limit_sim={
                 ".*_Hip_Pitch": 12.5,
                 ".*_Hip_Roll": 10.9,
                 ".*_Hip_Yaw": 10.9,
@@ -79,8 +91,8 @@ BOOSTER_T1_CFG = ArticulationCfg(
         ),
         "feet": ImplicitActuatorCfg(
             joint_names_expr=[".*_Ankle_Pitch", ".*_Ankle_Roll"],
-            effort_limit={".*_Ankle_Pitch": 24, ".*_Ankle_Roll": 15},
-            velocity_limit={".*_Ankle_Pitch": 18.8, ".*_Ankle_Roll": 12.4},
+            effort_limit_sim={".*_Ankle_Pitch": 24, ".*_Ankle_Roll": 15},
+            velocity_limit_sim={".*_Ankle_Pitch": 18.8, ".*_Ankle_Roll": 12.4},
             stiffness=50.0,
             damping=1.0,
             armature=0.01,
@@ -92,8 +104,8 @@ BOOSTER_T1_CFG = ArticulationCfg(
                 ".*_Elbow_Pitch",
                 ".*_Elbow_Yaw",
             ],
-            effort_limit=18.0,
-            velocity_limit=18.8,
+            effort_limit_sim=18.0,
+            velocity_limit_sim=18.8,
             stiffness=40.0,
             damping=10.0,
             armature=0.01,
