@@ -2,11 +2,9 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import isaaclab_tasks.manager_based.locomotion.velocity.mdp as mdp
-from isaaclab.managers import RewardTermCfg as RewTerm
-from isaaclab.managers import SceneEntityCfg
 from isaaclab.utils import configclass
 
-from robot_lab.tasks.manager_based.locomotion.velocity.velocity_env_cfg import LocomotionVelocityRoughEnvCfg, RewardsCfg
+from robot_lab.tasks.manager_based.locomotion.velocity.velocity_env_cfg import LocomotionVelocityRoughEnvCfg
 
 ##
 # Pre-defined configs
@@ -15,24 +13,7 @@ from robot_lab.assets.booster import BOOSTER_T1_CFG  # isort: skip
 
 
 @configclass
-class BoosterT1RewardsCfg(RewardsCfg):
-    """Reward terms for the MDP."""
-
-    feet_air_time_biped = RewTerm(
-        func=mdp.feet_air_time_positive_biped,
-        weight=0.0,
-        params={
-            "command_name": "base_velocity",
-            "sensor_cfg": SceneEntityCfg("contact_forces", body_names=""),
-            "threshold": 0.4,
-        },
-    )
-
-
-@configclass
 class BoosterT1RoughEnvCfg(LocomotionVelocityRoughEnvCfg):
-    rewards: BoosterT1RewardsCfg = BoosterT1RewardsCfg()
-
     base_link_name = "Trunk"
     foot_link_name = ".*_foot_link"
 
@@ -114,8 +95,10 @@ class BoosterT1RoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         self.rewards.track_ang_vel_z_exp.func = mdp.track_ang_vel_z_world_exp
 
         # Others
-        self.rewards.feet_air_time_biped.weight = 2.0
-        self.rewards.feet_air_time_biped.params["sensor_cfg"].body_names = [self.foot_link_name]
+        self.rewards.feet_air_time.weight = 2.0
+        self.rewards.feet_air_time.func = mdp.feet_air_time_positive_biped
+        self.rewards.feet_air_time.params["threshold"] = 0.4
+        self.rewards.feet_air_time.params["sensor_cfg"].body_names = [self.foot_link_name]
         self.rewards.feet_contact.weight = 0
         self.rewards.feet_contact.params["sensor_cfg"].body_names = [self.foot_link_name]
         self.rewards.feet_contact_without_cmd.weight = 0

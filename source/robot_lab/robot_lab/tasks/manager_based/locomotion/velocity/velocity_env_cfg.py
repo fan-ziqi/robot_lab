@@ -524,10 +524,7 @@ class RewardsCfg:
         weight=0.0,
         params={
             "command_name": "base_velocity",
-            "mode_time": 0.3,
-            "velocity_threshold": 0.5,
-            "command_threshold": 0.1,
-            "asset_cfg": SceneEntityCfg("robot"),
+            "threshold": 0.5,
             "sensor_cfg": SceneEntityCfg("contact_forces", body_names=""),
         },
     )
