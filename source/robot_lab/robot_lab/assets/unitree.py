@@ -385,8 +385,8 @@ UNITREE_G1_29DOF_CFG = ArticulationCfg(
                 ".*_hip_yaw_joint",
                 ".*_knee_joint",
             ],
-            effort_limit=300,
-            velocity_limit=100.0,
+            effort_limit_sim=300,
+            velocity_limit_sim=100.0,
             stiffness={
                 ".*_hip_pitch_joint": 200.0,
                 ".*_hip_roll_joint": 150.0,
@@ -406,8 +406,8 @@ UNITREE_G1_29DOF_CFG = ArticulationCfg(
         ),
         "waist": ImplicitActuatorCfg(
             joint_names_expr=["waist_.*_joint"],
-            effort_limit=300,
-            velocity_limit=100.0,
+            effort_limit_sim=300,
+            velocity_limit_sim=100.0,
             stiffness={
                 "waist_yaw_joint": 200.0,
                 "waist_roll_joint": 200.0,
@@ -425,7 +425,7 @@ UNITREE_G1_29DOF_CFG = ArticulationCfg(
             },
         ),
         "feet": ImplicitActuatorCfg(
-            effort_limit=20,
+            effort_limit_sim=20,
             joint_names_expr=[".*_ankle_pitch_joint", ".*_ankle_roll_joint"],
             stiffness=20.0,
             damping=2.0,
@@ -439,8 +439,8 @@ UNITREE_G1_29DOF_CFG = ArticulationCfg(
                 ".*_elbow_joint",
                 ".*_wrist_.*",
             ],
-            effort_limit=300,
-            velocity_limit=100.0,
+            effort_limit_sim=300,
+            velocity_limit_sim=100.0,
             stiffness=40.0,
             damping=10.0,
             armature={
