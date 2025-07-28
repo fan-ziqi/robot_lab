@@ -77,14 +77,16 @@ class DDTRobotTitaRoughEnvCfg(LocomotionVelocityRoughEnvCfg):
 
     base_link_name = "base_link"
     foot_link_name = ".*_leg_4"
-    wheel_joint_name = ".*_leg_4"
 
     # fmt: off
-    joint_names = [
+    leg_joint_names = [
         "joint_right_leg_1", "joint_right_leg_2", "joint_right_leg_3",
         "joint_left_leg_1", "joint_left_leg_2", "joint_left_leg_3",
+    ]
+    wheel_joint_names = [
         "joint_right_leg_4", "joint_left_leg_4",
     ]
+    joint_names = leg_joint_names + wheel_joint_names
     # fmt: on
 
     def __post_init__(self):
@@ -101,11 +103,11 @@ class DDTRobotTitaRoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         # ------------------------------Observations------------------------------
         self.observations.policy.joint_pos.func = mdp.joint_pos_rel_without_wheel
         self.observations.policy.joint_pos.params["wheel_asset_cfg"] = SceneEntityCfg(
-            "robot", joint_names=[self.wheel_joint_name]
+            "robot", joint_names=self.wheel_joint_names
         )
         self.observations.critic.joint_pos.func = mdp.joint_pos_rel_without_wheel
         self.observations.critic.joint_pos.params["wheel_asset_cfg"] = SceneEntityCfg(
-            "robot", joint_names=[self.wheel_joint_name]
+            "robot", joint_names=self.wheel_joint_names
         )
         self.observations.policy.base_lin_vel.scale = 2.0
         self.observations.policy.base_ang_vel.scale = 0.25
@@ -125,8 +127,8 @@ class DDTRobotTitaRoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         self.actions.joint_vel.scale = 5.0
         self.actions.joint_pos.clip = {".*": (-100.0, 100.0)}
         self.actions.joint_vel.clip = {".*": (-100.0, 100.0)}
-        self.actions.joint_pos.joint_names = self.joint_names[:6]
-        self.actions.joint_vel.joint_names = self.joint_names[6:]
+        self.actions.joint_pos.joint_names = self.leg_joint_names
+        self.actions.joint_vel.joint_names = self.wheel_joint_names
 
         # ------------------------------Events------------------------------
         # self.events.randomize_reset_base.params = {
@@ -167,32 +169,32 @@ class DDTRobotTitaRoughEnvCfg(LocomotionVelocityRoughEnvCfg):
 
         # Joint penalties
         self.rewards.joint_torques_l2.weight = -2.5e-5
-        self.rewards.joint_torques_l2.params["asset_cfg"].joint_names = [f"^(?!{self.wheel_joint_name}).*"]
+        self.rewards.joint_torques_l2.params["asset_cfg"].joint_names = self.leg_joint_names
         self.rewards.joint_torques_wheel_l2.weight = 0
-        self.rewards.joint_torques_wheel_l2.params["asset_cfg"].joint_names = [self.wheel_joint_name]
+        self.rewards.joint_torques_wheel_l2.params["asset_cfg"].joint_names = self.wheel_joint_names
         self.rewards.joint_vel_l2.weight = 0
-        self.rewards.joint_vel_l2.params["asset_cfg"].joint_names = [f"^(?!{self.wheel_joint_name}).*"]
+        self.rewards.joint_vel_l2.params["asset_cfg"].joint_names = self.leg_joint_names
         self.rewards.joint_vel_wheel_l2.weight = 0
-        self.rewards.joint_vel_wheel_l2.params["asset_cfg"].joint_names = [self.wheel_joint_name]
+        self.rewards.joint_vel_wheel_l2.params["asset_cfg"].joint_names = self.wheel_joint_names
         self.rewards.joint_acc_l2.weight = -2.5e-7
-        self.rewards.joint_acc_l2.params["asset_cfg"].joint_names = [f"^(?!{self.wheel_joint_name}).*"]
+        self.rewards.joint_acc_l2.params["asset_cfg"].joint_names = self.leg_joint_names
         self.rewards.joint_acc_wheel_l2.weight = -2.5e-9
-        self.rewards.joint_acc_wheel_l2.params["asset_cfg"].joint_names = [self.wheel_joint_name]
+        self.rewards.joint_acc_wheel_l2.params["asset_cfg"].joint_names = self.wheel_joint_names
         # self.rewards.create_joint_deviation_l1_rewterm("joint_deviation_hip_l1", -0.2, [".*_hip_joint"])
         self.rewards.joint_pos_limits.weight = -1.0
-        self.rewards.joint_pos_limits.params["asset_cfg"].joint_names = [f"^(?!{self.wheel_joint_name}).*"]
+        self.rewards.joint_pos_limits.params["asset_cfg"].joint_names = self.leg_joint_names
         self.rewards.joint_vel_limits.weight = 0
-        self.rewards.joint_vel_limits.params["asset_cfg"].joint_names = [self.wheel_joint_name]
+        self.rewards.joint_vel_limits.params["asset_cfg"].joint_names = self.wheel_joint_names
         self.rewards.joint_power.weight = -2e-5
-        self.rewards.joint_power.params["asset_cfg"].joint_names = [f"^(?!{self.wheel_joint_name}).*"]
+        self.rewards.joint_power.params["asset_cfg"].joint_names = self.leg_joint_names
         self.rewards.stand_still_without_cmd.weight = -2.0
-        self.rewards.stand_still_without_cmd.params["asset_cfg"].joint_names = [f"^(?!{self.wheel_joint_name}).*"]
+        self.rewards.stand_still_without_cmd.params["asset_cfg"].joint_names = self.leg_joint_names
         self.rewards.joint_pos_penalty.weight = -0.5
-        self.rewards.joint_pos_penalty.params["asset_cfg"].joint_names = [f"^(?!{self.wheel_joint_name}).*"]
+        self.rewards.joint_pos_penalty.params["asset_cfg"].joint_names = self.leg_joint_names
         self.rewards.joint_pos_penalty.params["velocity_threshold"] = 100
         self.rewards.wheel_vel_penalty.weight = -0.01
         self.rewards.wheel_vel_penalty.params["sensor_cfg"].body_names = [self.foot_link_name]
-        self.rewards.wheel_vel_penalty.params["asset_cfg"].joint_names = [self.wheel_joint_name]
+        self.rewards.wheel_vel_penalty.params["asset_cfg"].joint_names = self.wheel_joint_names
         self.rewards.joint_mirror.weight = -0.05
         self.rewards.joint_mirror.params["mirror_joints"] = [
             ["joint_right_leg_(1|2|3)", "joint_left_leg_(1|2|3)"],
