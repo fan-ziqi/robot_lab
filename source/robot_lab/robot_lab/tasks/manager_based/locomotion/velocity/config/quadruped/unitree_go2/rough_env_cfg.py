@@ -119,16 +119,18 @@ class UnitreeGo2RoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         self.rewards.track_ang_vel_z_exp.weight = 1.5
 
         # Others
-        self.rewards.feet_air_time.weight = 0
+        self.rewards.feet_air_time.weight = 0.1
         self.rewards.feet_air_time.params["threshold"] = 0.5
         self.rewards.feet_air_time.params["sensor_cfg"].body_names = [self.foot_link_name]
+        self.rewards.feet_air_time_variance.weight = -1.0
+        self.rewards.feet_air_time_variance.params["sensor_cfg"].body_names = [self.foot_link_name]
         self.rewards.feet_contact.weight = 0
         self.rewards.feet_contact.params["sensor_cfg"].body_names = [self.foot_link_name]
         self.rewards.feet_contact_without_cmd.weight = 0.1
         self.rewards.feet_contact_without_cmd.params["sensor_cfg"].body_names = [self.foot_link_name]
         self.rewards.feet_stumble.weight = 0
         self.rewards.feet_stumble.params["sensor_cfg"].body_names = [self.foot_link_name]
-        self.rewards.feet_slide.weight = 0
+        self.rewards.feet_slide.weight = -0.1
         self.rewards.feet_slide.params["sensor_cfg"].body_names = [self.foot_link_name]
         self.rewards.feet_slide.params["asset_cfg"].body_names = [self.foot_link_name]
         self.rewards.feet_height.weight = 0
@@ -137,7 +139,7 @@ class UnitreeGo2RoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         self.rewards.feet_height_body.weight = -5.0
         self.rewards.feet_height_body.params["target_height"] = -0.2
         self.rewards.feet_height_body.params["asset_cfg"].body_names = [self.foot_link_name]
-        self.rewards.feet_gait.weight = 0
+        self.rewards.feet_gait.weight = 0.5
         self.rewards.feet_gait.params["synced_feet_pair_names"] = (("FL_foot", "RR_foot"), ("FR_foot", "RL_foot"))
         self.rewards.upward.weight = 1.0
 

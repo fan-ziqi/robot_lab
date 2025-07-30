@@ -15,18 +15,16 @@ EXTENSION_TOML_DATA = toml.load(os.path.join(EXTENSION_PATH, "config", "extensio
 
 # Minimum dependencies required prior to installation
 INSTALL_REQUIRES = [
-    # NOTE: Add dependencies
+    # base
     "psutil",
-    # "lxml",
-    # "transformations",
-    # "pybullet",
     "colorama",
-    # "pyquaternion",
-    # "pyqt5",
     "xacrodoc",
-    "numpy",  # for amp
-    "pandas",  # for amp
-    "pinocchio",  # for amp
+    # amp
+    "numpy",
+    "pandas",
+    "pinocchio",
+    # devel
+    "cusrl@git+https://github.com/chengruiz/cusrl.git",
 ]
 
 # Installation operation
