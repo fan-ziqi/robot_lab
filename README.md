@@ -19,12 +19,12 @@
 
 ## Version Dependency
 
-| robot_lab Version | Isaac Lab Version             | Isaac Sim Version |
-|------------------ | ----------------------------- | ----------------- |
-| `main` branch     | `main` branch                 | Isaac Sim 5.0     |
-| `v2.2.0`          | `v2.2.0`                      | Isaac Sim 5.0     |
-| `v2.1.1`          | `v2.1.0`                      | Isaac Sim 4.5     |
-| `v1.1`            | `v1.4.1`                      | Isaac Sim 4.2     |
+| robot_lab Version | Isaac Lab Version             | Isaac Sim Version       |
+|------------------ | ----------------------------- | ----------------------- |
+| `main` branch     | `main` branch                 | Isaac Sim 5.0           |
+| `v2.2.0`          | `v2.2.0`                      | Isaac Sim 4.5 / 5.0     |
+| `v2.1.1`          | `v2.1.1`                      | Isaac Sim 4.5           |
+| `v1.1`            | `v1.4.1`                      | Isaac Sim 4.2           |
 
 ## Installation
 
