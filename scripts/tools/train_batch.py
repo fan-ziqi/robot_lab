@@ -17,7 +17,6 @@ commands = [
     "python scripts/rsl_rl/base/train.py --task RobotLab-Isaac-Velocity-Rough-Unitree-A1-v0 --headless",
     "python scripts/rsl_rl/base/train.py --task RobotLab-Isaac-Velocity-Rough-Unitree-B2-v0 --headless",
     "python scripts/rsl_rl/base/train.py --task RobotLab-Isaac-Velocity-Rough-Deeprobotics-Lite3-v0 --headless",
-    "python scripts/rsl_rl/base/train.py --task RobotLab-Isaac-Velocity-Rough-Deeprobotics-X30-v0 --headless",
     # Wheeled
     "python scripts/rsl_rl/base/train.py --task RobotLab-Isaac-Velocity-Rough-Unitree-Go2W-v0 --headless",
     "python scripts/rsl_rl/base/train.py --task RobotLab-Isaac-Velocity-Rough-Unitree-B2W-v0 --headless",
