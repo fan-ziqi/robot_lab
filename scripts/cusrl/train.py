@@ -26,6 +26,8 @@ parser.add_argument("--run_name", type=str, default=None, help="Name of the run 
 parser.add_argument("--checkpoint", type=str, default=None, help="Checkpoint to load for resuming training.")
 parser.add_argument("--logger", type=str, default="tensorboard", help="Logger to use for training.")
 parser.add_argument("--max_iterations", type=int, default=None, help="RL Policy training iterations.")
+parser.add_argument("--autocast", nargs="?", const=True, help="Datatype for automatic mixed precision.")
+parser.add_argument("--compile", action="store_true", help="Whether to use `torch.compile` for optimization.")
 
 # append AppLauncher cli args
 AppLauncher.add_app_launcher_args(parser)
@@ -116,7 +118,9 @@ def main():
     # create trainer from cusrl
     trainer = cusrl.Trainer(
         environment=cusrl.environment.IsaacLabEnvAdapter(env),
-        agent_factory=agent_cfg.agent_factory,
+        agent_factory=agent_cfg.agent_factory.override(
+            device=args_cli.device, autocast=args_cli.autocast, compile=args_cli.compile
+        ),
         logger_factory=cusrl.logger.make_factory(args_cli.logger, log_dir, add_datetime_prefix=False),
         num_iterations=agent_cfg.max_iterations,
         save_interval=agent_cfg.save_interval,
