@@ -464,3 +464,9 @@ Please cite the following if you use this code or parts of it:
   year = {2024}
 }
 ```
+
+## Acknowledgements
+
+The project uses some code from the following open-source code repositories:
+
+- [linden713/humanoid_amp](https://github.com/linden713/humanoid_amp)
