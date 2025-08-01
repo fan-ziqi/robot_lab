@@ -1,3 +1,6 @@
+# Copyright (c) 2024-2025 Ziqi Fan
+# SPDX-License-Identifier: Apache-2.0
+
 x-default-robot-lab-environment: &default-robot-lab-environment
   - OMNI_KIT_ALLOW_ROOT=1
 
