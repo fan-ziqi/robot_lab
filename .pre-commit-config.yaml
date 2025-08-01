@@ -1,3 +1,6 @@
+# Copyright (c) 2024-2025 Ziqi Fan
+# SPDX-License-Identifier: Apache-2.0
+
 repos:
   - repo: https://github.com/python/black
     rev: 23.10.1
@@ -10,7 +13,7 @@ repos:
       - id: flake8
         additional_dependencies: [flake8-simplify, flake8-return]
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.5.0
+    rev: v5.0.0
     hooks:
       - id: trailing-whitespace
       - id: check-symlinks
@@ -41,6 +44,7 @@ repos:
       - id: codespell
         additional_dependencies:
         - tomli
+        args: [-L lamda]
   - repo: https://github.com/pre-commit/pygrep-hooks
     rev: v1.10.0
     hooks:
@@ -51,11 +55,11 @@ repos:
     rev: v1.5.1
     hooks:
       - id: insert-license
-        files: \.py$   # This regex includes both .py and .yml files
+        files: \.(py|ya?ml)$   # This regex includes both .py and .yml files
         args:
           # - --remove-header    # Remove existing license headers. Useful when updating license.
           - --license-filepath
           - .github/LICENSE_HEADER.txt
           - --use-current-year
 
-exclude: ^(source/robot_lab/robot_lab/third_party/|.vscode/|.github/)
+exclude: ^(source/robot_lab/robot_lab/third_party/|source/robot_lab/data/|.vscode/|.github/)
