@@ -20,7 +20,7 @@ parser.add_argument(
 )
 parser.add_argument("--num_envs", type=int, default=None, help="Number of environments to simulate.")
 parser.add_argument("--task", type=str, default=None, help="Name of the task.")
-# parser.add_argument("--seed", type=int, default=None, help="Seed used for the environment")
+parser.add_argument("--seed", type=int, default=None, help="Seed used for the environment")
 parser.add_argument("--checkpoint", type=str, default=None, help="Checkpoint to load for playing.")
 parser.add_argument(
     "--stochastic",
@@ -82,8 +82,8 @@ def main():
 
     # # set the environment seed
     # # note: certain randomizations occur in the environment initialization so we set the seed here
-    # env_cfg.seed = agent_cfg.seed
-    # env_cfg.sim.device = args_cli.device if args_cli.device is not None else env_cfg.sim.device
+    cusrl.set_global_seed(args_cli.seed)
+    env_cfg.sim.device = args_cli.device if args_cli.device is not None else env_cfg.sim.device
 
     # spawn the robot randomly in the grid (instead of their terrain levels)
     env_cfg.scene.terrain.max_init_terrain_level = None
@@ -114,7 +114,9 @@ def main():
             func=lambda env: torch.tensor(controller.advance(), dtype=torch.float32).unsqueeze(0).to(env.device),
         )
 
-    trial = cusrl.Trial(args_cli.checkpoint) if args_cli.checkpoint else None
+    if args_cli.checkpoint is None:
+        args_cli.checkpoint = os.path.join("logs", "cusrl", agent_cfg.experiment_name)
+    trial = cusrl.Trial(args_cli.checkpoint)
     if trial is not None:
         log_dir = trial.home
     else:
@@ -144,7 +146,7 @@ def main():
     # create player from cusrl
     player = cusrl.Player(
         environment=cusrl.environment.IsaacLabEnvAdapter(env),
-        agent=agent_cfg.agent_factory,
+        agent=agent_cfg.agent_factory.override(device=args_cli.device),
         checkpoint_path=trial,
         deterministic=not args_cli.stochastic,
     )
