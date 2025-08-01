@@ -35,5 +35,4 @@ _repo
 _build
 .lastformat
 
-config.yaml
-.asset_hash
+**/usd/*
