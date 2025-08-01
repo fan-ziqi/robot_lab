@@ -370,7 +370,7 @@ itself. However, its various instances are included in directories within the en
 This looks like as follows:
 
 ```tree
-source/robot_lab/tasks/locomotion/
+source/robot_lab/tasks/manager_based/locomotion/
 ├── __init__.py
 └── velocity
     ├── config
@@ -383,7 +383,7 @@ source/robot_lab/tasks/locomotion/
     └── velocity_env_cfg.py  # <- this is the base task configuration
 ```
 
-The environments are then registered in the `source/robot_lab/tasks/locomotion/velocity/config/unitree_a1/__init__.py`:
+The environments are then registered in the `source/robot_lab/tasks/manager_based/locomotion/velocity/config/unitree_a1/__init__.py`:
 
 ```python
 gym.register(
