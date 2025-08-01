@@ -175,7 +175,7 @@ python scripts/rsl_rl/base/train.py --task=<ENV_NAME> --headless
 python scripts/rsl_rl/base/play.py --task=<ENV_NAME>
 ```
 
-CusRL (**Experimental**:​​ Hydra/fix-seed/view-follow/policy-export not supported yet):
+CusRL (**Experimental**:​​ Hydra/view-follow/policy-export not supported yet):
 
 ```bash
 # Train
@@ -197,7 +197,7 @@ The table below lists all available environments:
   </thead>
   <tbody>
     <tr>
-      <td style="text-align:center;" rowspan="7">Quadruped</td>
+      <td style="text-align:center;" rowspan="5">Quadruped</td>
       <td>Anymal D</td>
       <td>RobotLab-Isaac-Velocity-Rough-Anymal-D-v0</td>
     </tr>
@@ -214,16 +214,8 @@ The table below lists all available environments:
       <td>RobotLab-Isaac-Velocity-Rough-Unitree-A1-v0</td>
     </tr>
     <tr>
-      <td>Unitree A1 HandStand</td>
-      <td>RobotLab-Isaac-Velocity-Flat-HandStand-Unitree-A1-v0</td>
-    </tr>
-    <tr>
       <td>Deeprobotics Lite3</td>
       <td>RobotLab-Isaac-Velocity-Rough-Deeprobotics-Lite3-v0</td>
-    </tr>
-    <tr>
-      <td>Deeprobotics X30</td>
-      <td>RobotLab-Isaac-Velocity-Rough-Deeprobotics-X30-v0</td>
     </tr>
     <tr>
       <td style="text-align:center;" rowspan="4">Wheeled</td>
@@ -274,15 +266,27 @@ The table below lists all available environments:
   </tbody>
 </table>
 
-Train AMP Dance for Unitree G1
+Others (**Experimental**)
 
-```bash
-# Train
-python scripts/skrl/train.py --task RobotLab-Isaac-G1-AMP-Dance-Direct-v0 --algorithm AMP --headless
+- Train AMP Dance for Unitree G1
 
-# Play
-python scripts/skrl/play.py --task RobotLab-Isaac-G1-AMP-Dance-Direct-v0 --algorithm AMP --num_envs 32
-```
+  ```bash
+  # Train
+  python scripts/skrl/train.py --task=RobotLab-Isaac-G1-AMP-Dance-Direct-v0 --algorithm AMP --headless
+
+  # Play
+  python scripts/skrl/play.py --task=RobotLab-Isaac-G1-AMP-Dance-Direct-v0 --algorithm AMP --num_envs=32
+  ```
+
+- Train Handstand for Unitree A1
+
+  ```bash
+  # Train
+  python scripts/rsl_rl/base/train.py --task=RobotLab-Isaac-Velocity-Flat-HandStand-Unitree-A1-v0 --headless
+
+  # Play
+  python scripts/rsl_rl/base/play.py --task=RobotLab-Isaac-Velocity-Flat-HandStand-Unitree-A1-v0
+  ```
 
 > [!NOTE]
 > If you want to control a **SINGLE ROBOT** with the keyboard during playback, add `--keyboard` at the end of the play script.
