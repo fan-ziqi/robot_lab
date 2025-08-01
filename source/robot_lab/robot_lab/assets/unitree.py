@@ -2,20 +2,20 @@
 # SPDX-License-Identifier: Apache-2.0
 
 """Configuration for Unitree robots.
-
-The following configurations are available:
-
-* :obj:`UNITREE_A1_CFG`: Unitree A1 robot with DC motor model for the legs
-* :obj:`G1_CFG`: G1 humanoid robot
-
 Reference: https://github.com/unitreerobotics/unitree_ros
 """
 
 import isaaclab.sim as sim_utils
-from isaaclab.actuators import DCMotorCfg
+from isaaclab.actuators import DCMotorCfg, ImplicitActuatorCfg
 from isaaclab.assets.articulation import ArticulationCfg
 
 from robot_lab.assets import ISAACLAB_ASSETS_DATA_DIR
+from robot_lab.assets.utils.usd_converter import (  # noqa: F401
+    mjcf_to_usd,
+    spawn_from_lazy_usd,
+    urdf_to_usd,
+    xacro_to_usd,
+)
 
 ##
 # Configuration
@@ -24,7 +24,13 @@ from robot_lab.assets import ISAACLAB_ASSETS_DATA_DIR
 
 UNITREE_A1_CFG = ArticulationCfg(
     spawn=sim_utils.UsdFileCfg(
-        usd_path=f"{ISAACLAB_ASSETS_DATA_DIR}/Robots/Unitree/A1/a1.usd",
+        func=spawn_from_lazy_usd,
+        usd_path=urdf_to_usd(  # type: ignore
+            file_path=f"{ISAACLAB_ASSETS_DATA_DIR}/Robots/unitree/a1_description/urdf/a1.urdf",
+            output_usd_path=f"{ISAACLAB_ASSETS_DATA_DIR}/Robots/unitree/a1_description/usd/a1.usd",
+            merge_joints=True,
+            fix_base=False,
+        ),
         activate_contact_sensors=True,
         rigid_props=sim_utils.RigidBodyPropertiesCfg(
             disable_gravity=False,
@@ -70,7 +76,13 @@ Note: Specifications taken from: https://www.trossenrobotics.com/a1-quadruped#sp
 
 UNITREE_GO2_CFG = ArticulationCfg(
     spawn=sim_utils.UsdFileCfg(
-        usd_path=f"{ISAACLAB_ASSETS_DATA_DIR}/Robots/Unitree/Go2/go2.usd",
+        func=spawn_from_lazy_usd,
+        usd_path=urdf_to_usd(  # type: ignore
+            file_path=f"{ISAACLAB_ASSETS_DATA_DIR}/Robots/unitree/go2_description/urdf/go2_description.urdf",
+            output_usd_path=f"{ISAACLAB_ASSETS_DATA_DIR}/Robots/unitree/go2_description/usd/go2.usd",
+            merge_joints=True,
+            fix_base=False,
+        ),
         activate_contact_sensors=True,
         rigid_props=sim_utils.RigidBodyPropertiesCfg(
             disable_gravity=False,
@@ -114,7 +126,13 @@ UNITREE_GO2_CFG = ArticulationCfg(
 
 UNITREE_GO2W_CFG = ArticulationCfg(
     spawn=sim_utils.UsdFileCfg(
-        usd_path=f"{ISAACLAB_ASSETS_DATA_DIR}/Robots/Unitree/Go2W/go2w.usd",
+        func=spawn_from_lazy_usd,
+        usd_path=urdf_to_usd(  # type: ignore
+            file_path=f"{ISAACLAB_ASSETS_DATA_DIR}/Robots/unitree/go2w_description/urdf/go2w_description.urdf",
+            output_usd_path=f"{ISAACLAB_ASSETS_DATA_DIR}/Robots/unitree/go2w_description/usd/go2w_description.usd",
+            merge_joints=True,
+            fix_base=False,
+        ),
         activate_contact_sensors=True,
         rigid_props=sim_utils.RigidBodyPropertiesCfg(
             disable_gravity=False,
@@ -152,11 +170,10 @@ UNITREE_GO2W_CFG = ArticulationCfg(
             damping=0.5,
             friction=0.0,
         ),
-        "wheels": DCMotorCfg(
+        "wheels": ImplicitActuatorCfg(
             joint_names_expr=[".*_foot_joint"],
-            effort_limit=23.5,
-            saturation_effort=23.5,
-            velocity_limit=30.0,
+            effort_limit_sim=23.5,
+            velocity_limit_sim=30.0,
             stiffness=0.0,
             damping=0.5,
             friction=0.0,
@@ -168,7 +185,13 @@ UNITREE_GO2W_CFG = ArticulationCfg(
 
 UNITREE_B2_CFG = ArticulationCfg(
     spawn=sim_utils.UsdFileCfg(
-        usd_path=f"{ISAACLAB_ASSETS_DATA_DIR}/Robots/Unitree/B2/b2.usd",
+        func=spawn_from_lazy_usd,
+        usd_path=urdf_to_usd(  # type: ignore
+            file_path=f"{ISAACLAB_ASSETS_DATA_DIR}/Robots/unitree/b2_description/urdf/b2_description.urdf",
+            output_usd_path=f"{ISAACLAB_ASSETS_DATA_DIR}/Robots/unitree/b2_description/usd/b2_description.usd",
+            merge_joints=True,
+            fix_base=False,
+        ),
         activate_contact_sensors=True,
         rigid_props=sim_utils.RigidBodyPropertiesCfg(
             disable_gravity=False,
@@ -231,7 +254,13 @@ UNITREE_B2_CFG = ArticulationCfg(
 
 UNITREE_B2W_CFG = ArticulationCfg(
     spawn=sim_utils.UsdFileCfg(
-        usd_path=f"{ISAACLAB_ASSETS_DATA_DIR}/Robots/Unitree/B2W/b2w.usd",
+        func=spawn_from_lazy_usd,
+        usd_path=urdf_to_usd(  # type: ignore
+            file_path=f"{ISAACLAB_ASSETS_DATA_DIR}/Robots/unitree/b2w_description/urdf/b2w_description.urdf",
+            output_usd_path=f"{ISAACLAB_ASSETS_DATA_DIR}/Robots/unitree/b2w_description/usd/b2w_description.usd",
+            merge_joints=True,
+            fix_base=False,
+        ),
         activate_contact_sensors=True,
         rigid_props=sim_utils.RigidBodyPropertiesCfg(
             disable_gravity=False,
@@ -287,11 +316,10 @@ UNITREE_B2W_CFG = ArticulationCfg(
             damping=5.0,
             friction=0.0,
         ),
-        "wheel": DCMotorCfg(
+        "wheel": ImplicitActuatorCfg(
             joint_names_expr=[".*_foot_joint"],
-            effort_limit=20.0,
-            saturation_effort=20.0,
-            velocity_limit=50.0,
+            effort_limit_sim=20.0,
+            velocity_limit_sim=50.0,
             stiffness=0.0,
             damping=1.0,
             friction=0.0,

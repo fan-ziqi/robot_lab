@@ -311,16 +311,50 @@ python scripts/rsl_rl/base/play.py --task RobotLab-Isaac-Velocity-Flat-HandStand
 
 ## Add your own robot
 
-For example, to generate Unitree A1 usd file:
+This repository supports direct import of URDF, XACRO, and MJCF robot models without requiring pre-conversion to USD format.
 
-```bash
-python scripts/tools/convert_urdf.py source/robot_lab/data/Robots/Unitree/A1/a1_description/urdf/a1.urdf source/robot_lab/data/Robots/Unitree/A1/a1.usd --merge-joints
+```python
+from robot_lab.assets.utils.usd_converter import (  # noqa: F401
+    mjcf_to_usd,
+    spawn_from_lazy_usd,
+    urdf_to_usd,
+    xacro_to_usd,
+)
+
+YOUR_ROBOT_CFG = ArticulationCfg(
+    spawn=sim_utils.UsdFileCfg(
+        # for urdf
+        func=spawn_from_lazy_usd,
+        usd_path=urdf_to_usd(  # type: ignore
+            file_path=f"{ISAACLAB_ASSETS_DATA_DIR}/Robots/your_robot/your_robot.urdf",
+            merge_joints=True,
+            fix_base=False,
+        ),
+        # for xacro
+        func=spawn_from_lazy_usd,
+        usd_path=xacro_to_usd(  # type: ignore
+            file_path=f"{ISAACLAB_ASSETS_DATA_DIR}/Robots/your_robot/your_robot.xacro",
+            merge_joints=True,
+            fix_base=False,
+        ),
+        # for mjcf
+        func=spawn_from_lazy_usd,
+        usd_path=mjcf_to_usd(  # type: ignore
+            file_path=f"{ISAACLAB_ASSETS_DATA_DIR}/Robots/your_robot/your_robot.xml",
+            import_sites=True,
+            fix_base=False,
+        ),
+        # ... other configuration parameters ...
+    ),
+    # ... other configuration parameters ...
+)
 ```
 
-> [!NOTE]
-> There is a problem with the urdf conversion of the current Isaacsim version. Please checkout your IsaacLab to **v1.4.1** and use `scripts/tools/convert_urdf_v1.py` for conversion.
+Check your model import compatibility using:
 
-Check [import_new_asset](https://docs.robotsfan.com/isaaclab/source/how-to/import_new_asset.html) for detail
+```bash
+python scripts/tools/check_robot.py {urdf,mjcf,xacro} path_to_your_model_file
+```
 
 Using the core framework developed as part of Isaac Lab, we provide various learning environments for robotics research.
 These environments follow the `gym.Env` API from OpenAI Gym version `0.21.0`. The environments are registered using
