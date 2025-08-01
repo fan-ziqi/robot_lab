@@ -19,6 +19,7 @@ Guidelines for modifications:
 * [Zhenbiao Huang](https://github.com/legubiao)
 
 * [DDT Robot](https://directdrive.com)
+* [Deep Robotics](https://www.deeprobotics.cn/en)
 
 ## Acknowledgements
 
