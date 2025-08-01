@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Question / Feature request
+    url: https://github.com/fan-ziqi/robot_lab/discussions
+    about: Please ask questions or request features on the Discussions tab
+  - name: Isaac Lab repository
+    url: https://github.com/isaac-sim/IsaacLab
+    about: For issues or questions related to Isaac Lab, please refer to its repository
+  - name: Isaac Sim repository
+    url: https://github.com/isaac-sim/isaacsim
+    about: For issues or questions related to Isaac Sim, please refer to its repository
