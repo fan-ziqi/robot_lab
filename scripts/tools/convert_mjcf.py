@@ -1,21 +1,21 @@
 # Copyright (c) 2024-2025 Ziqi Fan
 # SPDX-License-Identifier: Apache-2.0
 
-# Copyright (c) 2022-2025, The Isaac Lab Project Developers.
+# Copyright (c) 2022-2025, The Isaac Lab Project Developers (https://github.com/isaac-sim/IsaacLab/blob/main/CONTRIBUTORS.md).
 # All rights reserved.
 #
 # SPDX-License-Identifier: BSD-3-Clause
 
 """
-Utility to convert a URDF into USD format.
+Utility to convert a MJCF into USD format.
 
-Unified Robot Description Format (URDF) is an XML file format used in ROS to describe all elements of
-a robot. For more information, see: http://wiki.ros.org/urdf
+MuJoCo XML Format (MJCF) is an XML file format used in MuJoCo to describe all elements of a robot.
+For more information, see: http://www.mujoco.org/book/XMLreference.html
 
-This script uses the URDF importer extension from Isaac Sim (``omni.isaac.urdf_importer``) to convert a
-URDF asset into USD format. It is designed as a convenience script for command-line use. For more
-information on the URDF importer, see the documentation for the extension:
-https://docs.omniverse.nvidia.com/app_isaacsim/app_isaacsim/ext_omni_isaac_urdf.html
+This script uses the MJCF importer extension from Isaac Sim (``isaacsim.asset.importer.mjcf``) to convert
+a MJCF asset into USD format. It is designed as a convenience script for command-line use. For more information
+on the MJCF importer, see the documentation for the extension:
+https://docs.isaacsim.omniverse.nvidia.com/latest/robot_setup/ext_isaacsim_asset_importer_mjcf.html
 
 
 positional arguments:
@@ -24,8 +24,8 @@ positional arguments:
 
 optional arguments:
   -h, --help                Show this help message and exit
-  --merge-joints            Consolidate links that are connected by fixed joints. (default: False)
   --fix-base                Fix the base to where it is imported. (default: False)
+  --import-sites            Import sites by parse <site> tag. (default: True)
   --make-instanceable       Make the asset instanceable for efficient cloning. (default: False)
 
 """
@@ -34,25 +34,23 @@ optional arguments:
 
 import argparse
 
-from omni.isaac.lab.app import AppLauncher
+from isaaclab.app import AppLauncher
 
 # add argparse arguments
-parser = argparse.ArgumentParser(description="Utility to convert a URDF into USD format.")
-parser.add_argument("input", type=str, help="The path to the input URDF file.")
+parser = argparse.ArgumentParser(description="Utility to convert a MJCF into USD format.")
+parser.add_argument("input", type=str, help="The path to the input MJCF file.")
 parser.add_argument("output", type=str, help="The path to store the USD file.")
-parser.add_argument(
-    "--merge-joints",
-    action="store_true",
-    default=False,
-    help="Consolidate links that are connected by fixed joints.",
-)
 parser.add_argument("--fix-base", action="store_true", default=False, help="Fix the base to where it is imported.")
+parser.add_argument(
+    "--import-sites", action="store_true", default=False, help="Import sites by parsing the <site> tag."
+)
 parser.add_argument(
     "--make-instanceable",
     action="store_true",
     default=False,
     help="Make the asset instanceable for efficient cloning.",
 )
+
 # append AppLauncher cli args
 AppLauncher.add_app_launcher_args(parser)
 # parse the arguments
@@ -68,32 +66,33 @@ import contextlib
 import os
 
 import carb
-import omni.isaac.core.utils.stage as stage_utils
+import isaacsim.core.utils.stage as stage_utils
 import omni.kit.app
-from omni.isaac.lab.sim.converters import UrdfConverter, UrdfConverterCfg
-from omni.isaac.lab.utils.assets import check_file_path
-from omni.isaac.lab.utils.dict import print_dict
+
+from isaaclab.sim.converters import MjcfConverter, MjcfConverterCfg
+from isaaclab.utils.assets import check_file_path
+from isaaclab.utils.dict import print_dict
 
 
 def main():
     # check valid file path
-    urdf_path = args_cli.input
-    if not os.path.isabs(urdf_path):
-        urdf_path = os.path.abspath(urdf_path)
-    if not check_file_path(urdf_path):
-        raise ValueError(f"Invalid file path: {urdf_path}")
+    mjcf_path = args_cli.input
+    if not os.path.isabs(mjcf_path):
+        mjcf_path = os.path.abspath(mjcf_path)
+    if not check_file_path(mjcf_path):
+        raise ValueError(f"Invalid file path: {mjcf_path}")
     # create destination path
     dest_path = args_cli.output
     if not os.path.isabs(dest_path):
         dest_path = os.path.abspath(dest_path)
 
-    # Create Urdf converter config
-    urdf_converter_cfg = UrdfConverterCfg(
-        asset_path=urdf_path,
+    # create the converter configuration
+    mjcf_converter_cfg = MjcfConverterCfg(
+        asset_path=mjcf_path,
         usd_dir=os.path.dirname(dest_path),
         usd_file_name=os.path.basename(dest_path),
         fix_base=args_cli.fix_base,
-        merge_fixed_joints=args_cli.merge_joints,
+        import_sites=args_cli.import_sites,
         force_usd_conversion=True,
         make_instanceable=args_cli.make_instanceable,
     )
@@ -101,17 +100,17 @@ def main():
     # Print info
     print("-" * 80)
     print("-" * 80)
-    print(f"Input URDF file: {urdf_path}")
-    print("URDF importer config:")
-    print_dict(urdf_converter_cfg.to_dict(), nesting=0)
+    print(f"Input MJCF file: {mjcf_path}")
+    print("MJCF importer config:")
+    print_dict(mjcf_converter_cfg.to_dict(), nesting=0)
     print("-" * 80)
     print("-" * 80)
 
-    # Create Urdf converter and import the file
-    urdf_converter = UrdfConverter(urdf_converter_cfg)
+    # Create mjcf converter and import the file
+    mjcf_converter = MjcfConverter(mjcf_converter_cfg)
     # print output
-    print("URDF importer output:")
-    print(f"Generated USD file: {urdf_converter.usd_path}")
+    print("MJCF importer output:")
+    print(f"Generated USD file: {mjcf_converter.usd_path}")
     print("-" * 80)
     print("-" * 80)
 
@@ -126,7 +125,7 @@ def main():
     # Simulate scene (if not headless)
     if local_gui or livestream_gui:
         # Open the stage with USD
-        stage_utils.open_stage(urdf_converter.usd_path)
+        stage_utils.open_stage(mjcf_converter.usd_path)
         # Reinitialize the simulation
         app = omni.kit.app.get_app_interface()
         # Run simulation
