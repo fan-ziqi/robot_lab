@@ -23,7 +23,7 @@ import cli_args
 # add argparse arguments
 parser = argparse.ArgumentParser(description="Train an RL agent with RSL-RL.")
 parser.add_argument("--video", action="store_true", default=False, help="Record videos during training.")
-parser.add_argument("--video_length", type=int, default=200, help="Length of the recorded video (in steps).")
+parser.add_argument("--video_length", type=int, default=20000000, help="Length of the recorded video (in steps).")
 parser.add_argument(
     "--disable_fabric", action="store_true", default=False, help="Disable fabric and use USD I/O operations."
 )
@@ -37,6 +37,7 @@ parser.add_argument(
 )
 parser.add_argument("--real-time", action="store_true", default=False, help="Run in real-time, if possible.")
 parser.add_argument("--keyboard", action="store_true", default=False, help="Whether to use keyboard.")
+parser.add_argument("--map", type=str, default=None, help="Dir of the map.")
 # append RSL-RL cli arguments
 cli_args.add_rsl_rl_args(parser)
 # append AppLauncher cli args
@@ -72,6 +73,7 @@ from isaaclab.envs import (
     multi_agent_to_single_agent,
 )
 from isaaclab.managers import ObservationTermCfg as ObsTerm
+from isaaclab.terrains import TerrainImporterCfg
 from isaaclab.utils.assets import retrieve_file_path
 from isaaclab.utils.dict import print_dict
 from isaaclab.utils.pretrained_checkpoint import get_published_pretrained_checkpoint
@@ -88,12 +90,49 @@ def main(env_cfg: ManagerBasedRLEnvCfg | DirectRLEnvCfg | DirectMARLEnvCfg, agen
     task_name = args_cli.task.split(":")[-1]
     # override configurations with non-hydra CLI arguments
     agent_cfg = cli_args.update_rsl_rl_cfg(agent_cfg, args_cli)
-    env_cfg.scene.num_envs = args_cli.num_envs if args_cli.num_envs is not None else 50
+    env_cfg.scene.num_envs = args_cli.num_envs if args_cli.num_envs is not None else env_cfg.scene.num_envs
 
     # set the environment seed
     # note: certain randomizations occur in the environment initialization so we set the seed here
     env_cfg.seed = agent_cfg.seed
-    env_cfg.sim.device = args_cli.device if args_cli.device is not None else env_cfg.sim.device
+    env_cfg.sim.device = args_cli.device if args_cli.device is not None else 50
+
+    # cs map config
+    env_cfg.scene.terrain = TerrainImporterCfg(
+        prim_path="/World/ground",
+        terrain_type="usd",
+        usd_path=args_cli.map,
+        debug_vis=False,
+    )
+    env_cfg.scene.sky_light = None
+    env_cfg.events.randomize_reset_base.params = {
+        "pose_range": {
+            "x": (15.0, 15.0),
+            "y": (10.0, 10.0),
+            "z": (0.0, 0.0),
+            "roll": (0.0, 0.0),
+            "pitch": (0.0, 0.0),
+            "yaw": (0.0, 0.0),
+        },
+        "velocity_range": {
+            "x": (-0.5, 0.5),
+            "y": (-0.5, 0.5),
+            "z": (-0.5, 0.5),
+            "roll": (-0.5, 0.5),
+            "pitch": (-0.5, 0.5),
+            "yaw": (-0.5, 0.5),
+        },
+    }
+    env_cfg.events.randomize_rigid_body_material.params["static_friction_range"] = (1.0, 1.0)
+    env_cfg.events.randomize_rigid_body_material.params["dynamic_friction_range"] = (1.0, 1.0)
+    env_cfg.events.randomize_rigid_body_material.params["restitution_range"] = (0.5, 0.5)
+    env_cfg.commands.base_velocity.ranges.lin_vel_x = (-2.0, 2.0)
+    env_cfg.commands.base_velocity.ranges.lin_vel_y = (-2.0, 2.0)
+    env_cfg.commands.base_velocity.ranges.ang_vel_z = (-1.5, 1.5)
+    env_cfg.curriculum.terrain_levels = None
+    env_cfg.curriculum.command_levels = None
+    env_cfg.terminations.illegal_contact = None
+    env_cfg.terminations.terrain_out_of_bounds = None
 
     # spawn the robot randomly in the grid (instead of their terrain levels)
     env_cfg.scene.terrain.max_init_terrain_level = None
