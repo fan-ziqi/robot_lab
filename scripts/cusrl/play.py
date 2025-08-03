@@ -51,6 +51,7 @@ import gymnasium as gym
 import torch
 
 import cusrl
+from cusrl_utils import CameraFollowPlayerHook
 
 from isaaclab.devices import Se2Keyboard, Se2KeyboardCfg
 from isaaclab.envs import DirectMARLEnvCfg  # noqa: F401
@@ -80,8 +81,8 @@ def main():
     agent_cfg = load_cfg_from_registry(args_cli.task, "cusrl_cfg_entry_point")
     env_cfg.scene.num_envs = args_cli.num_envs if args_cli.num_envs is not None else 50
 
-    # # set the environment seed
-    # # note: certain randomizations occur in the environment initialization so we set the seed here
+    # set the environment seed
+    # note: certain randomizations occur in the environment initialization so we set the seed here
     cusrl.set_global_seed(args_cli.seed)
     env_cfg.sim.device = args_cli.device if args_cli.device is not None else env_cfg.sim.device
 
@@ -150,6 +151,13 @@ def main():
         checkpoint_path=trial,
         deterministic=not args_cli.stochastic,
     )
+
+    export_model_dir = os.path.join(log_dir, "exported")
+    player.agent.export(output_dir=export_model_dir, target_format="onnx", verbose=args_cli.verbose)
+    player.agent.export(output_dir=export_model_dir, target_format="jit", verbose=args_cli.verbose)
+
+    if args_cli.keyboard:
+        player.register_hook(CameraFollowPlayerHook())
 
     # run playing loop
     player.run_playing_loop()
