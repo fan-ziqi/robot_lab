@@ -218,6 +218,10 @@ The table below lists all available environments:
       <td>RobotLab-Isaac-Velocity-Rough-Deeprobotics-Lite3-v0</td>
     </tr>
     <tr>
+      <td>Zsibot XG</td>
+      <td>RobotLab-Isaac-Velocity-Rough-Zsibot-XG-v0</td>
+    </tr>
+    <tr>
       <td style="text-align:center;" rowspan="4">Wheeled</td>
       <td>Unitree Go2W</td>
       <td>RobotLab-Isaac-Velocity-Rough-Unitree-Go2W-v0</td>
