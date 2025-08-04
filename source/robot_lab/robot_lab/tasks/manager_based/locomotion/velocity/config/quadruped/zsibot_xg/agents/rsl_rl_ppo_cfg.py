@@ -39,5 +39,5 @@ class ZsibotXGFlatPPORunnerCfg(ZsibotXGRoughPPORunnerCfg):
     def __post_init__(self):
         super().__post_init__()
 
-        self.max_iterations = 50000
+        self.max_iterations = 5000
         self.experiment_name = "zsibot_xg_flat"
