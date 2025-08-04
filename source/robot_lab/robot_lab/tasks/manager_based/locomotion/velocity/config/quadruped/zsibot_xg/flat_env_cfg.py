@@ -1,7 +1,5 @@
-# Copyright (c) 2022-2025, The Isaac Lab Project Developers (https://github.com/isaac-sim/IsaacLab/blob/main/CONTRIBUTORS.md).
-# All rights reserved.
-#
-# SPDX-License-Identifier: BSD-3-Clause
+# Copyright (c) 2024-2025 Ziqi Fan
+# SPDX-License-Identifier: Apache-2.0
 
 from isaaclab.utils import configclass
 
@@ -13,6 +11,7 @@ class ZsibotXGFlatEnvCfg(ZsibotXGRoughEnvCfg):
     def __post_init__(self):
         # post init of parent
         super().__post_init__()
+
         # override rewards
         self.rewards.base_height_l2.params["sensor_cfg"] = None
         # change terrain to flat
@@ -28,4 +27,3 @@ class ZsibotXGFlatEnvCfg(ZsibotXGRoughEnvCfg):
         # If the weight of rewards is 0, set rewards to None
         if self.__class__.__name__ == "ZsibotXGFlatEnvCfg":
             self.disable_zero_weight_rewards()
-

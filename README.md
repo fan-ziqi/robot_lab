@@ -197,7 +197,7 @@ The table below lists all available environments:
   </thead>
   <tbody>
     <tr>
-      <td style="text-align:center;" rowspan="5">Quadruped</td>
+      <td style="text-align:center;" rowspan="6">Quadruped</td>
       <td>Anymal D</td>
       <td>RobotLab-Isaac-Velocity-Rough-Anymal-D-v0</td>
     </tr>

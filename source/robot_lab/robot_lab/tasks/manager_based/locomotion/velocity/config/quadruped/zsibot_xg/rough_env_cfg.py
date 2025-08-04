@@ -1,7 +1,5 @@
-# Copyright (c) 2022-2025, The Isaac Lab Project Developers (https://github.com/isaac-sim/IsaacLab/blob/main/CONTRIBUTORS.md).
-# All rights reserved.
-#
-# SPDX-License-Identifier: BSD-3-Clause
+# Copyright (c) 2024-2025 Ziqi Fan
+# SPDX-License-Identifier: Apache-2.0
 
 from isaaclab.utils import configclass
 
@@ -24,11 +22,13 @@ class ZsibotXGRoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         "RAR_ABAD_JOINT", "RAR_HIP_JOINT", "RAR_KNEE_JOINT",
         "RBL_ABAD_JOINT", "RBL_HIP_JOINT", "RBL_KNEE_JOINT",
     ]
-    
+    # fmt: on
+
     def __post_init__(self):
         # post init of parent
         super().__post_init__()
 
+        # ------------------------------Sence------------------------------
         self.scene.robot = ZSIBOT_XG_CFG.replace(prim_path="{ENV_REGEX_NS}/Robot")
         self.scene.height_scanner.prim_path = "{ENV_REGEX_NS}/Robot/" + self.base_link_name
         self.scene.height_scanner_base.prim_path = "{ENV_REGEX_NS}/Robot/" + self.base_link_name
@@ -71,7 +71,7 @@ class ZsibotXGRoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         self.events.randomize_rigid_body_mass.params["asset_cfg"].body_names = [self.base_link_name]
         self.events.randomize_com_positions.params["asset_cfg"].body_names = [self.base_link_name]
         self.events.randomize_apply_external_force_torque.params["asset_cfg"].body_names = [self.base_link_name]
-        
+
         # ------------------------------Rewards------------------------------
         # General
         self.rewards.is_terminated.weight = 0
@@ -86,7 +86,7 @@ class ZsibotXGRoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         self.rewards.body_lin_acc_l2.weight = 0
         self.rewards.body_lin_acc_l2.params["asset_cfg"].body_names = [self.base_link_name]
 
-        # Joint penaltie
+        # Joint penalties
         self.rewards.joint_torques_l2.weight = -2.5e-5
         self.rewards.joint_vel_l2.weight = 0
         self.rewards.joint_acc_l2.weight = -2.5e-7
@@ -120,7 +120,7 @@ class ZsibotXGRoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         self.rewards.feet_air_time.params["threshold"] = 0.5
         self.rewards.feet_air_time.params["sensor_cfg"].body_names = [self.foot_link_name]
         self.rewards.feet_air_time_variance.weight = -1.0
-        self.rewards.feet_air_time_variance.params["sensor_cfg"].body_names = [self.foot_link_name]        
+        self.rewards.feet_air_time_variance.params["sensor_cfg"].body_names = [self.foot_link_name]
         self.rewards.feet_contact.weight = 0
         self.rewards.feet_contact.params["sensor_cfg"].body_names = [self.foot_link_name]
         self.rewards.feet_contact_without_cmd.weight = 0.1
@@ -137,7 +137,10 @@ class ZsibotXGRoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         self.rewards.feet_height_body.params["target_height"] = -0.2
         self.rewards.feet_height_body.params["asset_cfg"].body_names = [self.foot_link_name]
         self.rewards.feet_gait.weight = 0.5
-        self.rewards.feet_gait.params["synced_feet_pair_names"] = (("FL_FOOT_LINK", "RR_FOOT_LINK"), ("FR_FOOT_LINK", "RL_FOOT_LINK"))
+        self.rewards.feet_gait.params["synced_feet_pair_names"] = (
+            ("FL_FOOT_LINK", "RR_FOOT_LINK"),
+            ("FR_FOOT_LINK", "RL_FOOT_LINK"),
+        )
         self.rewards.upward.weight = 1.0
 
         # If the weight of rewards is 0, set rewards to None
@@ -147,6 +150,12 @@ class ZsibotXGRoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         # ------------------------------Terminations------------------------------
         # self.terminations.illegal_contact.params["sensor_cfg"].body_names = [self.base_link_name, ".*_hip"]
         self.terminations.illegal_contact = None
+
         # ------------------------------Curriculums------------------------------
         # self.curriculum.command_levels.params["range_multiplier"] = (0.2, 1.0)
         self.curriculum.command_levels = None
+
+        # ------------------------------Commands------------------------------
+        # self.commands.base_velocity.ranges.lin_vel_x = (-1.0, 1.0)
+        # self.commands.base_velocity.ranges.lin_vel_y = (-0.5, 0.5)
+        # self.commands.base_velocity.ranges.ang_vel_z = (-1.0, 1.0)
