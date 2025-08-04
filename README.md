@@ -169,20 +169,20 @@ RSL-RL:
 
 ```bash
 # Train
-python scripts/rsl_rl/base/train.py --task=<ENV_NAME> --headless
+python scripts/reinforcement_learning/rsl_rl/train.py --task=<ENV_NAME> --headless
 
 # Play
-python scripts/rsl_rl/base/play.py --task=<ENV_NAME>
+python scripts/reinforcement_learning/rsl_rl/play.py --task=<ENV_NAME>
 ```
 
-CusRL (**Experimental**:​​ Hydra/view-follow/policy-export not supported yet):
+CusRL (**Experimental**:​​ Hydra not supported yet):
 
 ```bash
 # Train
-python scripts/cusrl/train.py --task=<ENV_NAME> --headless
+python scripts/reinforcement_learning/cusrl/train.py --task=<ENV_NAME> --headless
 
 # Play
-python scripts/cusrl/play.py --task=<ENV_NAME>
+python scripts/reinforcement_learning/cusrl/play.py --task=<ENV_NAME>
 ```
 
 The table below lists all available environments:
@@ -272,20 +272,20 @@ Others (**Experimental**)
 
   ```bash
   # Train
-  python scripts/skrl/train.py --task=RobotLab-Isaac-G1-AMP-Dance-Direct-v0 --algorithm AMP --headless
+  python scripts/reinforcement_learning/skrl/train.py --task=RobotLab-Isaac-G1-AMP-Dance-Direct-v0 --algorithm AMP --headless
 
   # Play
-  python scripts/skrl/play.py --task=RobotLab-Isaac-G1-AMP-Dance-Direct-v0 --algorithm AMP --num_envs=32
+  python scripts/reinforcement_learning/skrl/play.py --task=RobotLab-Isaac-G1-AMP-Dance-Direct-v0 --algorithm AMP --num_envs=32
   ```
 
 - Train Handstand for Unitree A1
 
   ```bash
   # Train
-  python scripts/rsl_rl/base/train.py --task=RobotLab-Isaac-Velocity-Flat-HandStand-Unitree-A1-v0 --headless
+  python scripts/reinforcement_learning/rsl_rl/train.py --task=RobotLab-Isaac-Velocity-Flat-HandStand-Unitree-A1-v0 --headless
 
   # Play
-  python scripts/rsl_rl/base/play.py --task=RobotLab-Isaac-Velocity-Flat-HandStand-Unitree-A1-v0
+  python scripts/reinforcement_learning/rsl_rl/play.py --task=RobotLab-Isaac-Velocity-Flat-HandStand-Unitree-A1-v0
   ```
 
 > [!NOTE]
@@ -309,18 +309,18 @@ Others (**Experimental**)
 * Resume training from folder or checkpoint, add `--resume --load_run run_folder_name --checkpoint model.pt`
 * To train with multiple GPUs, use the following command, where --nproc_per_node represents the number of available GPUs:
     ```bash
-    python -m torch.distributed.run --nnodes=1 --nproc_per_node=2 scripts/rsl_rl/base/train.py --task=<ENV_NAME> --headless --distributed
+    python -m torch.distributed.run --nnodes=1 --nproc_per_node=2 scripts/reinforcement_learning/rsl_rl/train.py --task=<ENV_NAME> --headless --distributed
     ```
 * To scale up training beyond multiple GPUs on a single machine, it is also possible to train across multiple nodes. To train across multiple nodes/machines, it is required to launch an individual process on each node.
 
     For the master node, use the following command, where --nproc_per_node represents the number of available GPUs, and --nnodes represents the number of nodes:
     ```bash
-    python -m torch.distributed.run --nproc_per_node=2 --nnodes=2 --node_rank=0 --rdzv_id=123 --rdzv_backend=c10d --rdzv_endpoint=localhost:5555 scripts/rsl_rl/base/train.py --task=<ENV_NAME> --headless --distributed
+    python -m torch.distributed.run --nproc_per_node=2 --nnodes=2 --node_rank=0 --rdzv_id=123 --rdzv_backend=c10d --rdzv_endpoint=localhost:5555 scripts/reinforcement_learning/rsl_rl/train.py --task=<ENV_NAME> --headless --distributed
     ```
     Note that the port (`5555`) can be replaced with any other available port.
     For non-master nodes, use the following command, replacing `--node_rank` with the index of each machine:
     ```bash
-    python -m torch.distributed.run --nproc_per_node=2 --nnodes=2 --node_rank=1 --rdzv_id=123 --rdzv_backend=c10d --rdzv_endpoint=ip_of_master_machine:5555 scripts/rsl_rl/base/train.py --task=<ENV_NAME> --headless --distributed
+    python -m torch.distributed.run --nproc_per_node=2 --nnodes=2 --node_rank=1 --rdzv_id=123 --rdzv_backend=c10d --rdzv_endpoint=ip_of_master_machine:5555 scripts/reinforcement_learning/rsl_rl/train.py --task=<ENV_NAME> --headless --distributed
     ```
 
 ## Add your own robot

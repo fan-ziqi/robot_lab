@@ -19,6 +19,7 @@ from isaaclab.app import AppLauncher
 # local imports
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 import cli_args
+from rl_utils import camera_follow
 
 # add argparse arguments
 parser = argparse.ArgumentParser(description="Train an RL agent with RSL-RL.")
@@ -61,7 +62,6 @@ import gymnasium as gym
 import time
 import torch
 
-import rsl_rl_utils
 from rsl_rl.runners import OnPolicyRunner
 
 from isaaclab.devices import Se2Keyboard, Se2KeyboardCfg
@@ -255,7 +255,7 @@ def main(env_cfg: ManagerBasedRLEnvCfg | DirectRLEnvCfg | DirectMARLEnvCfg, agen
                 break
 
         if args_cli.keyboard:
-            rsl_rl_utils.camera_follow(env)
+            camera_follow(env)
 
         # time delay for real-time evaluation
         sleep_time = dt - (time.time() - start_time)
