@@ -11,6 +11,10 @@ import sys
 
 from isaaclab.app import AppLauncher
 
+# local imports
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+from rl_utils import camera_follow
+
 # add argparse arguments
 parser = argparse.ArgumentParser(description="Evaluate an RL agent with CusRL.")
 parser.add_argument("--video", action="store_true", default=False, help="Record videos during training.")
@@ -51,7 +55,6 @@ import gymnasium as gym
 import torch
 
 import cusrl
-from cusrl_utils import CameraFollowPlayerHook
 
 from isaaclab.devices import Se2Keyboard, Se2KeyboardCfg
 from isaaclab.envs import DirectMARLEnvCfg  # noqa: F401
@@ -65,6 +68,11 @@ from isaaclab_tasks.utils.hydra import hydra_task_config  # noqa: F401
 from isaaclab_tasks.utils.parse_cfg import load_cfg_from_registry
 
 import robot_lab.tasks  # noqa: F401
+
+
+class CameraFollowPlayerHook(cusrl.Player.Hook):
+    def step(self, step: int, transition: dict, metrics: dict):
+        camera_follow(self.player.environment)
 
 
 # @hydra_task_config(args_cli.task, "cusrl_cfg_entry_point")
