@@ -23,8 +23,8 @@ INSTALL_REQUIRES = [
     "numpy",
     "pandas",
     "pinocchio",
-    # devel
-    "cusrl@git+https://github.com/chengruiz/cusrl.git",
+    # rl
+    "cusrl[all]==1.1.0",
 ]
 
 # Installation operation
