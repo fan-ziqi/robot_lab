@@ -16,6 +16,7 @@ gym.register(
     kwargs={
         "env_cfg_entry_point": f"{__name__}.flat_env_cfg:ZsibotZSL1WFlatEnvCfg",
         "rsl_rl_cfg_entry_point": f"{agents.__name__}.rsl_rl_ppo_cfg:ZsibotZSL1WFlatPPORunnerCfg",
+        "cusrl_cfg_entry_point": f"{agents.__name__}.cusrl_ppo_cfg:ZsibotZSL1WFlatTrainerCfg",
     },
 )
 
@@ -26,5 +27,6 @@ gym.register(
     kwargs={
         "env_cfg_entry_point": f"{__name__}.rough_env_cfg:ZsibotZSL1WRoughEnvCfg",
         "rsl_rl_cfg_entry_point": f"{agents.__name__}.rsl_rl_ppo_cfg:ZsibotZSL1WRoughPPORunnerCfg",
+        "cusrl_cfg_entry_point": f"{agents.__name__}.cusrl_ppo_cfg:ZsibotZSL1WRoughTrainerCfg",
     },
 )

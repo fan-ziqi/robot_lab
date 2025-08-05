@@ -21,11 +21,12 @@ The table below lists all available environments:
 |            | [Unitree B2](https://www.unitree.com/b2) | RobotLab-Isaac-Velocity-Rough-Unitree-B2-v0 | <img src="./docs/imgs/unitree_b2.png" alt="unitree_b2" width="75"> |
 |            | [Unitree A1](https://www.unitree.com/a1) | RobotLab-Isaac-Velocity-Rough-Unitree-A1-v0 | <img src="./docs/imgs/unitree_a1.png" alt="unitree_a1" width="75"> |
 |            | [Deeprobotics Lite3](https://www.deeprobotics.cn/robot/index/product1.html) | RobotLab-Isaac-Velocity-Rough-Deeprobotics-Lite3-v0 | <img src="./docs/imgs/deeprobotics_lite3.png" alt="Lite3" width="75"> |
-|            | [Zsibot XG](https://www.zsibot.com/zsl1) | RobotLab-Isaac-Velocity-Rough-Zsibot-XG-v0 | <img src="./docs/imgs/zsibot_xg.png" alt="zsibot_xg" width="75"> |
+|            | [Zsibot ZSL1](https://www.zsibot.com/zsl1) | RobotLab-Isaac-Velocity-Rough-Zsibot-ZSL1-v0 | <img src="./docs/imgs/zsibot_zsl1.png" alt="zsibot_zsl1" width="75"> |
 | **Wheeled** | [Unitree Go2W](https://www.unitree.com/go2-w) | RobotLab-Isaac-Velocity-Rough-Unitree-Go2W-v0 | <img src="./docs/imgs/unitree_go2w.png" alt="unitree_go2w" width="75"> |
 |            | [Unitree B2W](https://www.unitree.com/b2-w) | RobotLab-Isaac-Velocity-Rough-Unitree-B2W-v0 | <img src="./docs/imgs/unitree_b2w.png" alt="unitree_b2w" width="75"> |
 |            | [Deeprobotics M20](https://www.deeprobotics.cn/robot/index/lynx.html) | RobotLab-Isaac-Velocity-Rough-Deeprobotics-M20-v0 | <img src="./docs/imgs/deeprobotics_m20.png" alt="deeprobotics_m20" width="75"> |
 |            | [DDTRobot Tita](https://directdrive.com/product_TITA) | RobotLab-Isaac-Velocity-Rough-DDTRobot-Tita-v0 | <img src="./docs/imgs/ddtrobot_tita.png" alt="ddtrobot_tita" width="75"> |
+|            | [Zsibot ZSL1W](https://www.zsibot.com/zsl1) | RobotLab-Isaac-Velocity-Rough-Zsibot-ZSL1W-v0 | <img src="./docs/imgs/zsibot_zsl1w.png" alt="zsibot_zsl1w" width="75"> |
 | **Humanoid** | [Unitree G1](https://www.unitree.com/g1) | RobotLab-Isaac-Velocity-Rough-Unitree-G1-v0 | <img src="./docs/imgs/unitree_g1.png" alt="unitree_g1" width="75"> |
 |             | [Unitree H1](https://www.unitree.com/h1) | RobotLab-Isaac-Velocity-Rough-Unitree-H1-v0 | <img src="./docs/imgs/unitree_h1.png" alt="unitree_h1" width="75"> |
 |             | [FFTAI GR1T1](https://www.fftai.com/products-gr1) | RobotLab-Isaac-Velocity-Rough-FFTAI-GR1T1-v0 | <img src="./docs/imgs/fftai_gr1t1.png" alt="fftai_gr1t1" width="75"> |
@@ -206,94 +207,6 @@ python scripts/reinforcement_learning/cusrl/train.py --task=<ENV_NAME> --headles
 # Play
 python scripts/reinforcement_learning/cusrl/play.py --task=<ENV_NAME>
 ```
-The table below lists all available environments:
-
-<table>
-  <thead>
-    <tr>
-      <th style="text-align:center;">Category</th>
-      <th>Robot Model</th>
-      <th>Environment Name (ID)</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td style="text-align:center;" rowspan="6">Quadruped</td>
-      <td>Anymal D</td>
-      <td>RobotLab-Isaac-Velocity-Rough-Anymal-D-v0</td>
-    </tr>
-    <tr>
-      <td>Unitree Go2</td>
-      <td>RobotLab-Isaac-Velocity-Rough-Unitree-Go2-v0</td>
-    </tr>
-    <tr>
-      <td>Unitree B2</td>
-      <td>RobotLab-Isaac-Velocity-Rough-Unitree-B2-v0</td>
-    </tr>
-    <tr>
-      <td>Unitree A1</td>
-      <td>RobotLab-Isaac-Velocity-Rough-Unitree-A1-v0</td>
-    </tr>
-    <tr>
-      <td>Deeprobotics Lite3</td>
-      <td>RobotLab-Isaac-Velocity-Rough-Deeprobotics-Lite3-v0</td>
-    </tr>
-    <tr>
-      <td>Zsibot ZSL1</td>
-      <td>RobotLab-Isaac-Velocity-Rough-Zsibot-ZSL1-v0</td>
-    </tr>
-    <tr>
-      <td style="text-align:center;" rowspan="4">Wheeled</td>
-      <td>Unitree Go2W</td>
-      <td>RobotLab-Isaac-Velocity-Rough-Unitree-Go2W-v0</td>
-    </tr>
-    <tr>
-      <td>Unitree B2W</td>
-      <td>RobotLab-Isaac-Velocity-Rough-Unitree-B2W-v0</td>
-    </tr>
-    <tr>
-      <td>Deeprobotics M20</td>
-      <td>RobotLab-Isaac-Velocity-Rough-Deeprobotics-M20-v0</td>
-    </tr>
-    <tr>
-      <td>DDTRobot Tita</td>
-      <td>RobotLab-Isaac-Velocity-Rough-DDTRobot-Tita-v0</td>
-    </tr>
-    <tr>
-      <td>Zsibot ZSL1W</td>
-      <td>RobotLab-Isaac-Velocity-Rough-Zsibot-ZSL1W-v0</td>
-    </tr>
-    <tr>
-      <td style="text-align:center;" rowspan="7">Humanoid</td>
-      <td>Unitree G1</td>
-      <td>RobotLab-Isaac-Velocity-Rough-Unitree-G1-v0</td>
-    </tr>
-    <tr>
-      <td>Unitree H1</td>
-      <td>RobotLab-Isaac-Velocity-Rough-Unitree-H1-v0</td>
-    </tr>
-    <tr>
-      <td>FFTAI GR1T1</td>
-      <td>RobotLab-Isaac-Velocity-Rough-FFTAI-GR1T1-v0</td>
-    </tr>
-    <tr>
-      <td>FFTAI GR1T2</td>
-      <td>RobotLab-Isaac-Velocity-Rough-FFTAI-GR1T2-v0</td>
-    </tr>
-    <tr>
-      <td>Booster T1</td>
-      <td>RobotLab-Isaac-Velocity-Rough-Booster-T1-v0</td>
-    </tr>
-    <tr>
-      <td>RobotEra Xbot</td>
-      <td>RobotLab-Isaac-Velocity-Rough-RobotEra-Xbot-v0</td>
-    </tr>
-    <tr>
-      <td>Openloong Loong</td>
-      <td>RobotLab-Isaac-Velocity-Rough-Openloong-Loong-v0</td>
-    </tr>
-  </tbody>
-</table>
 
 Others (**Experimental**)
 
