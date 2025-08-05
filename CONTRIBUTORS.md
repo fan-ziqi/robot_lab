@@ -21,6 +21,8 @@ Guidelines for modifications:
 * [Yankai Xiang](https://github.com/cmjang)
 * [Zhenbiao Huang](https://github.com/legubiao)
 * [Zsibot](https://www.zsibot.com)
+* [Zhihao Liu](https://github.com/Luo1imasi)
+* [RoboParty](https://roboparty.cn/)
 
 ## Acknowledgements
 
