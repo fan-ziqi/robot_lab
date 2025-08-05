@@ -45,6 +45,6 @@ class MagicDogRoughTrainerCfg:
 class MagicDogFlatTrainerCfg(MagicDogRoughTrainerCfg):
     def __post_init__(self):
         super().__post_init__()
-        
+
         self.max_iterations = 5000
         self.experiment_name = "magicdog_flat"
