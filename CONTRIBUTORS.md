@@ -21,6 +21,7 @@ Guidelines for modifications:
 * [Yankai Xiang](https://github.com/cmjang)
 * [Zhenbiao Huang](https://github.com/legubiao)
 * [Zsibot](https://www.zsibot.com)
+* [Magiclab](https://www.magiclab.top/)
 
 ## Acknowledgements
 
