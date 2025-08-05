@@ -218,8 +218,8 @@ The table below lists all available environments:
       <td>RobotLab-Isaac-Velocity-Rough-Deeprobotics-Lite3-v0</td>
     </tr>
     <tr>
-      <td>Zsibot XG</td>
-      <td>RobotLab-Isaac-Velocity-Rough-Zsibot-XG-v0</td>
+      <td>Zsibot ZSL1</td>
+      <td>RobotLab-Isaac-Velocity-Rough-Zsibot-ZSL1-v0</td>
     </tr>
     <tr>
       <td style="text-align:center;" rowspan="4">Wheeled</td>
@@ -237,6 +237,10 @@ The table below lists all available environments:
     <tr>
       <td>DDTRobot Tita</td>
       <td>RobotLab-Isaac-Velocity-Rough-DDTRobot-Tita-v0</td>
+    </tr>
+    <tr>
+      <td>Zsibot ZSL1W</td>
+      <td>RobotLab-Isaac-Velocity-Rough-Zsibot-ZSL1W-v0</td>
     </tr>
     <tr>
       <td style="text-align:center;" rowspan="7">Humanoid</td>
