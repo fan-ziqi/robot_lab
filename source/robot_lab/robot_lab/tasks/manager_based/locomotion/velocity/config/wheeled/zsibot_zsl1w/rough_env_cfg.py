@@ -208,7 +208,10 @@ class ZsibotZSL1WRoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         self.rewards.feet_height_body.params["target_height"] = -0.2
         self.rewards.feet_height_body.params["asset_cfg"].body_names = [self.foot_link_name]
         self.rewards.feet_gait.weight = 0
-        self.rewards.feet_gait.params["synced_feet_pair_names"] = (("FL_FOOT_LINK", "RR_FOOT_LINK"), ("FR_FOOT_LINK", "RL_FOOT_LINK"))
+        self.rewards.feet_gait.params["synced_feet_pair_names"] = (
+            ("FL_FOOT_LINK", "RR_FOOT_LINK"),
+            ("FR_FOOT_LINK", "RL_FOOT_LINK"),
+        )
         self.rewards.upward.weight = 1.0
 
         # If the weight of rewards is 0, set rewards to None
