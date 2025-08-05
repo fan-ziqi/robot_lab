@@ -18,10 +18,10 @@ Guidelines for modifications:
 * [Chengrui Zhu](https://github.com/chengruiz)
 * [DDT Robot](https://directdrive.com)
 * [Deep Robotics](https://www.deeprobotics.cn/en)
+* [Magiclab](https://www.magiclab.top/)
 * [Yankai Xiang](https://github.com/cmjang)
 * [Zhenbiao Huang](https://github.com/legubiao)
 * [Zsibot](https://www.zsibot.com)
-* [Magiclab](https://www.magiclab.top/)
 
 ## Acknowledgements
 

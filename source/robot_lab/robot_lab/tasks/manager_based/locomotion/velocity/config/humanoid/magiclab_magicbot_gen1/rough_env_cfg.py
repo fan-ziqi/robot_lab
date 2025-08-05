@@ -17,21 +17,21 @@ class MagicLabBotGen1RoughEnvCfg(LocomotionVelocityRoughEnvCfg):
     base_link_name = "pelvis"
     foot_link_name = "LINK_ANKLE_ROLL_.*"
     # fmt: off
-    joint_names = [  
-        "JOINT_HIP_ROLL_L",   
-        "JOINT_HIP_YAW_L",    
-        "JOINT_HIP_PITCH_L",      
-        "JOINT_KNEE_PITCH_L",     
-        "JOINT_ANKLE_PITCH_L",      
-        "JOINT_ANKLE_ROLL_L", 
-        "JOINT_HIP_ROLL_R",  
-        "JOINT_HIP_YAW_R",      
-        "JOINT_HIP_PITCH_R",     
-        "JOINT_KNEE_PITCH_R",    
-        "JOINT_ANKLE_PITCH_R",     
-        "JOINT_ANKLE_ROLL_R",         
-        "joint_la1",    
-        "joint_ra1",      
+    joint_names = [
+        "JOINT_HIP_ROLL_L",
+        "JOINT_HIP_YAW_L",
+        "JOINT_HIP_PITCH_L",
+        "JOINT_KNEE_PITCH_L",
+        "JOINT_ANKLE_PITCH_L",
+        "JOINT_ANKLE_ROLL_L",
+        "JOINT_HIP_ROLL_R",
+        "JOINT_HIP_YAW_R",
+        "JOINT_HIP_PITCH_R",
+        "JOINT_KNEE_PITCH_R",
+        "JOINT_ANKLE_PITCH_R",
+        "JOINT_ANKLE_ROLL_R",
+        "joint_la1",
+        "joint_ra1",
     ]
     # fmt: on
 
@@ -99,7 +99,7 @@ class MagicLabBotGen1RoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         # Action penalties
         self.rewards.action_rate_l2.weight = -0.005
         self.rewards.action_mirror.weight = 0
-        self.rewards.action_mirror.params["mirror_joints"] = [[".*_(HIP|KNEE|ANKLE_.*_L)",".*_(HIP|KNEE|ANKLE_.*_R)"]]
+        self.rewards.action_mirror.params["mirror_joints"] = [[".*_(HIP|KNEE|ANKLE_.*_L)", ".*_(HIP|KNEE|ANKLE_.*_R)"]]
 
         # Contact sensor
         self.rewards.undesired_contacts.weight = 0
