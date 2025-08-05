@@ -64,7 +64,9 @@ class RoboPartyATOM01RoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         self.rewards.joint_vel_l2.weight = 0
         self.rewards.joint_acc_l2.weight = -1.25e-7
         self.rewards.joint_acc_l2.params["asset_cfg"].joint_names = [".*_thigh_.*", ".*_knee_joint"]
-        self.rewards.create_joint_deviation_l1_rewterm("joint_deviation_thigh_l1", -0.1, [".*thigh_yaw.*", ".*thigh_roll.*"])
+        self.rewards.create_joint_deviation_l1_rewterm(
+            "joint_deviation_thigh_l1", -0.1, [".*thigh_yaw.*", ".*thigh_roll.*"]
+        )
         self.rewards.create_joint_deviation_l1_rewterm("joint_deviation_arms_l1", -0.1, [".*arm.*", ".*elbow.*"])
         self.rewards.create_joint_deviation_l1_rewterm("joint_deviation_torso_l1", -0.1, ["torso_joint"])
         self.rewards.joint_pos_limits.weight = -1.0
@@ -73,12 +75,16 @@ class RoboPartyATOM01RoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         self.rewards.stand_still_without_cmd.weight = 0
         self.rewards.joint_pos_penalty.weight = -1.0
         self.rewards.joint_mirror.weight = 0
-        self.rewards.joint_mirror.params["mirror_joints"] = [["left_(thigh|knee|ankle).*", "right_(thigh|knee|ankle).*"]]
+        self.rewards.joint_mirror.params["mirror_joints"] = [
+            ["left_(thigh|knee|ankle).*", "right_(thigh|knee|ankle).*"]
+        ]
 
         # Action penalties
         self.rewards.action_rate_l2.weight = -0.005
         self.rewards.action_mirror.weight = 0
-        self.rewards.action_mirror.params["mirror_joints"] = [["left_(thigh|knee|ankle).*", "right_(thigh|knee|ankle).*"]]
+        self.rewards.action_mirror.params["mirror_joints"] = [
+            ["left_(thigh|knee|ankle).*", "right_(thigh|knee|ankle).*"]
+        ]
 
         # Contact sensor
         self.rewards.undesired_contacts.weight = 0

@@ -18,11 +18,11 @@ Guidelines for modifications:
 * [Chengrui Zhu](https://github.com/chengruiz)
 * [DDT Robot](https://directdrive.com)
 * [Deep Robotics](https://www.deeprobotics.cn/en)
+* [RoboParty](https://roboparty.cn/)
 * [Yankai Xiang](https://github.com/cmjang)
 * [Zhenbiao Huang](https://github.com/legubiao)
-* [Zsibot](https://www.zsibot.com)
 * [Zhihao Liu](https://github.com/Luo1imasi)
-* [RoboParty](https://roboparty.cn/)
+* [Zsibot](https://www.zsibot.com)
 
 ## Acknowledgements
 

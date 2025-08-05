@@ -91,7 +91,7 @@
     <child
       link="left_thigh_yaw_link" />
     <axis
-      xyz="-0.5 0 -0.86603" />    
+      xyz="-0.5 0 -0.86603" />
     <limit
       lower="-1"
       upper="0.2"
@@ -539,7 +539,7 @@
         <box name="left_thigh_pitch_link" size="0.08 0.1 0.22"/>
       </geometry>
     </collision>
-    
+
   </link>
   <joint
     name="right_thigh_pitch_joint"
