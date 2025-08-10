@@ -441,17 +441,20 @@ def feet_distance_y_exp(
     cur_footsteps_translated = asset.data.body_link_pos_w[:, asset_cfg.body_ids, :] - asset.data.root_link_pos_w[
         :, :
     ].unsqueeze(1)
-    footsteps_in_body_frame = torch.zeros(env.num_envs, 4, 3, device=env.device)
-    for i in range(4):
+    n_feet = len(asset_cfg.body_ids)
+    footsteps_in_body_frame = torch.zeros(env.num_envs, n_feet, 3, device=env.device)
+    for i in range(n_feet):
         footsteps_in_body_frame[:, i, :] = math_utils.quat_apply(
             math_utils.quat_conjugate(asset.data.root_link_quat_w), cur_footsteps_translated[:, i, :]
         )
-    stance_width_tensor = stance_width * torch.ones([env.num_envs, 1], device=env.device)
-    desired_ys = torch.cat(
-        [stance_width_tensor / 2, -stance_width_tensor / 2, stance_width_tensor / 2, -stance_width_tensor / 2], dim=1
+    side_sign = torch.tensor(
+        [1.0 if i % 2 == 0 else -1.0 for i in range(n_feet)],
+        device=env.device,
     )
+    stance_width_tensor = stance_width * torch.ones([env.num_envs, 1], device=env.device)
+    desired_ys = stance_width_tensor / 2 * side_sign.unsqueeze(0)
     stance_diff = torch.square(desired_ys - footsteps_in_body_frame[:, :, 1])
-    reward = torch.exp(-torch.sum(stance_diff, dim=1) / std**2)
+    reward = torch.exp(-torch.sum(stance_diff, dim=1) / (std**2))
     reward *= torch.clamp(-env.scene["robot"].data.projected_gravity_b[:, 2], 0, 0.7) / 0.7
     return reward
 
