@@ -31,10 +31,10 @@ ROUGH_ROAD_CFG = terrain_gen.TerrainGeneratorCfg(
     use_cache=False,
     sub_terrains={
         "flat": terrain_gen.MeshPlaneTerrainCfg(
-            proportion=0.2,
+            proportion=0.4,
         ),
         "random_rough": terrain_gen.HfRandomUniformTerrainCfg(
-            proportion=0.4, noise_range=(0.01, 0.05), noise_step=0.02, border_width=0.25
+            proportion=0.5, noise_range=(0.01, 0.05), noise_step=0.02, border_width=0.25
         ),
     },
 )
@@ -195,7 +195,7 @@ class DDTRobotTitaRoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         self.rewards.wheel_vel_penalty.weight = -0.01
         self.rewards.wheel_vel_penalty.params["sensor_cfg"].body_names = [self.foot_link_name]
         self.rewards.wheel_vel_penalty.params["asset_cfg"].joint_names = self.wheel_joint_names
-        self.rewards.joint_mirror.weight = -0.05
+        self.rewards.joint_mirror.weight = -0.0
         self.rewards.joint_mirror.params["mirror_joints"] = [
             ["joint_right_leg_(1|2|3)", "joint_left_leg_(1|2|3)"],
         ]
@@ -210,8 +210,8 @@ class DDTRobotTitaRoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         self.rewards.contact_forces.params["sensor_cfg"].body_names = [self.foot_link_name]
 
         # Velocity-tracking rewards
-        self.rewards.track_lin_vel_xy_exp.weight = 6.5
-        self.rewards.track_ang_vel_z_exp.weight = 4.5
+        self.rewards.track_lin_vel_xy_exp.weight = 9.5
+        self.rewards.track_ang_vel_z_exp.weight = 6.5
 
         # Others
         self.rewards.feet_air_time.weight = 0
@@ -235,6 +235,9 @@ class DDTRobotTitaRoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         self.rewards.feet_gait.weight = 0
         self.rewards.feet_gait.params["synced_feet_pair_names"] = (("joint_left_leg_4", "joint_right_leg_4"),)
         self.rewards.upward.weight = 1.0
+        self.rewards.feet_distance_y_exp.weight = -1.0
+        self.rewards.feet_distance_y_exp.params["stance_width"] = 0.6
+        self.rewards.feet_distance_y_exp.params["asset_cfg"].body_names = [self.foot_link_name]
 
         # If the weight of rewards is 0, set rewards to None
         if self.__class__.__name__ == "DDTRobotTitaRoughEnvCfg":
@@ -250,5 +253,5 @@ class DDTRobotTitaRoughEnvCfg(LocomotionVelocityRoughEnvCfg):
 
         # ------------------------------Commands------------------------------
         self.commands.base_velocity.ranges.lin_vel_x = (-1.0, 1.0)
-        self.commands.base_velocity.ranges.lin_vel_y = (0.0, 0.0)
+        self.commands.base_velocity.ranges.lin_vel_y = (-1.0, 1.0)
         self.commands.base_velocity.ranges.ang_vel_z = (-1.0, 1.0)
