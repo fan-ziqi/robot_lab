@@ -29,7 +29,7 @@
       <origin xyz="0 0 -0.02" rpy="0 0 0" />
       <geometry>
         <cylinder length="0.16" radius="0.076" />
-        
+
       </geometry>
     </collision>
   </link>
@@ -143,7 +143,7 @@
     <limit lower="-0.87" upper="0.87" effort="200" velocity="23" />
   </joint>
   <link name="FL_hip_rotor">
-    
+
     <collision>
       <origin rpy="0 1.5707963267948966 0" xyz="0 0 0" />
       <geometry>
@@ -188,7 +188,7 @@
     <limit lower="-0.94" upper="4.69" effort="200" velocity="23" />
   </joint>
   <link name="FL_thigh_rotor">
-    
+
     <collision>
       <origin rpy="1.5707963267948966 0 0" xyz="0 0 0" />
       <geometry>
@@ -251,7 +251,7 @@
     <limit lower="-2.82" upper="-0.43" effort="320" velocity="14" />
   </joint>
   <link name="FL_calf_rotor">
-    
+
     <collision>
       <origin rpy="1.5707963267948966 0 0" xyz="0 0 0" />
       <geometry>
@@ -282,7 +282,7 @@
       </geometry>
     </collision>
   </link>
-  <joint name="FL_foot_joint" type="fixed">
+  <joint name="FL_foot_joint" type="fixed" dont_collapse="true">
     <origin xyz="0 0 -0.35" rpy="0 0 0" />
     <parent link="FL_calf" />
     <child link="FL_foot" />
@@ -314,7 +314,7 @@
     <limit lower="-0.87" upper="0.87" effort="200" velocity="23" />
   </joint>
   <link name="FR_hip_rotor">
-    
+
     <collision>
       <origin rpy="0 1.5707963267948966 0" xyz="0 0 0" />
       <geometry>
@@ -359,7 +359,7 @@
     <limit lower="-0.94" upper="4.69" effort="200" velocity="23" />
   </joint>
   <link name="FR_thigh_rotor">
-    
+
     <collision>
       <origin rpy="1.5707963267948966 0 0" xyz="0 0 0" />
       <geometry>
@@ -422,7 +422,7 @@
     <limit lower="-2.82" upper="-0.43" effort="320" velocity="14" />
   </joint>
   <link name="FR_calf_rotor">
-    
+
     <collision>
       <origin rpy="1.5707963267948966 0 0" xyz="0 0 0" />
       <geometry>
@@ -453,7 +453,7 @@
       </geometry>
     </collision>
   </link>
-  <joint name="FR_foot_joint" type="fixed">
+  <joint name="FR_foot_joint" type="fixed" dont_collapse="true">
     <origin xyz="0 0 -0.35" rpy="0 0 0" />
     <parent link="FR_calf" />
     <child link="FR_foot" />
@@ -485,7 +485,7 @@
     <limit lower="-0.87" upper="0.87" effort="200" velocity="23" />
   </joint>
   <link name="RL_hip_rotor">
-    
+
     <collision>
       <origin rpy="0 1.5707963267948966 0" xyz="0 0 0" />
       <geometry>
@@ -530,7 +530,7 @@
     <limit lower="-0.94" upper="4.69" effort="200" velocity="23" />
   </joint>
   <link name="RL_thigh_rotor">
-    
+
     <collision>
       <origin rpy="1.5707963267948966 0 0" xyz="0 0 0" />
       <geometry>
@@ -593,7 +593,7 @@
     <limit lower="-2.82" upper="-0.43" effort="320" velocity="14" />
   </joint>
   <link name="RL_calf_rotor">
-    
+
     <collision>
       <origin rpy="1.5707963267948966 0 0" xyz="0 0 0" />
       <geometry>
@@ -624,7 +624,7 @@
       </geometry>
     </collision>
   </link>
-  <joint name="RL_foot_joint" type="fixed">
+  <joint name="RL_foot_joint" type="fixed" dont_collapse="true">
     <origin xyz="0 0 -0.35" rpy="0 0 0" />
     <parent link="RL_calf" />
     <child link="RL_foot" />
@@ -656,7 +656,7 @@
     <limit lower="-0.87" upper="0.87" effort="200" velocity="23" />
   </joint>
   <link name="RR_hip_rotor">
-    
+
     <collision>
       <origin rpy="0 1.5707963267948966 0" xyz="0 0 0" />
       <geometry>
@@ -701,7 +701,7 @@
     <limit lower="-0.94" upper="4.69" effort="200" velocity="23" />
   </joint>
   <link name="RR_thigh_rotor">
-    
+
     <collision>
       <origin rpy="1.5707963267948966 0 0" xyz="0 0 0" />
       <geometry>
@@ -764,7 +764,7 @@
     <limit lower="-2.82" upper="-0.43" effort="320" velocity="14" />
   </joint>
   <link name="RR_calf_rotor">
-    
+
     <collision>
       <origin rpy="1.5707963267948966 0 0" xyz="0 0 0" />
       <geometry>
@@ -795,7 +795,7 @@
       </geometry>
     </collision>
   </link>
-  <joint name="RR_foot_joint" type="fixed">
+  <joint name="RR_foot_joint" type="fixed" dont_collapse="true">
     <origin xyz="0 -8.6984E-05 -0.35" rpy="0 0 0" />
     <parent link="RR_calf" />
     <child link="RR_foot" />
@@ -806,7 +806,7 @@
       <mass value="4.19E-15" />
       <inertia ixx="1.68E-27" ixy="-3.89E-44" ixz="5.04E-44" iyy="1.68E-27" iyz="2.81E-45" izz="1.68E-27" />
     </inertial>
-    
+
   </link>
   <joint name="joint_f_oc" type="fixed">
     <origin xyz="0.39079 0 -0.013433" rpy="-1.5708 0 -1.5708" />
@@ -820,7 +820,7 @@
       <mass value="4.19E-12" />
       <inertia ixx="1.68E-22" ixy="9.03E-39" ixz="0" iyy="1.68E-22" iyz="-1.2E-38" izz="1.68E-22" />
     </inertial>
-    
+
   </link>
   <joint name="joint_r_oc" type="fixed">
     <origin xyz="-0.38451 0 -0.023249" rpy="-1.5708 0 1.5708" />
