@@ -2,12 +2,13 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import cusrl
+from cusrl.environment.isaaclab import TrainerCfg
 
 from isaaclab.utils import configclass
 
 
 @configclass
-class FTAIGR1T2RoughTrainerCfg:
+class FTAIGR1T2RoughTrainerCfg(TrainerCfg):
     max_iterations = 3000
     save_interval = 100
     experiment_name = "fftai_gr1t2_rough"

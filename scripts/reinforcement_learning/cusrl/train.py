@@ -51,6 +51,7 @@ import torch
 from datetime import datetime
 
 import cusrl
+from cusrl.environment.isaaclab import TrainerCfg
 
 from isaaclab.envs import DirectMARLEnvCfg  # noqa: F401
 from isaaclab.envs import DirectRLEnvCfg  # noqa: F401
@@ -58,7 +59,6 @@ from isaaclab.envs import ManagerBasedRLEnvCfg  # noqa: F401
 from isaaclab.envs import DirectMARLEnv, multi_agent_to_single_agent
 from isaaclab.utils.dict import print_dict
 from isaaclab_tasks.utils.hydra import hydra_task_config  # noqa: F401
-from isaaclab_tasks.utils.parse_cfg import load_cfg_from_registry
 
 import robot_lab.tasks  # noqa: F401
 
@@ -68,14 +68,9 @@ torch.backends.cudnn.deterministic = False
 torch.backends.cudnn.benchmark = False
 
 
-# @hydra_task_config(args_cli.task, "cusrl_cfg_entry_point")
-# def main(env_cfg: ManagerBasedRLEnvCfg | DirectRLEnvCfg | DirectMARLEnvCfg):
-def main():
+@hydra_task_config(args_cli.task, "cusrl_cfg_entry_point")
+def main(env_cfg: ManagerBasedRLEnvCfg | DirectRLEnvCfg | DirectMARLEnvCfg, agent_cfg: TrainerCfg):
     """Train with CusRL agent."""
-    # override configurations with non-hydra CLI arguments
-    env_cfg = load_cfg_from_registry(args_cli.task, "env_cfg_entry_point")
-    agent_cfg = load_cfg_from_registry(args_cli.task, "cusrl_cfg_entry_point")
-
     env_cfg.scene.num_envs = args_cli.num_envs if args_cli.num_envs is not None else env_cfg.scene.num_envs
     agent_cfg.max_iterations = (
         args_cli.max_iterations if args_cli.max_iterations is not None else agent_cfg.max_iterations

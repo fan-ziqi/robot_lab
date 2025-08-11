@@ -203,7 +203,7 @@ python scripts/reinforcement_learning/rsl_rl/train.py --task=<ENV_NAME> --headle
 python scripts/reinforcement_learning/rsl_rl/play.py --task=<ENV_NAME>
 ```
 
-CusRL (**Experimental**:​​ Hydra not supported yet):
+CusRL (**Experimental**):
 
 ```bash
 # Train
