@@ -2,12 +2,13 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import cusrl
+from cusrl.environment.isaaclab import TrainerCfg
 
 from isaaclab.utils import configclass
 
 
 @configclass
-class MagicLabBotZ1RoughTrainerCfg:
+class MagicLabBotZ1RoughTrainerCfg(TrainerCfg):
     max_iterations = 3000
     save_interval = 100
     experiment_name = "magiclab_bot_z1_rough"

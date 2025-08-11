@@ -2,12 +2,13 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import cusrl
+from cusrl.environment.isaaclab import TrainerCfg
 
 from isaaclab.utils import configclass
 
 
 @configclass
-class UnitreeH1RoughTrainerCfg:
+class UnitreeH1RoughTrainerCfg(TrainerCfg):
     max_iterations = 3000
     save_interval = 100
     experiment_name = "unitree_h1_rough"

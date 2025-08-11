@@ -2,12 +2,13 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import cusrl
+from cusrl.environment.isaaclab import TrainerCfg
 
 from isaaclab.utils import configclass
 
 
 @configclass
-class ZsibotZSL1WRoughTrainerCfg:
+class ZsibotZSL1WRoughTrainerCfg(TrainerCfg):
     max_iterations = 20000
     save_interval = 100
     experiment_name = "zsibot_zsl1w_rough"
