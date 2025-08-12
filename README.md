@@ -252,8 +252,8 @@ Others (**Experimental**)
 * You can change `Rough` to `Flat` in the above configs.
 * Record video of a trained agent (requires installing `ffmpeg`), add `--video --video_length 200`
 * Play/Train with 32 environments, add `--num_envs 32`
-* Play on specific folder or checkpoint, add `--load_run run_folder_name --checkpoint model.pt`
-* Resume training from folder or checkpoint, add `--resume --load_run run_folder_name --checkpoint model.pt`
+* Play on specific folder or checkpoint, add `--load_run run_folder_name --checkpoint /PATH/TO/model.pt`
+* Resume training from folder or checkpoint, add `--resume --load_run run_folder_name --checkpoint /PATH/TO/model.pt`
 * To train with multiple GPUs, use the following command, where --nproc_per_node represents the number of available GPUs:
     ```bash
     python -m torch.distributed.run --nnodes=1 --nproc_per_node=2 scripts/reinforcement_learning/rsl_rl/train.py --task=<ENV_NAME> --headless --distributed
