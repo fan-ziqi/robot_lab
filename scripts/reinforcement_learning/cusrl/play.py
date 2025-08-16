@@ -24,6 +24,9 @@ parser.add_argument(
 )
 parser.add_argument("--num_envs", type=int, default=None, help="Number of environments to simulate.")
 parser.add_argument("--task", type=str, default=None, help="Name of the task.")
+parser.add_argument(
+    "--agent", type=str, default="cusrl_cfg_entry_point", help="Name of the RL agent configuration entry point."
+)
 parser.add_argument("--seed", type=int, default=None, help="Seed used for the environment")
 parser.add_argument("--checkpoint", type=str, default=None, help="Checkpoint to load for playing.")
 parser.add_argument(
@@ -75,9 +78,8 @@ class CameraFollowPlayerHook(cusrl.Player.Hook):
         camera_follow(self.player.environment)
 
 
-# @hydra_task_config(args_cli.task, "cusrl_cfg_entry_point")
-# def main(env_cfg: ManagerBasedRLEnvCfg | DirectRLEnvCfg | DirectMARLEnvCfg):
-def main():
+@hydra_task_config(args_cli.task, args_cli.agent)
+def main(env_cfg: ManagerBasedRLEnvCfg | DirectRLEnvCfg | DirectMARLEnvCfg):
     """Play with CusRL-RL agent."""
     # parse configuration
     env_cfg = parse_env_cfg(
@@ -86,7 +88,7 @@ def main():
         num_envs=args_cli.num_envs,
         use_fabric=not args_cli.disable_fabric,
     )
-    agent_cfg = load_cfg_from_registry(args_cli.task, "cusrl_cfg_entry_point")
+    agent_cfg = load_cfg_from_registry(args_cli.task, args_cli.agent)
     env_cfg.scene.num_envs = args_cli.num_envs if args_cli.num_envs is not None else 50
 
     # set the environment seed
