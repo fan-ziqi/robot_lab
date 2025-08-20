@@ -24,7 +24,7 @@ INSTALL_REQUIRES = [
     "pandas",
     "pinocchio",
     # rl
-    "cusrl[all]==1.1.1",
+    "cusrl[all]",
 ]
 
 # Installation operation

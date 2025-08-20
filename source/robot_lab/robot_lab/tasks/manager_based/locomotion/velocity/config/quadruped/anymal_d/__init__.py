@@ -18,6 +18,9 @@ gym.register(
         "rsl_rl_cfg_entry_point": f"{agents.__name__}.rsl_rl_ppo_cfg:AnymalDFlatPPORunnerCfg",
         "rsl_rl_with_symmetry_cfg_entry_point": f"{agents.__name__}.rsl_rl_ppo_cfg:AnymalDFlatPPORunnerWithSymmetryCfg",
         "cusrl_cfg_entry_point": f"{agents.__name__}.cusrl_ppo_cfg:AnymalDFlatTrainerCfg",
+        "cusrl_with_symmetry_cfg_entry_point": (
+            f"{agents.__name__}.cusrl_ppo_cfg:AnymalDFlatTrainerCfgWithSymmetryAugmentation"
+        ),
     },
 )
 
@@ -32,5 +35,8 @@ gym.register(
             f"{agents.__name__}.rsl_rl_ppo_cfg:AnymalDRoughPPORunnerWithSymmetryCfg"
         ),
         "cusrl_cfg_entry_point": f"{agents.__name__}.cusrl_ppo_cfg:AnymalDRoughTrainerCfg",
+        "cusrl_with_symmetry_cfg_entry_point": (
+            f"{agents.__name__}.cusrl_ppo_cfg:AnymalDRoughTrainerCfgWithSymmetryAugmentation"
+        ),
     },
 )
