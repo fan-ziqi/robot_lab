@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import isaaclab.sim as sim_utils
-from isaaclab.actuators import ImplicitActuatorCfg
+from isaaclab.actuators import IdealPDActuatorCfg, ImplicitActuatorCfg  # noqa: F401
 from isaaclab.assets.articulation import ArticulationCfg
 
 from robot_lab.assets import ISAACLAB_ASSETS_DATA_DIR
@@ -63,7 +63,7 @@ BOOSTER_T1_CFG = ArticulationCfg(
     ),
     soft_joint_pos_limit_factor=0.9,
     actuators={
-        "legs": ImplicitActuatorCfg(
+        "legs": IdealPDActuatorCfg(
             joint_names_expr=[
                 ".*_Hip_Pitch",
                 ".*_Hip_Roll",
@@ -71,14 +71,14 @@ BOOSTER_T1_CFG = ArticulationCfg(
                 ".*_Knee_Pitch",
                 "Waist",
             ],
-            effort_limit_sim={
+            effort_limit={
                 ".*_Hip_Pitch": 45.0,
                 ".*_Hip_Roll": 30.0,
                 ".*_Hip_Yaw": 30.0,
                 ".*_Knee_Pitch": 60.0,
                 "Waist": 30.0,
             },
-            velocity_limit_sim={
+            velocity_limit={
                 ".*_Hip_Pitch": 12.5,
                 ".*_Hip_Roll": 10.9,
                 ".*_Hip_Yaw": 10.9,
@@ -88,27 +88,33 @@ BOOSTER_T1_CFG = ArticulationCfg(
             stiffness=200.0,
             damping=5.0,
             armature=0.01,
+            min_delay=0,  # physics time steps (min: 5.0*0=00.0ms)
+            max_delay=5,  # physics time steps (max: 5.0*5=25.0ms)
         ),
-        "feet": ImplicitActuatorCfg(
+        "feet": IdealPDActuatorCfg(
             joint_names_expr=[".*_Ankle_Pitch", ".*_Ankle_Roll"],
-            effort_limit_sim={".*_Ankle_Pitch": 24, ".*_Ankle_Roll": 15},
-            velocity_limit_sim={".*_Ankle_Pitch": 18.8, ".*_Ankle_Roll": 12.4},
+            effort_limit={".*_Ankle_Pitch": 24, ".*_Ankle_Roll": 15},
+            velocity_limit={".*_Ankle_Pitch": 18.8, ".*_Ankle_Roll": 12.4},
             stiffness=50.0,
             damping=1.0,
             armature=0.01,
+            min_delay=0,  # physics time steps (min: 5.0*0=00.0ms)
+            max_delay=5,  # physics time steps (max: 5.0*5=25.0ms)
         ),
-        "arms": ImplicitActuatorCfg(
+        "arms": IdealPDActuatorCfg(
             joint_names_expr=[
                 ".*_Shoulder_Pitch",
                 ".*_Shoulder_Roll",
                 ".*_Elbow_Pitch",
                 ".*_Elbow_Yaw",
             ],
-            effort_limit_sim=18.0,
-            velocity_limit_sim=18.8,
+            effort_limit=18.0,
+            velocity_limit=18.8,
             stiffness=40.0,
             damping=10.0,
             armature=0.01,
+            min_delay=0,  # physics time steps (min: 5.0*0=00.0ms)
+            max_delay=5,  # physics time steps (max: 5.0*5=25.0ms)
         ),
     },
 )
