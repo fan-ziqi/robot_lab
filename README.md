@@ -43,7 +43,7 @@ The table below lists all available environments:
 > [!NOTE]
 > If you want to run policy in gazebo or real robot, please use [rl_sar](https://github.com/fan-ziqi/rl_sar) project.
 >
-> Discuss in [Github Discussion](https://github.com/fan-ziqi/robot_lab/discussions).
+> Discuss in [Github Discussion](https://github.com/fan-ziqi/robot_lab/discussions) or [Discord](http://www.robotsfan.com/dc_robot_lab).
 
 ## Version Dependency
 
