@@ -6,7 +6,7 @@ Reference: https://github.com/DDTRobot
 """
 
 import isaaclab.sim as sim_utils
-from isaaclab.actuators import DCMotorCfg, ImplicitActuatorCfg  # noqa: F401
+from isaaclab.actuators import IdealPDActuatorCfg, ImplicitActuatorCfg  # noqa: F401
 from isaaclab.assets.articulation import ArticulationCfg
 
 from robot_lab.assets import ISAACLAB_ASSETS_DATA_DIR
@@ -64,41 +64,45 @@ DDTROBOT_TITA_CFG = ArticulationCfg(
     ),
     soft_joint_pos_limit_factor=0.9,
     actuators={
-        "hip": DCMotorCfg(
+        "hip": IdealPDActuatorCfg(
             joint_names_expr=["joint_left_leg_1", "joint_right_leg_1"],
             effort_limit=60.0,
-            saturation_effort=60.0,
             velocity_limit=25.0,
             stiffness=40.0,
             damping=1.0,
             friction=0.0,
+            min_delay=0,  # physics time steps (min: 5.0*0=00.0ms)
+            max_delay=5,  # physics time steps (max: 5.0*5=25.0ms)
         ),
-        "thigh": DCMotorCfg(
+        "thigh": IdealPDActuatorCfg(
             joint_names_expr=["joint_left_leg_2", "joint_right_leg_2"],
             effort_limit=60.0,
-            saturation_effort=60.0,
             velocity_limit=25.0,
             stiffness=40.0,
             damping=1.0,
             friction=0.0,
+            min_delay=0,  # physics time steps (min: 5.0*0=00.0ms)
+            max_delay=5,  # physics time steps (max: 5.0*5=25.0ms)
         ),
-        "calf": DCMotorCfg(
+        "calf": IdealPDActuatorCfg(
             joint_names_expr=["joint_left_leg_3", "joint_right_leg_3"],
             effort_limit=60.0,
-            saturation_effort=60.0,
             velocity_limit=25.0,
             stiffness=40.0,
             damping=1.0,
             friction=0.0,
+            min_delay=0,  # physics time steps (min: 5.0*0=00.0ms)
+            max_delay=5,  # physics time steps (max: 5.0*5=25.0ms)
         ),
-        "wheel": DCMotorCfg(
+        "wheel": IdealPDActuatorCfg(
             joint_names_expr=["joint_left_leg_4", "joint_right_leg_4"],
             effort_limit=15.0,
-            saturation_effort=15.0,
             velocity_limit=20.0,
             stiffness=0.0,
             damping=1.0,
             friction=0.0,
+            min_delay=0,  # physics time steps (min: 5.0*0=00.0ms)
+            max_delay=5,  # physics time steps (max: 5.0*5=25.0ms)
         ),
     },
 )

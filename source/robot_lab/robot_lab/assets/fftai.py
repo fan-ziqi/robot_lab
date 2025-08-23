@@ -11,7 +11,7 @@ Reference: https://github.com/FFTAI
 """
 
 import isaaclab.sim as sim_utils
-from isaaclab.actuators import ImplicitActuatorCfg
+from isaaclab.actuators import IdealPDActuatorCfg, ImplicitActuatorCfg  # noqa: F401
 from isaaclab.assets.articulation import ArticulationCfg
 
 from robot_lab.assets import ISAACLAB_ASSETS_DATA_DIR
@@ -96,7 +96,7 @@ FFTAI_GR1T1_CFG = ArticulationCfg(
     ),
     soft_joint_pos_limit_factor=0.9,
     actuators={
-        "actuators": ImplicitActuatorCfg(
+        "actuators": IdealPDActuatorCfg(
             joint_names_expr=[".*"],
             stiffness={
                 ".*_hip_roll": 251.625,
@@ -140,6 +140,8 @@ FFTAI_GR1T1_CFG = ArticulationCfg(
                 ".*_wrist_roll": 1.0,
                 ".*_wrist_pitch": 1.0,
             },
+            min_delay=0,  # physics time steps (min: 5.0*0=00.0ms)
+            max_delay=5,  # physics time steps (max: 5.0*5=25.0ms)
         ),
     },
 )
@@ -157,7 +159,7 @@ FFTAI_GR1T1_LOWER_LIMB_CFG.spawn.usd_path = (
 )
 FFTAI_GR1T1_LOWER_LIMB_CFG.actuators = (
     {
-        "actuators": ImplicitActuatorCfg(
+        "actuators": IdealPDActuatorCfg(
             joint_names_expr=[".*"],
             stiffness={
                 ".*_hip_roll": 114,
@@ -173,6 +175,8 @@ FFTAI_GR1T1_LOWER_LIMB_CFG.actuators = (
                 ".*_knee_pitch": 229 / 15,
                 ".*_ankle_pitch": 30.5 / 15,
             },
+            min_delay=0,  # physics time steps (min: 5.0*0=00.0ms)
+            max_delay=5,  # physics time steps (max: 5.0*5=25.0ms)
         ),
     },
 )

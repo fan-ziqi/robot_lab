@@ -5,7 +5,7 @@
 """
 
 import isaaclab.sim as sim_utils
-from isaaclab.actuators import ImplicitActuatorCfg
+from isaaclab.actuators import IdealPDActuatorCfg, ImplicitActuatorCfg  # noqa: F401
 from isaaclab.assets.articulation import ArticulationCfg
 
 from robot_lab.assets import ISAACLAB_ASSETS_DATA_DIR
@@ -66,7 +66,7 @@ OPENLOONG_LOONG_CFG = ArticulationCfg(
     ),
     soft_joint_pos_limit_factor=0.9,
     actuators={
-        "actuators": ImplicitActuatorCfg(
+        "actuators": IdealPDActuatorCfg(
             joint_names_expr=[".*"],
             stiffness={
                 "J_hip_.*_roll": 400.0,
@@ -84,6 +84,8 @@ OPENLOONG_LOONG_CFG = ArticulationCfg(
                 "J_ankle_.*_pitch": 0.5,
                 "J_ankle_.*_roll": 0.5,
             },
+            min_delay=0,  # physics time steps (min: 5.0*0=00.0ms)
+            max_delay=5,  # physics time steps (max: 5.0*5=25.0ms)
         ),
     },
 )

@@ -3,7 +3,7 @@
 
 
 import isaaclab.sim as sim_utils
-from isaaclab.actuators import ImplicitActuatorCfg
+from isaaclab.actuators import IdealPDActuatorCfg, ImplicitActuatorCfg  # noqa: F401
 from isaaclab.assets.articulation import ArticulationCfg
 
 from robot_lab.assets import ISAACLAB_ASSETS_DATA_DIR
@@ -62,7 +62,7 @@ ATOM01_CFG = ArticulationCfg(
     ),
     soft_joint_pos_limit_factor=0.90,
     actuators={
-        "legs": ImplicitActuatorCfg(
+        "legs": IdealPDActuatorCfg(
             joint_names_expr=[
                 ".*_thigh_yaw_joint",
                 ".*_thigh_roll_joint",
@@ -85,14 +85,18 @@ ATOM01_CFG = ArticulationCfg(
                 ".*torso.*": 5.0,
             },
             armature=0.01,
+            min_delay=0,  # physics time steps (min: 5.0*0=00.0ms)
+            max_delay=5,  # physics time steps (max: 5.0*5=25.0ms)
         ),
-        "feet": ImplicitActuatorCfg(
+        "feet": IdealPDActuatorCfg(
             joint_names_expr=[".*_ankle_pitch_joint", ".*_ankle_roll_joint"],
             stiffness=40.0,
             damping=1.5,
             armature=0.01,
+            min_delay=0,  # physics time steps (min: 5.0*0=00.0ms)
+            max_delay=5,  # physics time steps (max: 5.0*5=25.0ms)
         ),
-        "shoulders": ImplicitActuatorCfg(
+        "shoulders": IdealPDActuatorCfg(
             joint_names_expr=[
                 ".*_arm_pitch_joint",
                 ".*_arm_roll_joint",
@@ -101,8 +105,10 @@ ATOM01_CFG = ArticulationCfg(
             stiffness=60.0,
             damping=2.0,
             armature=0.01,
+            min_delay=0,  # physics time steps (min: 5.0*0=00.0ms)
+            max_delay=5,  # physics time steps (max: 5.0*5=25.0ms)
         ),
-        "arms": ImplicitActuatorCfg(
+        "arms": IdealPDActuatorCfg(
             joint_names_expr=[
                 ".*_elbow_pitch_joint",
                 ".*_elbow_yaw_joint",
@@ -116,6 +122,8 @@ ATOM01_CFG = ArticulationCfg(
                 ".*_elbow_yaw_joint": 1.0,
             },
             armature=0.01,
+            min_delay=0,  # physics time steps (min: 5.0*0=00.0ms)
+            max_delay=5,  # physics time steps (max: 5.0*5=25.0ms)
         ),
     },
 )
