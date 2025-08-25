@@ -10,12 +10,6 @@ from isaaclab.actuators import DCMotorCfg, ImplicitActuatorCfg
 from isaaclab.assets.articulation import ArticulationCfg
 
 from robot_lab.assets import ISAACLAB_ASSETS_DATA_DIR
-from robot_lab.assets.utils.usd_converter import (  # noqa: F401
-    mjcf_to_usd,
-    spawn_from_lazy_usd,
-    urdf_to_usd,
-    xacro_to_usd,
-)
 
 ##
 # Configuration
@@ -23,14 +17,11 @@ from robot_lab.assets.utils.usd_converter import (  # noqa: F401
 
 
 UNITREE_A1_CFG = ArticulationCfg(
-    spawn=sim_utils.UsdFileCfg(
-        func=spawn_from_lazy_usd,
-        usd_path=urdf_to_usd(  # type: ignore
-            file_path=f"{ISAACLAB_ASSETS_DATA_DIR}/Robots/unitree/a1_description/urdf/a1.urdf",
-            output_usd_path=f"{ISAACLAB_ASSETS_DATA_DIR}/Robots/unitree/a1_description/usd/a1.usd",
-            merge_joints=True,
-            fix_base=False,
-        ),
+    spawn=sim_utils.UrdfFileCfg(
+        fix_base=False,
+        merge_fixed_joints=True,
+        replace_cylinders_with_capsules=True,
+        asset_path=f"{ISAACLAB_ASSETS_DATA_DIR}/Robots/unitree/a1_description/urdf/a1.urdf",
         activate_contact_sensors=True,
         rigid_props=sim_utils.RigidBodyPropertiesCfg(
             disable_gravity=False,
@@ -43,6 +34,9 @@ UNITREE_A1_CFG = ArticulationCfg(
         ),
         articulation_props=sim_utils.ArticulationRootPropertiesCfg(
             enabled_self_collisions=False, solver_position_iteration_count=4, solver_velocity_iteration_count=0
+        ),
+        joint_drive=sim_utils.UrdfConverterCfg.JointDriveCfg(
+            gains=sim_utils.UrdfConverterCfg.JointDriveCfg.PDGainsCfg(stiffness=0, damping=0)
         ),
     ),
     init_state=ArticulationCfg.InitialStateCfg(
@@ -75,14 +69,11 @@ Note: Specifications taken from: https://www.trossenrobotics.com/a1-quadruped#sp
 """
 
 UNITREE_GO2_CFG = ArticulationCfg(
-    spawn=sim_utils.UsdFileCfg(
-        func=spawn_from_lazy_usd,
-        usd_path=urdf_to_usd(  # type: ignore
-            file_path=f"{ISAACLAB_ASSETS_DATA_DIR}/Robots/unitree/go2_description/urdf/go2_description.urdf",
-            output_usd_path=f"{ISAACLAB_ASSETS_DATA_DIR}/Robots/unitree/go2_description/usd/go2.usd",
-            merge_joints=True,
-            fix_base=False,
-        ),
+    spawn=sim_utils.UrdfFileCfg(
+        fix_base=False,
+        merge_fixed_joints=True,
+        replace_cylinders_with_capsules=True,
+        asset_path=f"{ISAACLAB_ASSETS_DATA_DIR}/Robots/unitree/go2_description/urdf/go2_description.urdf",
         activate_contact_sensors=True,
         rigid_props=sim_utils.RigidBodyPropertiesCfg(
             disable_gravity=False,
@@ -95,6 +86,9 @@ UNITREE_GO2_CFG = ArticulationCfg(
         ),
         articulation_props=sim_utils.ArticulationRootPropertiesCfg(
             enabled_self_collisions=False, solver_position_iteration_count=4, solver_velocity_iteration_count=0
+        ),
+        joint_drive=sim_utils.UrdfConverterCfg.JointDriveCfg(
+            gains=sim_utils.UrdfConverterCfg.JointDriveCfg.PDGainsCfg(stiffness=0, damping=0)
         ),
     ),
     init_state=ArticulationCfg.InitialStateCfg(
@@ -125,14 +119,11 @@ UNITREE_GO2_CFG = ArticulationCfg(
 """
 
 UNITREE_GO2W_CFG = ArticulationCfg(
-    spawn=sim_utils.UsdFileCfg(
-        func=spawn_from_lazy_usd,
-        usd_path=urdf_to_usd(  # type: ignore
-            file_path=f"{ISAACLAB_ASSETS_DATA_DIR}/Robots/unitree/go2w_description/urdf/go2w_description.urdf",
-            output_usd_path=f"{ISAACLAB_ASSETS_DATA_DIR}/Robots/unitree/go2w_description/usd/go2w_description.usd",
-            merge_joints=True,
-            fix_base=False,
-        ),
+    spawn=sim_utils.UrdfFileCfg(
+        fix_base=False,
+        merge_fixed_joints=True,
+        replace_cylinders_with_capsules=True,
+        asset_path=f"{ISAACLAB_ASSETS_DATA_DIR}/Robots/unitree/go2w_description/urdf/go2w_description.urdf",
         activate_contact_sensors=True,
         rigid_props=sim_utils.RigidBodyPropertiesCfg(
             disable_gravity=False,
@@ -145,6 +136,9 @@ UNITREE_GO2W_CFG = ArticulationCfg(
         ),
         articulation_props=sim_utils.ArticulationRootPropertiesCfg(
             enabled_self_collisions=False, solver_position_iteration_count=4, solver_velocity_iteration_count=0
+        ),
+        joint_drive=sim_utils.UrdfConverterCfg.JointDriveCfg(
+            gains=sim_utils.UrdfConverterCfg.JointDriveCfg.PDGainsCfg(stiffness=0, damping=0)
         ),
     ),
     init_state=ArticulationCfg.InitialStateCfg(
@@ -184,14 +178,11 @@ UNITREE_GO2W_CFG = ArticulationCfg(
 """
 
 UNITREE_B2_CFG = ArticulationCfg(
-    spawn=sim_utils.UsdFileCfg(
-        func=spawn_from_lazy_usd,
-        usd_path=urdf_to_usd(  # type: ignore
-            file_path=f"{ISAACLAB_ASSETS_DATA_DIR}/Robots/unitree/b2_description/urdf/b2_description.urdf",
-            output_usd_path=f"{ISAACLAB_ASSETS_DATA_DIR}/Robots/unitree/b2_description/usd/b2_description.usd",
-            merge_joints=True,
-            fix_base=False,
-        ),
+    spawn=sim_utils.UrdfFileCfg(
+        fix_base=False,
+        merge_fixed_joints=True,
+        replace_cylinders_with_capsules=True,
+        asset_path=f"{ISAACLAB_ASSETS_DATA_DIR}/Robots/unitree/b2_description/urdf/b2_description.urdf",
         activate_contact_sensors=True,
         rigid_props=sim_utils.RigidBodyPropertiesCfg(
             disable_gravity=False,
@@ -204,6 +195,9 @@ UNITREE_B2_CFG = ArticulationCfg(
         ),
         articulation_props=sim_utils.ArticulationRootPropertiesCfg(
             enabled_self_collisions=False, solver_position_iteration_count=4, solver_velocity_iteration_count=0
+        ),
+        joint_drive=sim_utils.UrdfConverterCfg.JointDriveCfg(
+            gains=sim_utils.UrdfConverterCfg.JointDriveCfg.PDGainsCfg(stiffness=0, damping=0)
         ),
     ),
     init_state=ArticulationCfg.InitialStateCfg(
@@ -253,14 +247,11 @@ UNITREE_B2_CFG = ArticulationCfg(
 
 
 UNITREE_B2W_CFG = ArticulationCfg(
-    spawn=sim_utils.UsdFileCfg(
-        func=spawn_from_lazy_usd,
-        usd_path=urdf_to_usd(  # type: ignore
-            file_path=f"{ISAACLAB_ASSETS_DATA_DIR}/Robots/unitree/b2w_description/urdf/b2w_description.urdf",
-            output_usd_path=f"{ISAACLAB_ASSETS_DATA_DIR}/Robots/unitree/b2w_description/usd/b2w_description.usd",
-            merge_joints=True,
-            fix_base=False,
-        ),
+    spawn=sim_utils.UrdfFileCfg(
+        fix_base=False,
+        merge_fixed_joints=True,
+        replace_cylinders_with_capsules=True,
+        asset_path=f"{ISAACLAB_ASSETS_DATA_DIR}/Robots/unitree/b2w_description/urdf/b2w_description.urdf",
         activate_contact_sensors=True,
         rigid_props=sim_utils.RigidBodyPropertiesCfg(
             disable_gravity=False,
@@ -273,6 +264,9 @@ UNITREE_B2W_CFG = ArticulationCfg(
         ),
         articulation_props=sim_utils.ArticulationRootPropertiesCfg(
             enabled_self_collisions=False, solver_position_iteration_count=4, solver_velocity_iteration_count=0
+        ),
+        joint_drive=sim_utils.UrdfConverterCfg.JointDriveCfg(
+            gains=sim_utils.UrdfConverterCfg.JointDriveCfg.PDGainsCfg(stiffness=0, damping=0)
         ),
     ),
     init_state=ArticulationCfg.InitialStateCfg(
@@ -331,15 +325,11 @@ UNITREE_B2W_CFG = ArticulationCfg(
 
 
 UNITREE_G1_29DOF_CFG = ArticulationCfg(
-    prim_path="{ENV_REGEX_NS}/Robot",
-    spawn=sim_utils.UsdFileCfg(
-        func=spawn_from_lazy_usd,
-        usd_path=urdf_to_usd(  # type: ignore
-            file_path=f"{ISAACLAB_ASSETS_DATA_DIR}/Robots/unitree/g1_description/urdf/g1_29dof_rev_1_0.urdf",
-            output_usd_path=f"{ISAACLAB_ASSETS_DATA_DIR}/Robots/unitree/g1_description/usd/g1_29dof_rev_1_0.usd",
-            merge_joints=True,
-            fix_base=False,
-        ),
+    spawn=sim_utils.UrdfFileCfg(
+        fix_base=False,
+        merge_fixed_joints=True,
+        replace_cylinders_with_capsules=True,
+        asset_path=f"{ISAACLAB_ASSETS_DATA_DIR}/Robots/unitree/g1_description/urdf/g1_29dof_rev_1_0.urdf",
         activate_contact_sensors=True,
         rigid_props=sim_utils.RigidBodyPropertiesCfg(
             disable_gravity=False,
@@ -352,6 +342,9 @@ UNITREE_G1_29DOF_CFG = ArticulationCfg(
         ),
         articulation_props=sim_utils.ArticulationRootPropertiesCfg(
             enabled_self_collisions=False, solver_position_iteration_count=4, solver_velocity_iteration_count=0
+        ),
+        joint_drive=sim_utils.UrdfConverterCfg.JointDriveCfg(
+            gains=sim_utils.UrdfConverterCfg.JointDriveCfg.PDGainsCfg(stiffness=0, damping=0)
         ),
     ),
     init_state=ArticulationCfg.InitialStateCfg(

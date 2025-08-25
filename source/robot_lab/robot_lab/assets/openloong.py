@@ -9,12 +9,6 @@ from isaaclab.actuators import ImplicitActuatorCfg
 from isaaclab.assets.articulation import ArticulationCfg
 
 from robot_lab.assets import ISAACLAB_ASSETS_DATA_DIR
-from robot_lab.assets.utils.usd_converter import (  # noqa: F401
-    mjcf_to_usd,
-    spawn_from_lazy_usd,
-    urdf_to_usd,
-    xacro_to_usd,
-)
 
 ##
 # Configuration
@@ -22,14 +16,11 @@ from robot_lab.assets.utils.usd_converter import (  # noqa: F401
 
 
 OPENLOONG_LOONG_CFG = ArticulationCfg(
-    spawn=sim_utils.UsdFileCfg(
-        func=spawn_from_lazy_usd,
-        usd_path=urdf_to_usd(  # type: ignore
-            file_path=f"{ISAACLAB_ASSETS_DATA_DIR}/Robots/openloong/loong_description/urdf/loong.urdf",
-            output_usd_path=f"{ISAACLAB_ASSETS_DATA_DIR}/Robots/openloong/loong_description/usd/loong.usd",
-            merge_joints=True,
-            fix_base=False,
-        ),
+    spawn=sim_utils.UrdfFileCfg(
+        fix_base=False,
+        merge_fixed_joints=True,
+        replace_cylinders_with_capsules=True,
+        asset_path=f"{ISAACLAB_ASSETS_DATA_DIR}/Robots/openloong/loong_description/urdf/loong.urdf",
         activate_contact_sensors=True,
         rigid_props=sim_utils.RigidBodyPropertiesCfg(
             disable_gravity=False,
@@ -42,6 +33,9 @@ OPENLOONG_LOONG_CFG = ArticulationCfg(
         ),
         articulation_props=sim_utils.ArticulationRootPropertiesCfg(
             enabled_self_collisions=False, solver_position_iteration_count=4, solver_velocity_iteration_count=4
+        ),
+        joint_drive=sim_utils.UrdfConverterCfg.JointDriveCfg(
+            gains=sim_utils.UrdfConverterCfg.JointDriveCfg.PDGainsCfg(stiffness=0, damping=0)
         ),
     ),
     init_state=ArticulationCfg.InitialStateCfg(
