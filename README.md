@@ -384,6 +384,14 @@ In some VsCode versions, the indexing of part of the extensions is missing. In t
 }
 ```
 
+### Clean USD Caches
+
+Temporary USD files are generated in `/tmp/IsaacLab/usd_{date}_{time}_{random}` during simulation runs. These files can consume significant disk space and can be cleaned by:
+
+```bash
+rm -rf /tmp/IsaacLab/usd_*
+```
+
 ## Citation
 
 Please cite the following if you use this code or parts of it:
