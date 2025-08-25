@@ -57,6 +57,7 @@ class MySceneCfg(InteractiveSceneCfg):
             restitution_combine_mode="multiply",
             static_friction=1.0,
             dynamic_friction=1.0,
+            restitution=1.0,
         ),
         visual_material=sim_utils.MdlFileCfg(
             mdl_path=f"{ISAACLAB_NUCLEUS_DIR}/Materials/TilesMarbleSpiderWhiteBrickBondHoned/TilesMarbleSpiderWhiteBrickBondHoned.mdl",
@@ -265,10 +266,10 @@ class EventCfg:
         mode="startup",
         params={
             "asset_cfg": SceneEntityCfg("robot", body_names=".*"),
-            "static_friction_range": (0.1, 1.0),
-            "dynamic_friction_range": (0.1, 0.8),
-            "restitution_range": (0.0, 0.5),
-            "num_buckets": 64,
+            "static_friction_range": (0.3, 1.0),
+            "dynamic_friction_range": (0.3, 0.8),
+            "restitution_range": (0.0, 0.4),
+            "num_buckets": 1024,
         },
     )
 
@@ -279,6 +280,18 @@ class EventCfg:
             "asset_cfg": SceneEntityCfg("robot", body_names=""),
             "mass_distribution_params": (-1.0, 3.0),
             "operation": "add",
+            "recompute_inertia": True,
+        },
+    )
+
+    randomize_rigid_body_mass_all_link = EventTerm(
+        func=mdp.randomize_rigid_body_mass,
+        mode="startup",
+        params={
+            "asset_cfg": SceneEntityCfg("robot", body_names=".*"),
+            "mass_distribution_params": (0.7, 1.3),
+            "operation": "scale",
+            "recompute_inertia": True,
         },
     )
 
@@ -297,7 +310,7 @@ class EventCfg:
         mode="startup",
         params={
             "asset_cfg": SceneEntityCfg("robot", body_names=".*"),
-            "com_range": {"x": (-0.05, 0.05), "y": (-0.05, 0.05), "z": (-0.05, 0.05)},
+            "com_range": {"x": (-0.02, 0.02), "y": (-0.02, 0.02), "z": (-0.02, 0.02)},
         },
     )
 
@@ -327,10 +340,10 @@ class EventCfg:
         mode="reset",
         params={
             "asset_cfg": SceneEntityCfg("robot", joint_names=".*"),
-            "stiffness_distribution_params": (0.5, 2.0),
-            "damping_distribution_params": (0.5, 2.0),
+            "stiffness_distribution_params": (0.7, 1.3),
+            "damping_distribution_params": (0.7, 1.3),
             "operation": "scale",
-            "distribution": "log_uniform",
+            "distribution": "uniform",
         },
     )
 
@@ -425,7 +438,7 @@ class RewardsCfg:
         weight=0.0,
         params={
             "command_name": "base_velocity",
-            "command_threshold": 0.1,
+            "command_threshold": 0.2,
             "asset_cfg": SceneEntityCfg("robot", joint_names=".*"),
         },
     )
@@ -438,7 +451,7 @@ class RewardsCfg:
             "asset_cfg": SceneEntityCfg("robot", joint_names=".*"),
             "stand_still_scale": 5.0,
             "velocity_threshold": 0.5,
-            "command_threshold": 0.1,
+            "command_threshold": 0.2,
         },
     )
 
@@ -450,7 +463,7 @@ class RewardsCfg:
             "sensor_cfg": SceneEntityCfg("contact_forces", body_names=""),
             "command_name": "base_velocity",
             "velocity_threshold": 0.5,
-            "command_threshold": 0.1,
+            "command_threshold": 0.2,
         },
     )
 
