@@ -25,7 +25,7 @@ FFTAI_GR1T1_CFG = ArticulationCfg(
     spawn=sim_utils.UrdfFileCfg(
         fix_base=False,
         merge_fixed_joints=True,
-        replace_cylinders_with_capsules=True,
+        replace_cylinders_with_capsules=False,
         asset_path=f"{ISAACLAB_ASSETS_DATA_DIR}/Robots/fftai/gr1t1_description/urdf/GR1T1.urdf",
         activate_contact_sensors=True,
         rigid_props=sim_utils.RigidBodyPropertiesCfg(
@@ -141,7 +141,9 @@ FFTAI_GR1T1_CFG = ArticulationCfg(
 
 
 FFTAI_GR1T1_LOWER_LIMB_CFG = FFTAI_GR1T1_CFG.copy()
-FFTAI_GR1T1_LOWER_LIMB_CFG.spawn.asset_path = f"{ISAACLAB_ASSETS_DATA_DIR}/Robots/fftai/gr1t1_description/urdf/GR1T1_lower_limb.urdf"
+FFTAI_GR1T1_LOWER_LIMB_CFG.spawn.asset_path = (
+    f"{ISAACLAB_ASSETS_DATA_DIR}/Robots/fftai/gr1t1_description/urdf/GR1T1_lower_limb.urdf"
+)
 FFTAI_GR1T1_LOWER_LIMB_CFG.actuators = (
     {
         "actuators": ImplicitActuatorCfg(
@@ -172,5 +174,7 @@ FFTAI_GR1T2_CFG.spawn.asset_path = f"{ISAACLAB_ASSETS_DATA_DIR}/Robots/fftai/gr1
 
 
 FFTAI_GR1T2_LOWER_LIMB_CFG = FFTAI_GR1T1_LOWER_LIMB_CFG.copy()
-FFTAI_GR1T2_LOWER_LIMB_CFG.spawn.asset_path = f"{ISAACLAB_ASSETS_DATA_DIR}/Robots/fftai/gr1t2_description/urdf/GR1T2_lower_limb.urdf"
+FFTAI_GR1T2_LOWER_LIMB_CFG.spawn.asset_path = (
+    f"{ISAACLAB_ASSETS_DATA_DIR}/Robots/fftai/gr1t2_description/urdf/GR1T2_lower_limb.urdf"
+)
 """Configuration for the FFTAI GR1T2 Humanoid robot with fixed upper limb."""
