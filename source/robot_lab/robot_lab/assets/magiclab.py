@@ -9,27 +9,17 @@ from isaaclab.actuators import DCMotorCfg, ImplicitActuatorCfg
 from isaaclab.assets.articulation import ArticulationCfg
 
 from robot_lab.assets import ISAACLAB_ASSETS_DATA_DIR
-from robot_lab.assets.utils.usd_converter import (  # noqa: F401
-    mjcf_to_usd,
-    spawn_from_lazy_usd,
-    urdf_to_usd,
-    xacro_to_usd,
-)
 
 ##
 # Configuration
 ##
 
 MAGICLAB_BOT_GEN1_CFG = ArticulationCfg(
-    prim_path="{ENV_REGEX_NS}/Robot",
-    spawn=sim_utils.UsdFileCfg(
-        func=spawn_from_lazy_usd,
-        usd_path=urdf_to_usd(  # type: ignore
-            file_path=f"{ISAACLAB_ASSETS_DATA_DIR}/Robots/magiclab/magicbot-Gen1/urdf/MAGICBOT.urdf",
-            output_usd_path=f"{ISAACLAB_ASSETS_DATA_DIR}/Robots/magiclab/magicbot-Gen1/usd/MAGICLAB_BOT_GEN1.usd",
-            merge_joints=False,
-            fix_base=False,
-        ),
+    spawn=sim_utils.UrdfFileCfg(
+        fix_base=False,
+        merge_fixed_joints=False,
+        replace_cylinders_with_capsules=False,
+        asset_path=f"{ISAACLAB_ASSETS_DATA_DIR}/Robots/magiclab/magicbot-Gen1/urdf/MAGICBOT.urdf",
         activate_contact_sensors=True,
         rigid_props=sim_utils.RigidBodyPropertiesCfg(
             disable_gravity=False,
@@ -42,6 +32,9 @@ MAGICLAB_BOT_GEN1_CFG = ArticulationCfg(
         ),
         articulation_props=sim_utils.ArticulationRootPropertiesCfg(
             enabled_self_collisions=False, solver_position_iteration_count=4, solver_velocity_iteration_count=0
+        ),
+        joint_drive=sim_utils.UrdfConverterCfg.JointDriveCfg(
+            gains=sim_utils.UrdfConverterCfg.JointDriveCfg.PDGainsCfg(stiffness=0, damping=0)
         ),
     ),
     init_state=ArticulationCfg.InitialStateCfg(
@@ -109,15 +102,11 @@ MAGICLAB_BOT_GEN1_CFG = ArticulationCfg(
 
 
 MAGICLAB_BOT_Z1_CFG = ArticulationCfg(
-    prim_path="{ENV_REGEX_NS}/Robot",
-    spawn=sim_utils.UsdFileCfg(
-        func=spawn_from_lazy_usd,
-        usd_path=urdf_to_usd(  # type: ignore
-            file_path=f"{ISAACLAB_ASSETS_DATA_DIR}/Robots/magiclab/magicbot-Z1/urdf/MagicBotZ1.urdf",
-            output_usd_path=f"{ISAACLAB_ASSETS_DATA_DIR}/Robots/magiclab/magicbot-Z1/usd/MAGICLAB_BOT_Z1.usd",
-            merge_joints=False,
-            fix_base=False,
-        ),
+    spawn=sim_utils.UrdfFileCfg(
+        fix_base=False,
+        merge_fixed_joints=False,
+        replace_cylinders_with_capsules=False,
+        asset_path=f"{ISAACLAB_ASSETS_DATA_DIR}/Robots/magiclab/magicbot-Z1/urdf/MagicBotZ1.urdf",
         activate_contact_sensors=True,
         rigid_props=sim_utils.RigidBodyPropertiesCfg(
             disable_gravity=False,
@@ -130,6 +119,9 @@ MAGICLAB_BOT_Z1_CFG = ArticulationCfg(
         ),
         articulation_props=sim_utils.ArticulationRootPropertiesCfg(
             enabled_self_collisions=False, solver_position_iteration_count=4, solver_velocity_iteration_count=0
+        ),
+        joint_drive=sim_utils.UrdfConverterCfg.JointDriveCfg(
+            gains=sim_utils.UrdfConverterCfg.JointDriveCfg.PDGainsCfg(stiffness=0, damping=0)
         ),
     ),
     init_state=ArticulationCfg.InitialStateCfg(
@@ -197,14 +189,11 @@ MAGICLAB_BOT_Z1_CFG = ArticulationCfg(
 
 
 MAGICDOG_CFG = ArticulationCfg(
-    spawn=sim_utils.UsdFileCfg(
-        func=spawn_from_lazy_usd,
-        usd_path=urdf_to_usd(  # type: ignore
-            file_path=f"{ISAACLAB_ASSETS_DATA_DIR}/Robots/magiclab/magicdog/urdf/magicdog.urdf",
-            output_usd_path=f"{ISAACLAB_ASSETS_DATA_DIR}/Robots/magiclab/magicdog/usd/magicdog.usd",
-            merge_joints=False,
-            fix_base=False,
-        ),
+    spawn=sim_utils.UrdfFileCfg(
+        fix_base=False,
+        merge_fixed_joints=False,
+        replace_cylinders_with_capsules=False,
+        asset_path=f"{ISAACLAB_ASSETS_DATA_DIR}/Robots/magiclab/magicdog/urdf/magicdog.urdf",
         activate_contact_sensors=True,
         rigid_props=sim_utils.RigidBodyPropertiesCfg(
             disable_gravity=False,
@@ -217,6 +206,9 @@ MAGICDOG_CFG = ArticulationCfg(
         ),
         articulation_props=sim_utils.ArticulationRootPropertiesCfg(
             enabled_self_collisions=False, solver_position_iteration_count=4, solver_velocity_iteration_count=0
+        ),
+        joint_drive=sim_utils.UrdfConverterCfg.JointDriveCfg(
+            gains=sim_utils.UrdfConverterCfg.JointDriveCfg.PDGainsCfg(stiffness=0, damping=0)
         ),
     ),
     init_state=ArticulationCfg.InitialStateCfg(
@@ -246,14 +238,11 @@ MAGICDOG_CFG = ArticulationCfg(
 
 
 MAGICDOG_W_CFG = ArticulationCfg(
-    spawn=sim_utils.UsdFileCfg(
-        func=spawn_from_lazy_usd,
-        usd_path=urdf_to_usd(  # type: ignore
-            file_path=f"{ISAACLAB_ASSETS_DATA_DIR}/Robots/magiclab/magicdog_w/urdf/magicdog_w.urdf",
-            output_usd_path=f"{ISAACLAB_ASSETS_DATA_DIR}/Robots/magiclab/magicdog_w/usd/magicdog_w.usd",
-            merge_joints=True,
-            fix_base=False,
-        ),
+    spawn=sim_utils.UrdfFileCfg(
+        fix_base=False,
+        merge_fixed_joints=True,
+        replace_cylinders_with_capsules=False,
+        asset_path=f"{ISAACLAB_ASSETS_DATA_DIR}/Robots/magiclab/magicdog_w/urdf/magicdog_w.urdf",
         activate_contact_sensors=True,
         rigid_props=sim_utils.RigidBodyPropertiesCfg(
             disable_gravity=False,
@@ -266,6 +255,9 @@ MAGICDOG_W_CFG = ArticulationCfg(
         ),
         articulation_props=sim_utils.ArticulationRootPropertiesCfg(
             enabled_self_collisions=False, solver_position_iteration_count=4, solver_velocity_iteration_count=0
+        ),
+        joint_drive=sim_utils.UrdfConverterCfg.JointDriveCfg(
+            gains=sim_utils.UrdfConverterCfg.JointDriveCfg.PDGainsCfg(stiffness=0, damping=0)
         ),
     ),
     init_state=ArticulationCfg.InitialStateCfg(

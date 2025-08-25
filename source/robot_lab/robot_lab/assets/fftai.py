@@ -15,12 +15,6 @@ from isaaclab.actuators import ImplicitActuatorCfg
 from isaaclab.assets.articulation import ArticulationCfg
 
 from robot_lab.assets import ISAACLAB_ASSETS_DATA_DIR
-from robot_lab.assets.utils.usd_converter import (  # noqa: F401
-    mjcf_to_usd,
-    spawn_from_lazy_usd,
-    urdf_to_usd,
-    xacro_to_usd,
-)
 
 ##
 # Configuration
@@ -28,14 +22,11 @@ from robot_lab.assets.utils.usd_converter import (  # noqa: F401
 
 
 FFTAI_GR1T1_CFG = ArticulationCfg(
-    spawn=sim_utils.UsdFileCfg(
-        func=spawn_from_lazy_usd,
-        usd_path=urdf_to_usd(  # type: ignore
-            file_path=f"{ISAACLAB_ASSETS_DATA_DIR}/Robots/fftai/gr1t1_description/urdf/GR1T1.urdf",
-            output_usd_path=f"{ISAACLAB_ASSETS_DATA_DIR}/Robots/fftai/gr1t1_description/usd/GR1T1.usd",
-            merge_joints=True,
-            fix_base=False,
-        ),
+    spawn=sim_utils.UrdfFileCfg(
+        fix_base=False,
+        merge_fixed_joints=True,
+        replace_cylinders_with_capsules=False,
+        asset_path=f"{ISAACLAB_ASSETS_DATA_DIR}/Robots/fftai/gr1t1_description/urdf/GR1T1.urdf",
         activate_contact_sensors=True,
         rigid_props=sim_utils.RigidBodyPropertiesCfg(
             disable_gravity=False,
@@ -48,6 +39,9 @@ FFTAI_GR1T1_CFG = ArticulationCfg(
         ),
         articulation_props=sim_utils.ArticulationRootPropertiesCfg(
             enabled_self_collisions=False, solver_position_iteration_count=4, solver_velocity_iteration_count=4
+        ),
+        joint_drive=sim_utils.UrdfConverterCfg.JointDriveCfg(
+            gains=sim_utils.UrdfConverterCfg.JointDriveCfg.PDGainsCfg(stiffness=0, damping=0)
         ),
     ),
     init_state=ArticulationCfg.InitialStateCfg(
@@ -147,13 +141,8 @@ FFTAI_GR1T1_CFG = ArticulationCfg(
 
 
 FFTAI_GR1T1_LOWER_LIMB_CFG = FFTAI_GR1T1_CFG.copy()
-FFTAI_GR1T1_LOWER_LIMB_CFG.spawn.usd_path = (
-    urdf_to_usd(
-        file_path=f"{ISAACLAB_ASSETS_DATA_DIR}/Robots/fftai/gr1t1_description/urdf/GR1T1_lower_limb.urdf",
-        output_usd_path=f"{ISAACLAB_ASSETS_DATA_DIR}/Robots/fftai/gr1t1_description/usd/GR1T1_lower_limb.usd",
-        merge_joints=True,
-        fix_base=False,
-    ),
+FFTAI_GR1T1_LOWER_LIMB_CFG.spawn.asset_path = (
+    f"{ISAACLAB_ASSETS_DATA_DIR}/Robots/fftai/gr1t1_description/urdf/GR1T1_lower_limb.urdf"
 )
 FFTAI_GR1T1_LOWER_LIMB_CFG.actuators = (
     {
@@ -180,24 +169,12 @@ FFTAI_GR1T1_LOWER_LIMB_CFG.actuators = (
 
 
 FFTAI_GR1T2_CFG = FFTAI_GR1T1_CFG.copy()
-FFTAI_GR1T2_CFG.spawn.usd_path = (
-    urdf_to_usd(
-        file_path=f"{ISAACLAB_ASSETS_DATA_DIR}/Robots/fftai/gr1t2_description/urdf/GR1T2.urdf",
-        output_usd_path=f"{ISAACLAB_ASSETS_DATA_DIR}/Robots/fftai/gr1t2_description/usd/GR1T2.usd",
-        merge_joints=True,
-        fix_base=False,
-    ),
-)
+FFTAI_GR1T2_CFG.spawn.asset_path = f"{ISAACLAB_ASSETS_DATA_DIR}/Robots/fftai/gr1t2_description/urdf/GR1T2.urdf"
 """Configuration for the FFTAI GR1T1 Humanoid robot."""
 
 
 FFTAI_GR1T2_LOWER_LIMB_CFG = FFTAI_GR1T1_LOWER_LIMB_CFG.copy()
-FFTAI_GR1T2_LOWER_LIMB_CFG.spawn.usd_path = (
-    urdf_to_usd(
-        file_path=f"{ISAACLAB_ASSETS_DATA_DIR}/Robots/fftai/gr1t2_description/urdf/GR1T2_lower_limb.urdf",
-        output_usd_path=f"{ISAACLAB_ASSETS_DATA_DIR}/Robots/fftai/gr1t2_description/usd/GR1T2_lower_limb.usd",
-        merge_joints=True,
-        fix_base=False,
-    ),
+FFTAI_GR1T2_LOWER_LIMB_CFG.spawn.asset_path = (
+    f"{ISAACLAB_ASSETS_DATA_DIR}/Robots/fftai/gr1t2_description/urdf/GR1T2_lower_limb.urdf"
 )
 """Configuration for the FFTAI GR1T2 Humanoid robot with fixed upper limb."""
