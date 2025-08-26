@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import isaaclab.sim as sim_utils
-from isaaclab.actuators import DCMotorCfg
+from isaaclab.actuators import DCMotorCfg, DelayedPDActuatorCfg
 from isaaclab.assets.articulation import ArticulationCfg
 
 from robot_lab.assets import ISAACLAB_ASSETS_DATA_DIR
@@ -47,23 +47,25 @@ DEEPROBOTICS_LITE3_CFG = ArticulationCfg(
     ),
     soft_joint_pos_limit_factor=0.99,
     actuators={
-        "Hip": DCMotorCfg(
+        "Hip": DelayedPDActuatorCfg(
             joint_names_expr=[".*_Hip[X,Y]_joint"],
             effort_limit=24.0,
-            saturation_effort=24.0,
             velocity_limit=26.2,
             stiffness=30.0,
-            damping=0.5,
+            damping=1.0,
             friction=0.0,
+            min_delay=0,  # physics time steps (min: 5.0*0=00.0ms)
+            max_delay=5,  # physics time steps (max: 5.0*5=25.0ms)
         ),
-        "Knee": DCMotorCfg(
+        "Knee": DelayedPDActuatorCfg(
             joint_names_expr=[".*_Knee_joint"],
             effort_limit=36.0,
-            saturation_effort=36.0,
             velocity_limit=17.3,
             stiffness=30.0,
-            damping=0.5,
+            damping=1.0,
             friction=0.0,
+            min_delay=0,  # physics time steps (min: 5.0*0=00.0ms)
+            max_delay=5,  # physics time steps (max: 5.0*5=25.0ms)
         ),
     },
 )
