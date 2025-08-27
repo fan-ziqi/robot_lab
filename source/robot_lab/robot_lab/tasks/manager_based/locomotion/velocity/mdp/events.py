@@ -7,7 +7,7 @@ import torch
 from typing import TYPE_CHECKING, Literal
 
 import isaaclab.utils.math as math_utils
-from isaaclab.assets import Articulation, RigidObject
+from isaaclab.assets import Articulation
 from isaaclab.managers import SceneEntityCfg
 
 if TYPE_CHECKING:
@@ -33,7 +33,7 @@ def randomize_rigid_body_inertia(
         only during the initialization of the environment.
     """
     # extract the used quantities (to enable type-hinting)
-    asset: RigidObject | Articulation = env.scene[asset_cfg.name]
+    asset: Articulation = env.scene[asset_cfg.name]
 
     # resolve environment ids
     if env_ids is None:
@@ -95,8 +95,8 @@ def randomize_com_positions(
         operation (Literal["add", "scale", "abs"]): The operation to apply for randomization.
         distribution (Literal["uniform", "log_uniform", "gaussian"]): The distribution to sample random values from.
     """
-    # Extract the asset (Articulation or RigidObject)
-    asset: RigidObject | Articulation = env.scene[asset_cfg.name]
+    # Extract the asset
+    asset: Articulation = env.scene[asset_cfg.name]
 
     # Resolve environment indices
     if env_ids is None:

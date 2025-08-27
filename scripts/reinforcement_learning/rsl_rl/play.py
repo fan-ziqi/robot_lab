@@ -40,6 +40,7 @@ parser.add_argument(
     help="Use the pre-trained checkpoint from Nucleus.",
 )
 parser.add_argument("--real-time", action="store_true", default=False, help="Run in real-time, if possible.")
+parser.add_argument("--newton_visualizer", action="store_true", default=False, help="Enable Newton rendering.")
 parser.add_argument("--keyboard", action="store_true", default=False, help="Whether to use keyboard.")
 # append RSL-RL cli arguments
 cli_args.add_rsl_rl_args(parser)
@@ -66,29 +67,43 @@ import torch
 
 from rsl_rl.runners import OnPolicyRunner
 
-from isaaclab.devices import Se2Keyboard, Se2KeyboardCfg
+from isaaclab.utils.timer import Timer
+
+Timer.enable = False
+Timer.enable_display_output = False
+
+# from isaaclab.devices import Se2Keyboard, Se2KeyboardCfg
 from isaaclab.envs import (
-    DirectMARLEnv,
-    DirectMARLEnvCfg,
+    # DirectMARLEnv,
+    # DirectMARLEnvCfg,
     DirectRLEnvCfg,
     ManagerBasedRLEnvCfg,
-    multi_agent_to_single_agent,
+    # multi_agent_to_single_agent,
 )
 from isaaclab.managers import ObservationTermCfg as ObsTerm
 from isaaclab.utils.assets import retrieve_file_path
 from isaaclab.utils.dict import print_dict
 from isaaclab.utils.pretrained_checkpoint import get_published_pretrained_checkpoint
 from isaaclab_rl.rsl_rl import RslRlOnPolicyRunnerCfg, RslRlVecEnvWrapper, export_policy_as_jit, export_policy_as_onnx
-from isaaclab_tasks.utils import get_checkpoint_path
+from isaaclab_tasks.utils import get_checkpoint_path, parse_env_cfg
 from isaaclab_tasks.utils.hydra import hydra_task_config
 
 import robot_lab.tasks  # noqa: F401
 
 
 @hydra_task_config(args_cli.task, args_cli.agent)
-def main(env_cfg: ManagerBasedRLEnvCfg | DirectRLEnvCfg | DirectMARLEnvCfg, agent_cfg: RslRlOnPolicyRunnerCfg):
+def main(env_cfg: ManagerBasedRLEnvCfg | DirectRLEnvCfg
+        #   | DirectMARLEnvCfg
+         , agent_cfg: RslRlOnPolicyRunnerCfg):
     """Play with RSL-RL agent."""
     task_name = args_cli.task.split(":")[-1]
+    env_cfg = parse_env_cfg(
+        args_cli.task,
+        device=args_cli.device,
+        num_envs=args_cli.num_envs,
+        use_fabric=not args_cli.disable_fabric,
+        newton_visualizer=args_cli.newton_visualizer,
+    )
     # override configurations with non-hydra CLI arguments
     agent_cfg = cli_args.update_rsl_rl_cfg(agent_cfg, args_cli)
     env_cfg.scene.num_envs = args_cli.num_envs if args_cli.num_envs is not None else 50
@@ -113,19 +128,19 @@ def main(env_cfg: ManagerBasedRLEnvCfg | DirectRLEnvCfg | DirectMARLEnvCfg, agen
     env_cfg.events.push_robot = None
     env_cfg.curriculum.command_levels = None
 
-    if args_cli.keyboard:
-        env_cfg.scene.num_envs = 1
-        env_cfg.terminations.time_out = None
-        env_cfg.commands.base_velocity.debug_vis = False
-        config = Se2KeyboardCfg(
-            v_x_sensitivity=env_cfg.commands.base_velocity.ranges.lin_vel_x[1],
-            v_y_sensitivity=env_cfg.commands.base_velocity.ranges.lin_vel_y[1],
-            omega_z_sensitivity=env_cfg.commands.base_velocity.ranges.ang_vel_z[1],
-        )
-        controller = Se2Keyboard(config)
-        env_cfg.observations.policy.velocity_commands = ObsTerm(
-            func=lambda env: torch.tensor(controller.advance(), dtype=torch.float32).unsqueeze(0).to(env.device),
-        )
+    # if args_cli.keyboard:
+    #     env_cfg.scene.num_envs = 1
+    #     env_cfg.terminations.time_out = None
+    #     env_cfg.commands.base_velocity.debug_vis = False
+    #     config = Se2KeyboardCfg(
+    #         v_x_sensitivity=env_cfg.commands.base_velocity.ranges.lin_vel_x[1],
+    #         v_y_sensitivity=env_cfg.commands.base_velocity.ranges.lin_vel_y[1],
+    #         omega_z_sensitivity=env_cfg.commands.base_velocity.ranges.ang_vel_z[1],
+    #     )
+    #     controller = Se2Keyboard(config)
+    #     env_cfg.observations.policy.velocity_commands = ObsTerm(
+    #         func=lambda env: torch.tensor(controller.advance(), dtype=torch.float32).unsqueeze(0).to(env.device),
+    #     )
 
     # specify directory for logging experiments
     log_root_path = os.path.join("logs", "rsl_rl", agent_cfg.experiment_name)
@@ -146,9 +161,9 @@ def main(env_cfg: ManagerBasedRLEnvCfg | DirectRLEnvCfg | DirectMARLEnvCfg, agen
     # create isaac environment
     env = gym.make(args_cli.task, cfg=env_cfg, render_mode="rgb_array" if args_cli.video else None)
 
-    # convert to single-agent instance if required by the RL algorithm
-    if isinstance(env.unwrapped, DirectMARLEnv):
-        env = multi_agent_to_single_agent(env)
+    # # convert to single-agent instance if required by the RL algorithm
+    # if isinstance(env.unwrapped, DirectMARLEnv):
+    #     env = multi_agent_to_single_agent(env)
 
     # wrap for video recording
     if args_cli.video:

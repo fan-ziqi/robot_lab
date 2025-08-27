@@ -7,11 +7,11 @@ import torch
 from typing import TYPE_CHECKING
 
 import isaaclab.utils.math as math_utils
-from isaaclab.assets import Articulation, RigidObject
+from isaaclab.assets import Articulation
 from isaaclab.managers import ManagerTermBase
 from isaaclab.managers import RewardTermCfg as RewTerm
 from isaaclab.managers import SceneEntityCfg
-from isaaclab.sensors import ContactSensor, RayCaster
+from isaaclab.sensors import ContactSensor#, RayCaster
 from isaaclab.utils.math import quat_apply_inverse, yaw_quat
 
 if TYPE_CHECKING:
@@ -23,7 +23,7 @@ def track_lin_vel_xy_exp(
 ) -> torch.Tensor:
     """Reward tracking of linear velocity commands (xy axes) using exponential kernel."""
     # extract the used quantities (to enable type-hinting)
-    asset: RigidObject = env.scene[asset_cfg.name]
+    asset: Articulation = env.scene[asset_cfg.name]
     # compute the error
     lin_vel_error = torch.sum(
         torch.square(env.command_manager.get_command(command_name)[:, :2] - asset.data.root_lin_vel_b[:, :2]),
@@ -39,7 +39,7 @@ def track_ang_vel_z_exp(
 ) -> torch.Tensor:
     """Reward tracking of angular velocity commands (yaw) using exponential kernel."""
     # extract the used quantities (to enable type-hinting)
-    asset: RigidObject = env.scene[asset_cfg.name]
+    asset: Articulation = env.scene[asset_cfg.name]
     # compute the error
     ang_vel_error = torch.square(env.command_manager.get_command(command_name)[:, 2] - asset.data.root_ang_vel_b[:, 2])
     reward = torch.exp(-ang_vel_error / std**2)
@@ -437,7 +437,7 @@ def feet_stumble(env: ManagerBasedRLEnv, sensor_cfg: SceneEntityCfg) -> torch.Te
 def feet_distance_y_exp(
     env: ManagerBasedRLEnv, stance_width: float, std: float, asset_cfg: SceneEntityCfg = SceneEntityCfg("robot")
 ) -> torch.Tensor:
-    asset: RigidObject = env.scene[asset_cfg.name]
+    asset: Articulation = env.scene[asset_cfg.name]
     cur_footsteps_translated = asset.data.body_link_pos_w[:, asset_cfg.body_ids, :] - asset.data.root_link_pos_w[
         :, :
     ].unsqueeze(1)
@@ -466,7 +466,7 @@ def feet_distance_xy_exp(
     std: float,
     asset_cfg: SceneEntityCfg = SceneEntityCfg("robot"),
 ) -> torch.Tensor:
-    asset: RigidObject = env.scene[asset_cfg.name]
+    asset: Articulation = env.scene[asset_cfg.name]
 
     # Compute the current footstep positions relative to the root
     cur_footsteps_translated = asset.data.body_link_pos_w[:, asset_cfg.body_ids, :] - asset.data.root_link_pos_w[
@@ -510,7 +510,7 @@ def feet_height(
     tanh_mult: float,
 ) -> torch.Tensor:
     """Reward the swinging feet for clearing a specified height off the ground"""
-    asset: RigidObject = env.scene[asset_cfg.name]
+    asset: Articulation = env.scene[asset_cfg.name]
     foot_z_target_error = torch.square(asset.data.body_pos_w[:, asset_cfg.body_ids, 2] - target_height)
     foot_velocity_tanh = torch.tanh(
         tanh_mult * torch.linalg.norm(asset.data.body_lin_vel_w[:, asset_cfg.body_ids, :2], dim=2)
@@ -530,7 +530,7 @@ def feet_height_body(
     tanh_mult: float,
 ) -> torch.Tensor:
     """Reward the swinging feet for clearing a specified height off the ground"""
-    asset: RigidObject = env.scene[asset_cfg.name]
+    asset: Articulation = env.scene[asset_cfg.name]
     cur_footpos_translated = asset.data.body_pos_w[:, asset_cfg.body_ids, :] - asset.data.root_pos_w[:, :].unsqueeze(1)
     footpos_in_body_frame = torch.zeros(env.num_envs, len(asset_cfg.body_ids), 3, device=env.device)
     cur_footvel_translated = asset.data.body_lin_vel_w[:, asset_cfg.body_ids, :] - asset.data.root_lin_vel_w[
@@ -564,7 +564,7 @@ def feet_slide(
     # Penalize feet sliding
     contact_sensor: ContactSensor = env.scene.sensors[sensor_cfg.name]
     contacts = contact_sensor.data.net_forces_w_history[:, :, sensor_cfg.body_ids, :].norm(dim=-1).max(dim=1)[0] > 1.0
-    asset: RigidObject = env.scene[asset_cfg.name]
+    asset: Articulation = env.scene[asset_cfg.name]
 
     # feet_vel = asset.data.body_lin_vel_w[:, asset_cfg.body_ids, :2]
     # reward = torch.sum(feet_vel.norm(dim=-1) * contacts, dim=1)
@@ -603,46 +603,46 @@ def feet_slide(
 def upward(env: ManagerBasedRLEnv, asset_cfg: SceneEntityCfg = SceneEntityCfg("robot")) -> torch.Tensor:
     """Penalize z-axis base linear velocity using L2 squared kernel."""
     # extract the used quantities (to enable type-hinting)
-    asset: RigidObject = env.scene[asset_cfg.name]
+    asset: Articulation = env.scene[asset_cfg.name]
     reward = torch.square(1 - asset.data.projected_gravity_b[:, 2])
     return reward
 
 
-def base_height_l2(
-    env: ManagerBasedRLEnv,
-    target_height: float,
-    asset_cfg: SceneEntityCfg = SceneEntityCfg("robot"),
-    sensor_cfg: SceneEntityCfg | None = None,
-) -> torch.Tensor:
-    """Penalize asset height from its target using L2 squared kernel.
+# def base_height_l2(
+#     env: ManagerBasedRLEnv,
+#     target_height: float,
+#     asset_cfg: SceneEntityCfg = SceneEntityCfg("robot"),
+#     sensor_cfg: SceneEntityCfg | None = None,
+# ) -> torch.Tensor:
+#     """Penalize asset height from its target using L2 squared kernel.
 
-    Note:
-        For flat terrain, target height is in the world frame. For rough terrain,
-        sensor readings can adjust the target height to account for the terrain.
-    """
-    # extract the used quantities (to enable type-hinting)
-    asset: RigidObject = env.scene[asset_cfg.name]
-    if sensor_cfg is not None:
-        sensor: RayCaster = env.scene[sensor_cfg.name]
-        # Adjust the target height using the sensor data
-        ray_hits = sensor.data.ray_hits_w[..., 2]
-        if torch.isnan(ray_hits).any() or torch.isinf(ray_hits).any() or torch.max(torch.abs(ray_hits)) > 1e6:
-            adjusted_target_height = asset.data.root_link_pos_w[:, 2]
-        else:
-            adjusted_target_height = target_height + torch.mean(ray_hits, dim=1)
-    else:
-        # Use the provided target height directly for flat terrain
-        adjusted_target_height = target_height
-    # Compute the L2 squared penalty
-    reward = torch.square(asset.data.root_pos_w[:, 2] - adjusted_target_height)
-    reward *= torch.clamp(-env.scene["robot"].data.projected_gravity_b[:, 2], 0, 0.7) / 0.7
-    return reward
+#     Note:
+#         For flat terrain, target height is in the world frame. For rough terrain,
+#         sensor readings can adjust the target height to account for the terrain.
+#     """
+#     # extract the used quantities (to enable type-hinting)
+#     asset: Articulation = env.scene[asset_cfg.name]
+#     if sensor_cfg is not None:
+#         sensor: RayCaster = env.scene[sensor_cfg.name]
+#         # Adjust the target height using the sensor data
+#         ray_hits = sensor.data.ray_hits_w[..., 2]
+#         if torch.isnan(ray_hits).any() or torch.isinf(ray_hits).any() or torch.max(torch.abs(ray_hits)) > 1e6:
+#             adjusted_target_height = asset.data.root_link_pos_w[:, 2]
+#         else:
+#             adjusted_target_height = target_height + torch.mean(ray_hits, dim=1)
+#     else:
+#         # Use the provided target height directly for flat terrain
+#         adjusted_target_height = target_height
+#     # Compute the L2 squared penalty
+#     reward = torch.square(asset.data.root_pos_w[:, 2] - adjusted_target_height)
+#     reward *= torch.clamp(-env.scene["robot"].data.projected_gravity_b[:, 2], 0, 0.7) / 0.7
+#     return reward
 
 
 def lin_vel_z_l2(env: ManagerBasedRLEnv, asset_cfg: SceneEntityCfg = SceneEntityCfg("robot")) -> torch.Tensor:
     """Penalize z-axis base linear velocity using L2 squared kernel."""
     # extract the used quantities (to enable type-hinting)
-    asset: RigidObject = env.scene[asset_cfg.name]
+    asset: Articulation = env.scene[asset_cfg.name]
     reward = torch.square(asset.data.root_lin_vel_b[:, 2])
     reward *= torch.clamp(-env.scene["robot"].data.projected_gravity_b[:, 2], 0, 0.7) / 0.7
     return reward
@@ -651,7 +651,7 @@ def lin_vel_z_l2(env: ManagerBasedRLEnv, asset_cfg: SceneEntityCfg = SceneEntity
 def ang_vel_xy_l2(env: ManagerBasedRLEnv, asset_cfg: SceneEntityCfg = SceneEntityCfg("robot")) -> torch.Tensor:
     """Penalize xy-axis base angular velocity using L2 squared kernel."""
     # extract the used quantities (to enable type-hinting)
-    asset: RigidObject = env.scene[asset_cfg.name]
+    asset: Articulation = env.scene[asset_cfg.name]
     reward = torch.sum(torch.square(asset.data.root_ang_vel_b[:, :2]), dim=1)
     reward *= torch.clamp(-env.scene["robot"].data.projected_gravity_b[:, 2], 0, 0.7) / 0.7
     return reward
@@ -676,7 +676,7 @@ def flat_orientation_l2(env: ManagerBasedRLEnv, asset_cfg: SceneEntityCfg = Scen
     This is computed by penalizing the xy-components of the projected gravity vector.
     """
     # extract the used quantities (to enable type-hinting)
-    asset: RigidObject = env.scene[asset_cfg.name]
+    asset: Articulation = env.scene[asset_cfg.name]
     reward = torch.sum(torch.square(asset.data.projected_gravity_b[:, :2]), dim=1)
     reward *= torch.clamp(-env.scene["robot"].data.projected_gravity_b[:, 2], 0, 0.7) / 0.7
     return reward

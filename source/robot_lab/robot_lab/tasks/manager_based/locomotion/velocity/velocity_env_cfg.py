@@ -22,7 +22,7 @@ from isaaclab.managers import RewardTermCfg as RewTerm
 from isaaclab.managers import SceneEntityCfg
 from isaaclab.managers import TerminationTermCfg as DoneTerm
 from isaaclab.scene import InteractiveSceneCfg
-from isaaclab.sensors import ContactSensorCfg, RayCasterCfg, patterns
+from isaaclab.sensors import ContactSensorCfg#, RayCasterCfg, patterns
 from isaaclab.terrains import TerrainImporterCfg
 from isaaclab.utils import configclass
 from isaaclab.utils.assets import ISAAC_NUCLEUS_DIR, ISAACLAB_NUCLEUS_DIR
@@ -68,23 +68,28 @@ class MySceneCfg(InteractiveSceneCfg):
     # robots
     robot: ArticulationCfg = MISSING
     # sensors
-    height_scanner = RayCasterCfg(
-        prim_path="{ENV_REGEX_NS}/Robot/base",
-        offset=RayCasterCfg.OffsetCfg(pos=(0.0, 0.0, 20.0)),
-        ray_alignment="yaw",
-        pattern_cfg=patterns.GridPatternCfg(resolution=0.1, size=[1.6, 1.0]),
-        debug_vis=False,
-        mesh_prim_paths=["/World/ground"],
+    # height_scanner = RayCasterCfg(
+    #     prim_path="{ENV_REGEX_NS}/Robot/base",
+    #     offset=RayCasterCfg.OffsetCfg(pos=(0.0, 0.0, 20.0)),
+    #     ray_alignment="yaw",
+    #     pattern_cfg=patterns.GridPatternCfg(resolution=0.1, size=[1.6, 1.0]),
+    #     debug_vis=False,
+    #     mesh_prim_paths=["/World/ground"],
+    # )
+    # height_scanner_base = RayCasterCfg(
+    #     prim_path="{ENV_REGEX_NS}/Robot/base",
+    #     offset=RayCasterCfg.OffsetCfg(pos=(0.0, 0.0, 20.0)),
+    #     ray_alignment="yaw",
+    #     pattern_cfg=patterns.GridPatternCfg(resolution=0.05, size=(0.1, 0.1)),
+    #     debug_vis=False,
+    #     mesh_prim_paths=["/World/ground"],
+    # )
+    contact_forces = ContactSensorCfg(
+        prim_path="{ENV_REGEX_NS}/Robot/.*",
+        filter_shape_paths_expr=None,
+        history_length=3,
+        track_air_time=True
     )
-    height_scanner_base = RayCasterCfg(
-        prim_path="{ENV_REGEX_NS}/Robot/base",
-        offset=RayCasterCfg.OffsetCfg(pos=(0.0, 0.0, 20.0)),
-        ray_alignment="yaw",
-        pattern_cfg=patterns.GridPatternCfg(resolution=0.05, size=(0.1, 0.1)),
-        debug_vis=False,
-        mesh_prim_paths=["/World/ground"],
-    )
-    contact_forces = ContactSensorCfg(prim_path="{ENV_REGEX_NS}/Robot/.*", history_length=3, track_air_time=True)
     # lights
     sky_light = AssetBaseCfg(
         prim_path="/World/skyLight",
@@ -179,13 +184,13 @@ class ObservationsCfg:
             clip=(-100.0, 100.0),
             scale=1.0,
         )
-        height_scan = ObsTerm(
-            func=mdp.height_scan,
-            params={"sensor_cfg": SceneEntityCfg("height_scanner")},
-            noise=Unoise(n_min=-0.1, n_max=0.1),
-            clip=(-1.0, 1.0),
-            scale=1.0,
-        )
+        # height_scan = ObsTerm(
+        #     func=mdp.height_scan,
+        #     params={"sensor_cfg": SceneEntityCfg("height_scanner")},
+        #     noise=Unoise(n_min=-0.1, n_max=0.1),
+        #     clip=(-1.0, 1.0),
+        #     scale=1.0,
+        # )
 
         def __post_init__(self):
             self.enable_corruption = True
@@ -234,12 +239,12 @@ class ObservationsCfg:
             clip=(-100.0, 100.0),
             scale=1.0,
         )
-        height_scan = ObsTerm(
-            func=mdp.height_scan,
-            params={"sensor_cfg": SceneEntityCfg("height_scanner")},
-            clip=(-1.0, 1.0),
-            scale=1.0,
-        )
+        # height_scan = ObsTerm(
+        #     func=mdp.height_scan,
+        #     params={"sensor_cfg": SceneEntityCfg("height_scanner")},
+        #     clip=(-1.0, 1.0),
+        #     scale=1.0,
+        # )
         # joint_effort = ObsTerm(
         #     func=mdp.joint_effort,
         #     clip=(-100, 100),
@@ -260,17 +265,17 @@ class EventCfg:
     """Configuration for events."""
 
     # startup
-    randomize_rigid_body_material = EventTerm(
-        func=mdp.randomize_rigid_body_material,
-        mode="startup",
-        params={
-            "asset_cfg": SceneEntityCfg("robot", body_names=".*"),
-            "static_friction_range": (0.1, 1.0),
-            "dynamic_friction_range": (0.1, 0.8),
-            "restitution_range": (0.0, 0.5),
-            "num_buckets": 64,
-        },
-    )
+    #  = EventTerm(
+    #     func=mdp.randomize_rigid_body_material,
+    #     mode="startup",
+    #     params={
+    #         "asset_cfg": SceneEntityCfg("robot", body_names=".*"),
+    #         "static_friction_range": (0.1, 1.0),
+    #         "dynamic_friction_range": (0.1, 0.8),
+    #         "restitution_range": (0.0, 0.5),
+    #         "num_buckets": 64,
+    #     },
+    # )
 
     randomize_rigid_body_mass = EventTerm(
         func=mdp.randomize_rigid_body_mass,
@@ -282,15 +287,15 @@ class EventCfg:
         },
     )
 
-    randomize_rigid_body_inertia = EventTerm(
-        func=mdp.randomize_rigid_body_inertia,
-        mode="startup",
-        params={
-            "asset_cfg": SceneEntityCfg("robot", body_names=".*"),
-            "inertia_distribution_params": (0.5, 1.5),
-            "operation": "scale",
-        },
-    )
+    # randomize_rigid_body_inertia = EventTerm(
+    #     func=mdp.randomize_rigid_body_inertia,
+    #     mode="startup",
+    #     params={
+    #         "asset_cfg": SceneEntityCfg("robot", body_names=".*"),
+    #         "inertia_distribution_params": (0.5, 1.5),
+    #         "operation": "scale",
+    #     },
+    # )
 
     randomize_com_positions = EventTerm(
         func=mdp.randomize_rigid_body_com,
@@ -370,15 +375,15 @@ class RewardsCfg:
     lin_vel_z_l2 = RewTerm(func=mdp.lin_vel_z_l2, weight=0.0)
     ang_vel_xy_l2 = RewTerm(func=mdp.ang_vel_xy_l2, weight=0.0)
     flat_orientation_l2 = RewTerm(func=mdp.flat_orientation_l2, weight=0.0)
-    base_height_l2 = RewTerm(
-        func=mdp.base_height_l2,
-        weight=0.0,
-        params={
-            "asset_cfg": SceneEntityCfg("robot", body_names=""),
-            "sensor_cfg": SceneEntityCfg("height_scanner_base"),
-            "target_height": 0.0,
-        },
-    )
+    # base_height_l2 = RewTerm(
+    #     func=mdp.base_height_l2,
+    #     weight=0.0,
+    #     params={
+    #         "asset_cfg": SceneEntityCfg("robot", body_names=""),
+    #         "sensor_cfg": SceneEntityCfg("height_scanner_base"),
+    #         "target_height": 0.0,
+    #     },
+    # )
     body_lin_acc_l2 = RewTerm(
         func=mdp.body_lin_acc_l2,
         weight=0.0,
@@ -677,7 +682,7 @@ class LocomotionVelocityRoughEnvCfg(ManagerBasedRLEnvCfg):
     """Configuration for the locomotion velocity-tracking environment."""
 
     # Scene settings
-    scene: MySceneCfg = MySceneCfg(num_envs=4096, env_spacing=2.5)
+    scene: MySceneCfg = MySceneCfg(num_envs=4096, env_spacing=2.5, replicate_physics=True)
     # Basic settings
     observations: ObservationsCfg = ObservationsCfg()
     actions: ActionsCfg = ActionsCfg()
@@ -696,12 +701,17 @@ class LocomotionVelocityRoughEnvCfg(ManagerBasedRLEnvCfg):
         # simulation settings
         self.sim.dt = 0.005
         self.sim.render_interval = self.decimation
-        self.sim.physics_material = self.scene.terrain.physics_material
-        self.sim.physx.gpu_max_rigid_patch_count = 10 * 2**15
+        # self.sim.physics_material = self.scene.terrain.physics_material
+        # self.sim.physx.gpu_max_rigid_patch_count = 10 * 2**15
+        self.sim.newton_cfg.solver_cfg.nefc_per_env = 80
+        self.sim.newton_cfg.solver_cfg.ls_iterations = 15
+        self.sim.newton_cfg.solver_cfg.cone = "elliptic"
+        self.sim.newton_cfg.solver_cfg.impratio = 100.0
+        self.sim.newton_cfg.solver_cfg.ls_parallel = True
         # update sensor update periods
         # we tick all the sensors based on the smallest update period (physics update period)
-        if self.scene.height_scanner is not None:
-            self.scene.height_scanner.update_period = self.decimation * self.sim.dt
+        # if self.scene.height_scanner is not None:
+        #     self.scene.height_scanner.update_period = self.decimation * self.sim.dt
         if self.scene.contact_forces is not None:
             self.scene.contact_forces.update_period = self.sim.dt
 
