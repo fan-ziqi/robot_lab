@@ -281,51 +281,6 @@ Others (**Experimental**)
 
 ## Add your own robot
 
-This repository supports direct import of URDF, XACRO, and MJCF robot models without requiring pre-conversion to USD format.
-
-```python
-from robot_lab.assets.utils.usd_converter import (  # noqa: F401
-    mjcf_to_usd,
-    spawn_from_lazy_usd,
-    urdf_to_usd,
-    xacro_to_usd,
-)
-
-YOUR_ROBOT_CFG = ArticulationCfg(
-    spawn=sim_utils.UsdFileCfg(
-        # for urdf
-        func=spawn_from_lazy_usd,
-        usd_path=urdf_to_usd(  # type: ignore
-            file_path=f"{ISAACLAB_ASSETS_DATA_DIR}/Robots/your_robot/your_robot.urdf",
-            merge_joints=True,
-            fix_base=False,
-        ),
-        # for xacro
-        func=spawn_from_lazy_usd,
-        usd_path=xacro_to_usd(  # type: ignore
-            file_path=f"{ISAACLAB_ASSETS_DATA_DIR}/Robots/your_robot/your_robot.xacro",
-            merge_joints=True,
-            fix_base=False,
-        ),
-        # for mjcf
-        func=spawn_from_lazy_usd,
-        usd_path=mjcf_to_usd(  # type: ignore
-            file_path=f"{ISAACLAB_ASSETS_DATA_DIR}/Robots/your_robot/your_robot.xml",
-            import_sites=True,
-            fix_base=False,
-        ),
-        # ... other configuration parameters ...
-    ),
-    # ... other configuration parameters ...
-)
-```
-
-Check your model import compatibility using:
-
-```bash
-python scripts/tools/check_robot.py {urdf,mjcf,xacro} path_to_your_model_file
-```
-
 Using the core framework developed as part of Isaac Lab, we provide various learning environments for robotics research.
 These environments follow the `gym.Env` API from OpenAI Gym version `0.21.0`. The environments are registered using
 the Gym registry.
@@ -340,6 +295,10 @@ itself. However, its various instances are included in directories within the en
 This looks like as follows:
 
 ```tree
+source/robot_lab/assets/
+├── __init__.py
+└── unitree.py  # <- this is where we define robot assets
+
 source/robot_lab/tasks/manager_based/locomotion/
 ├── __init__.py
 └── velocity
@@ -413,6 +372,7 @@ In some VsCode versions, the indexing of part of the extensions is missing. In t
 
 ```json
 {
+    "python.languageServer": "Pylance",
     "python.analysis.extraPaths": [
         "${workspaceFolder}/source/robot_lab",
         "/<path-to-isaac-lab>/source/isaaclab",
@@ -422,6 +382,14 @@ In some VsCode versions, the indexing of part of the extensions is missing. In t
         "/<path-to-isaac-lab>/source/isaaclab_tasks",
     ]
 }
+```
+
+### Clean USD Caches
+
+Temporary USD files are generated in `/tmp/IsaacLab/usd_{date}_{time}_{random}` during simulation runs. These files can consume significant disk space and can be cleaned by:
+
+```bash
+rm -rf /tmp/IsaacLab/usd_*
 ```
 
 ## Citation
