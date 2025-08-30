@@ -272,25 +272,38 @@ class EventCfg:
         },
     )
 
-    randomize_rigid_body_mass = EventTerm(
+    randomize_rigid_body_mass_base = EventTerm(
         func=mdp.randomize_rigid_body_mass,
         mode="startup",
         params={
             "asset_cfg": SceneEntityCfg("robot", body_names=""),
             "mass_distribution_params": (-1.0, 3.0),
             "operation": "add",
+            "recompute_inertia": True,
         },
     )
 
-    randomize_rigid_body_inertia = EventTerm(
-        func=mdp.randomize_rigid_body_inertia,
+    randomize_rigid_body_mass_others = EventTerm(
+        func=mdp.randomize_rigid_body_mass,
         mode="startup",
         params={
             "asset_cfg": SceneEntityCfg("robot", body_names=".*"),
-            "inertia_distribution_params": (0.5, 1.5),
+            "mass_distribution_params": (0.7, 1.3),
             "operation": "scale",
+            "recompute_inertia": True,
         },
     )
+
+    # Skip: inertia updated via mass randomization by setting recompute_inertia=True
+    # randomize_rigid_body_inertia = EventTerm(
+    #     func=mdp.randomize_rigid_body_inertia,
+    #     mode="startup",
+    #     params={
+    #         "asset_cfg": SceneEntityCfg("robot", body_names=".*"),
+    #         "inertia_distribution_params": (0.5, 1.5),
+    #         "operation": "scale",
+    #     },
+    # )
 
     randomize_com_positions = EventTerm(
         func=mdp.randomize_rigid_body_com,
