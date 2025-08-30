@@ -8,6 +8,7 @@ from typing import TYPE_CHECKING
 
 import isaaclab.utils.math as math_utils
 from isaaclab.assets import Articulation, RigidObject
+from isaaclab.envs import mdp
 from isaaclab.managers import ManagerTermBase
 from isaaclab.managers import RewardTermCfg as RewTerm
 from isaaclab.managers import SceneEntityCfg
@@ -86,19 +87,16 @@ def joint_power(env: ManagerBasedRLEnv, asset_cfg: SceneEntityCfg = SceneEntityC
     return reward
 
 
-def stand_still_without_cmd(
+def stand_still(
     env: ManagerBasedRLEnv,
     command_name: str,
-    command_threshold: float,
+    command_threshold: float = 0.06,
     asset_cfg: SceneEntityCfg = SceneEntityCfg("robot"),
 ) -> torch.Tensor:
-    """Penalize joint positions that deviate from the default one when no command."""
-    # extract the used quantities (to enable type-hinting)
-    asset: Articulation = env.scene[asset_cfg.name]
-    # compute out of limits constraints
-    diff_angle = asset.data.joint_pos[:, asset_cfg.joint_ids] - asset.data.default_joint_pos[:, asset_cfg.joint_ids]
-    reward = torch.sum(torch.abs(diff_angle), dim=1)
-    reward *= torch.linalg.norm(env.command_manager.get_command(command_name), dim=1) < command_threshold
+    """Penalize offsets from the default joint positions when the command is very small."""
+    # Penalize motion when command is nearly zero.
+    reward = mdp.joint_deviation_l1(env, asset_cfg)
+    reward *= torch.norm(env.command_manager.get_command(command_name)[:, :2], dim=1) < command_threshold
     reward *= torch.clamp(-env.scene["robot"].data.projected_gravity_b[:, 2], 0, 0.7) / 0.7
     return reward
 
