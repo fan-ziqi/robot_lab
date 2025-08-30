@@ -404,7 +404,7 @@ def feet_contact(
     contact_num = torch.sum(contact, dim=1)
     reward = (contact_num != expect_contact_num).float()
     # no reward for zero command
-    reward *= torch.norm(env.command_manager.get_command(command_name)[:, :2], dim=1) > 0.5
+    reward *= torch.norm(env.command_manager.get_command(command_name)[:, :2], dim=1) > 0.1
     reward *= torch.clamp(-env.scene["robot"].data.projected_gravity_b[:, 2], 0, 0.7) / 0.7
     return reward
 
@@ -416,7 +416,7 @@ def feet_contact_without_cmd(env: ManagerBasedRLEnv, command_name: str, sensor_c
     # compute the reward
     contact = contact_sensor.compute_first_contact(env.step_dt)[:, sensor_cfg.body_ids]
     reward = torch.sum(contact, dim=-1).float()
-    reward *= torch.norm(env.command_manager.get_command(command_name)[:, :2], dim=1) < 0.5
+    reward *= torch.norm(env.command_manager.get_command(command_name)[:, :2], dim=1) < 0.1
     reward *= torch.clamp(-env.scene["robot"].data.projected_gravity_b[:, 2], 0, 0.7) / 0.7
     return reward
 
@@ -515,7 +515,7 @@ def feet_height(
     )
     reward = torch.sum(foot_z_target_error * foot_velocity_tanh, dim=1)
     # no reward for zero command
-    reward *= torch.norm(env.command_manager.get_command(command_name)[:, :2], dim=1) > 0.5
+    reward *= torch.norm(env.command_manager.get_command(command_name)[:, :2], dim=1) > 0.1
     reward *= torch.clamp(-env.scene["robot"].data.projected_gravity_b[:, 2], 0, 0.7) / 0.7
     return reward
 
@@ -545,7 +545,7 @@ def feet_height_body(
     foot_z_target_error = torch.square(footpos_in_body_frame[:, :, 2] - target_height).view(env.num_envs, -1)
     foot_velocity_tanh = torch.tanh(tanh_mult * torch.norm(footvel_in_body_frame[:, :, :2], dim=2))
     reward = torch.sum(foot_z_target_error * foot_velocity_tanh, dim=1)
-    reward *= torch.norm(env.command_manager.get_command(command_name)[:, :2], dim=1) > 0.5
+    reward *= torch.norm(env.command_manager.get_command(command_name)[:, :2], dim=1) > 0.1
     reward *= torch.clamp(-env.scene["robot"].data.projected_gravity_b[:, 2], 0, 0.7) / 0.7
     return reward
 

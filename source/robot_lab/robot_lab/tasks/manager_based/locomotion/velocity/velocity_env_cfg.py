@@ -295,22 +295,23 @@ class EventCfg:
         },
     )
 
-    randomize_rigid_body_inertia = EventTerm(
-        func=mdp.randomize_rigid_body_inertia,
-        mode="startup",
-        params={
-            "asset_cfg": SceneEntityCfg("robot", body_names=".*"),
-            "inertia_distribution_params": (0.5, 1.5),
-            "operation": "scale",
-        },
-    )
+    # Skip: inertia updated via mass randomization by setting recompute_inertia=True
+    # randomize_rigid_body_inertia = EventTerm(
+    #     func=mdp.randomize_rigid_body_inertia,
+    #     mode="startup",
+    #     params={
+    #         "asset_cfg": SceneEntityCfg("robot", body_names=".*"),
+    #         "inertia_distribution_params": (0.5, 1.5),
+    #         "operation": "scale",
+    #     },
+    # )
 
     randomize_com_positions = EventTerm(
         func=mdp.randomize_rigid_body_com,
         mode="startup",
         params={
             "asset_cfg": SceneEntityCfg("robot", body_names=".*"),
-            "com_range": {"x": (-0.03, 0.03), "y": (-0.03, 0.03), "z": (-0.02, 0.02)},
+            "com_range": {"x": (-0.05, 0.05), "y": (-0.05, 0.05), "z": (-0.05, 0.05)},  # TODO: move to config
         },
     )
 
@@ -340,8 +341,8 @@ class EventCfg:
         mode="reset",
         params={
             "asset_cfg": SceneEntityCfg("robot", joint_names=".*"),
-            "stiffness_distribution_params": (0.7, 1.3),
-            "damping_distribution_params": (0.7, 1.3),
+            "stiffness_distribution_params": (0.5, 2.0),
+            "damping_distribution_params": (0.5, 2.0),
             "operation": "scale",
             "distribution": "uniform",
         },
@@ -438,7 +439,7 @@ class RewardsCfg:
         weight=0.0,
         params={
             "command_name": "base_velocity",
-            "command_threshold": 0.2,
+            "command_threshold": 0.1,
             "asset_cfg": SceneEntityCfg("robot", joint_names=".*"),
         },
     )
@@ -451,7 +452,7 @@ class RewardsCfg:
             "asset_cfg": SceneEntityCfg("robot", joint_names=".*"),
             "stand_still_scale": 5.0,
             "velocity_threshold": 0.5,
-            "command_threshold": 0.2,
+            "command_threshold": 0.1,
         },
     )
 
@@ -463,7 +464,7 @@ class RewardsCfg:
             "sensor_cfg": SceneEntityCfg("contact_forces", body_names=""),
             "command_name": "base_velocity",
             "velocity_threshold": 0.5,
-            "command_threshold": 0.2,
+            "command_threshold": 0.1,
         },
     )
 

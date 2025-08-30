@@ -39,7 +39,7 @@ DEEPROBOTICS_LITE3_CFG = ArticulationCfg(
         },
         joint_vel={".*": 0.0},
     ),
-    soft_joint_pos_limit_factor=0.99,
+    soft_joint_pos_limit_factor=0.9,
     actuators={
         "Hip": DelayedPDActuatorCfg(
             joint_names_expr=[".*_Hip[X,Y]_joint"],
@@ -68,7 +68,7 @@ DEEPROBOTICS_M20_CFG = ArticulationCfg(
     spawn=sim_utils.UrdfFileCfg(
         fix_base=False,
         merge_fixed_joints=True,
-        replace_cylinders_with_capsules=True,
+        replace_cylinders_with_capsules=False,
         asset_path=f"{ISAACLAB_ASSETS_DATA_DIR}/Robots/deeprobotics/m20_description/urdf/m20.urdf",
         activate_contact_sensors=True,
         rigid_props=sim_utils.RigidBodyPropertiesCfg(
@@ -99,7 +99,7 @@ DEEPROBOTICS_M20_CFG = ArticulationCfg(
         },
         joint_vel={".*": 0.0},
     ),
-    soft_joint_pos_limit_factor=0.99,
+    soft_joint_pos_limit_factor=0.9,
     actuators={
         "joint": DCMotorCfg(
             joint_names_expr=[".*hipx_joint", ".*hipy_joint", ".*knee_joint"],
