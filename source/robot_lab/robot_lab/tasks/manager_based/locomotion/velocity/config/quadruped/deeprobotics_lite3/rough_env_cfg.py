@@ -96,7 +96,7 @@ class DeeproboticsLite3RoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         self.rewards.joint_torques_l2.weight = -2.5e-5
         self.rewards.joint_vel_l2.weight = 0
         self.rewards.joint_acc_l2.weight = -1e-8
-        self.rewards.create_joint_deviation_l1_rewterm("joint_deviation_hip_l1", -0.2, [".*HipX.*"])
+        self.rewards.create_joint_deviation_l1_rewterm("joint_deviation_hip_l1", -0.5, [".*HipX.*"])
         self.rewards.joint_pos_limits.weight = -5.0
         self.rewards.joint_vel_limits.weight = 0
         self.rewards.joint_power.weight = -2e-5
@@ -109,13 +109,12 @@ class DeeproboticsLite3RoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         ]
 
         # Action penalties
-        self.rewards.action_rate_l2.weight = -0.01
-        # self.rewards.smoothness_2.weight = -0.004
+        self.rewards.action_rate_l2.weight = -0.02
 
         # Contact sensor
         self.rewards.undesired_contacts.weight = -0.5
         self.rewards.undesired_contacts.params["sensor_cfg"].body_names = [f"^(?!.*{self.foot_link_name}).*"]
-        self.rewards.contact_forces.weight = 0
+        self.rewards.contact_forces.weight = -1e-2
         self.rewards.contact_forces.params["sensor_cfg"].body_names = [self.foot_link_name]
 
         # Velocity-tracking rewards
@@ -137,10 +136,10 @@ class DeeproboticsLite3RoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         self.rewards.feet_slide.weight = -0.05
         self.rewards.feet_slide.params["sensor_cfg"].body_names = [self.foot_link_name]
         self.rewards.feet_slide.params["asset_cfg"].body_names = [self.foot_link_name]
-        self.rewards.feet_height.weight = 0
+        self.rewards.feet_height.weight = -0.2
         self.rewards.feet_height.params["target_height"] = 0.05
         self.rewards.feet_height.params["asset_cfg"].body_names = [self.foot_link_name]
-        self.rewards.feet_height_body.weight = -5.0
+        self.rewards.feet_height_body.weight = -2.5
         self.rewards.feet_height_body.params["target_height"] = -0.35
         self.rewards.feet_height_body.params["asset_cfg"].body_names = [self.foot_link_name]
         self.rewards.feet_gait.weight = 0
