@@ -273,7 +273,7 @@ class EventCfg:
         },
     )
 
-    randomize_rigid_body_mass = EventTerm(
+    randomize_rigid_body_mass_base = EventTerm(
         func=mdp.randomize_rigid_body_mass,
         mode="startup",
         params={
@@ -284,7 +284,7 @@ class EventCfg:
         },
     )
 
-    randomize_rigid_body_mass_all_link = EventTerm(
+    randomize_rigid_body_mass_others = EventTerm(
         func=mdp.randomize_rigid_body_mass,
         mode="startup",
         params={
