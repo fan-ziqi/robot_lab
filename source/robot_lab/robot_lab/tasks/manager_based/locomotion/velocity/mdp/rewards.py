@@ -87,7 +87,7 @@ def joint_power(env: ManagerBasedRLEnv, asset_cfg: SceneEntityCfg = SceneEntityC
     return reward
 
 
-def stand_still_without_cmd(
+def stand_still(
     env: ManagerBasedRLEnv,
     command_name: str,
     command_threshold: float = 0.06,

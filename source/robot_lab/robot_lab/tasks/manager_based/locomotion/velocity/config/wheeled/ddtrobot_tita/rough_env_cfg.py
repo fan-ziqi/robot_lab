@@ -187,8 +187,8 @@ class DDTRobotTitaRoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         self.rewards.joint_vel_limits.params["asset_cfg"].joint_names = self.wheel_joint_names
         self.rewards.joint_power.weight = -2e-5
         self.rewards.joint_power.params["asset_cfg"].joint_names = self.leg_joint_names
-        self.rewards.stand_still_without_cmd.weight = -2.0
-        self.rewards.stand_still_without_cmd.params["asset_cfg"].joint_names = self.leg_joint_names
+        self.rewards.stand_still.weight = -2.0
+        self.rewards.stand_still.params["asset_cfg"].joint_names = self.leg_joint_names
         self.rewards.joint_pos_penalty.weight = -0.5
         self.rewards.joint_pos_penalty.params["asset_cfg"].joint_names = self.leg_joint_names
         self.rewards.joint_pos_penalty.params["velocity_threshold"] = 100

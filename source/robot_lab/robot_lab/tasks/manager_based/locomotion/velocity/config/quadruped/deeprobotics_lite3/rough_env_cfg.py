@@ -100,7 +100,7 @@ class DeeproboticsLite3RoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         self.rewards.joint_pos_limits.weight = -5.0
         self.rewards.joint_vel_limits.weight = 0
         self.rewards.joint_power.weight = -2e-5
-        self.rewards.stand_still_without_cmd.weight = -0.3
+        self.rewards.stand_still.weight = -0.3
         self.rewards.joint_pos_penalty.weight = 0
         self.rewards.joint_mirror.weight = 0
         self.rewards.joint_mirror.params["mirror_joints"] = [

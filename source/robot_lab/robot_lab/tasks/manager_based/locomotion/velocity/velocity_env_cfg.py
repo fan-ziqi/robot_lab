@@ -433,8 +433,8 @@ class RewardsCfg:
         },
     )
 
-    stand_still_without_cmd = RewTerm(
-        func=mdp.stand_still_without_cmd,
+    stand_still = RewTerm(
+        func=mdp.stand_still,
         weight=0.0,
         params={
             "command_name": "base_velocity",
