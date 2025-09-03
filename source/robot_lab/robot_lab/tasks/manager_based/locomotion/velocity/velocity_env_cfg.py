@@ -344,7 +344,7 @@ class EventCfg:
             "stiffness_distribution_params": (0.5, 2.0),
             "damping_distribution_params": (0.5, 2.0),
             "operation": "scale",
-            "distribution": "log_uniform",
+            "distribution": "uniform",
         },
     )
 
