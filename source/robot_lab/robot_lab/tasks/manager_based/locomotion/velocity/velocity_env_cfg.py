@@ -703,7 +703,7 @@ class LocomotionVelocityRoughEnvCfg(ManagerBasedRLEnvCfg):
         self.sim.render_interval = self.decimation
         # self.sim.physics_material = self.scene.terrain.physics_material
         # self.sim.physx.gpu_max_rigid_patch_count = 10 * 2**15
-        self.sim.newton_cfg.solver_cfg.nefc_per_env = 80
+        self.sim.newton_cfg.solver_cfg.njmax = 80
         self.sim.newton_cfg.solver_cfg.ls_iterations = 15
         self.sim.newton_cfg.solver_cfg.cone = "elliptic"
         self.sim.newton_cfg.solver_cfg.impratio = 100.0
