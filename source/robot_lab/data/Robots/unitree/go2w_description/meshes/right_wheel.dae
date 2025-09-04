@@ -10,6 +10,30 @@
     <unit name="meter" meter="1"/>
     <up_axis>Z_UP</up_axis>
   </asset>
+  <library_effects>
+    <effect id="黑色塑料_003-effect">
+      <profile_COMMON>
+        <technique sid="common">
+          <lambert>
+            <emission>
+              <color sid="emission">0 0 0 1</color>
+            </emission>
+            <diffuse>
+              <color sid="diffuse">0.023455 0.023455 0.023455 1</color>
+            </diffuse>
+            <index_of_refraction>
+              <float sid="ior">1.45</float>
+            </index_of_refraction>
+          </lambert>
+        </technique>
+      </profile_COMMON>
+    </effect>
+  </library_effects>
+  <library_materials>
+    <material id="黑色塑料_003-material" name="黑色塑料.003">
+      <instance_effect url="#黑色塑料_003-effect"/>
+    </material>
+  </library_materials>
   <library_cameras>
     <camera id="Camera-camera" name="Camera">
       <optics>

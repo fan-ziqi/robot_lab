@@ -199,9 +199,7 @@
       <geometry>
         <mesh filename="package://go2w_description/meshes/left_wheel.dae" />
       </geometry>
-      <material name="">
-        <color rgba="1 1 1 1" />
-      </material>
+      <material name="黑色塑料_003-effect"><color rgba="0.023455 0.023455 0.023455 1" /></material>
     </visual>
     <collision>
       <origin rpy="0 0 0" xyz="0 0.0 0" />
@@ -361,9 +359,7 @@
       <geometry>
         <mesh filename="package://go2w_description/meshes/right_wheel.dae" />
       </geometry>
-      <material name="">
-        <color rgba="1 1 1 1" />
-      </material>
+      <material name="黑色塑料_003-effect"><color rgba="0.023455 0.023455 0.023455 1" /></material>
     </visual>
     <collision>
       <origin rpy="0 0 0" xyz="0 -0.0 0" />
@@ -524,9 +520,7 @@
       <geometry>
         <mesh filename="package://go2w_description/meshes/left_wheel.dae" />
       </geometry>
-      <material name="">
-        <color rgba="1 1 1 1" />
-      </material>
+      <material name="黑色塑料_003-effect"><color rgba="0.023455 0.023455 0.023455 1" /></material>
     </visual>
     <collision>
       <origin rpy="0 0 0" xyz="0 0.0 0" />
@@ -686,9 +680,7 @@
       <geometry>
         <mesh filename="package://go2w_description/meshes/right_wheel.dae" />
       </geometry>
-      <material name="">
-        <color rgba="1 1 1 1" />
-      </material>
+      <material name="黑色塑料_003-effect"><color rgba="0.023455 0.023455 0.023455 1" /></material>
     </visual>
     <collision>
       <origin rpy="0 0 0" xyz="0 -0.0 0" />
