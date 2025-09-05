@@ -6,7 +6,7 @@ Reference: https://github.com/unitreerobotics/unitree_ros
 """
 
 import isaaclab.sim as sim_utils
-from isaaclab.actuators import DCMotorCfg, ImplicitActuatorCfg
+from isaaclab.actuators import IdealPDActuatorCfg, ImplicitActuatorCfg  # noqa: F401
 from isaaclab.assets.articulation import ArticulationCfg
 
 from robot_lab.assets import ISAACLAB_ASSETS_DATA_DIR
@@ -52,14 +52,15 @@ UNITREE_A1_CFG = ArticulationCfg(
     ),
     soft_joint_pos_limit_factor=0.9,
     actuators={
-        "legs": DCMotorCfg(
+        "legs": IdealPDActuatorCfg(
             joint_names_expr=[".*_joint"],
             effort_limit=33.5,
-            saturation_effort=33.5,
             velocity_limit=21.0,
             stiffness=20.0,
             damping=0.5,
             friction=0.0,
+            min_delay=0,  # physics time steps (min: 5.0*0=00.0ms)
+            max_delay=5,  # physics time steps (max: 5.0*5=25.0ms)
         ),
     },
 )
@@ -104,14 +105,15 @@ UNITREE_GO2_CFG = ArticulationCfg(
     ),
     soft_joint_pos_limit_factor=0.9,
     actuators={
-        "legs": DCMotorCfg(
+        "legs": IdealPDActuatorCfg(
             joint_names_expr=[".*"],
             effort_limit=23.5,
-            saturation_effort=23.5,
             velocity_limit=30.0,
             stiffness=25.0,
             damping=0.5,
             friction=0.0,
+            min_delay=0,  # physics time steps (min: 5.0*0=00.0ms)
+            max_delay=5,  # physics time steps (max: 5.0*5=25.0ms)
         ),
     },
 )
@@ -155,14 +157,15 @@ UNITREE_GO2W_CFG = ArticulationCfg(
     ),
     soft_joint_pos_limit_factor=0.9,
     actuators={
-        "legs": DCMotorCfg(
+        "legs": IdealPDActuatorCfg(
             joint_names_expr=["^(?!.*_foot_joint).*"],
             effort_limit=23.5,
-            saturation_effort=23.5,
             velocity_limit=30.0,
             stiffness=25.0,
             damping=0.5,
             friction=0.0,
+            min_delay=0,  # physics time steps (min: 5.0*0=00.0ms)
+            max_delay=5,  # physics time steps (max: 5.0*5=25.0ms)
         ),
         "wheels": ImplicitActuatorCfg(
             joint_names_expr=[".*_foot_joint"],
@@ -213,32 +216,23 @@ UNITREE_B2_CFG = ArticulationCfg(
     ),
     soft_joint_pos_limit_factor=0.9,
     actuators={
-        "hip": DCMotorCfg(
-            joint_names_expr=[".*_hip_joint"],
-            effort_limit=200.0,
-            saturation_effort=200.0,
-            velocity_limit=23.0,
-            stiffness=160.0,
-            damping=5.0,
+        "legs": IdealPDActuatorCfg(
+            joint_names_expr=["^(?!.*_foot_joint).*"],
+            effort_limit={
+                ".*_hip_joint": 200.0,
+                ".*_thigh_joint": 200.0,
+                ".*_calf_joint": 320.0,
+            },
+            velocity_limit={
+                ".*_hip_joint": 23.0,
+                ".*_thigh_joint": 23.0,
+                ".*_calf_joint": 14.0,
+            },
+            stiffness=25.0,
+            damping=0.5,
             friction=0.0,
-        ),
-        "thigh": DCMotorCfg(
-            joint_names_expr=[".*_thigh_joint"],
-            effort_limit=200.0,
-            saturation_effort=200.0,
-            velocity_limit=23.0,
-            stiffness=160.0,
-            damping=5.0,
-            friction=0.0,
-        ),
-        "calf": DCMotorCfg(
-            joint_names_expr=[".*_calf_joint"],
-            effort_limit=320.0,
-            saturation_effort=320.0,
-            velocity_limit=14.0,
-            stiffness=160.0,
-            damping=5.0,
-            friction=0.0,
+            min_delay=0,  # physics time steps (min: 5.0*0=00.0ms)
+            max_delay=5,  # physics time steps (max: 5.0*5=25.0ms)
         ),
     },
 )
@@ -283,32 +277,23 @@ UNITREE_B2W_CFG = ArticulationCfg(
     ),
     soft_joint_pos_limit_factor=0.9,
     actuators={
-        "hip": DCMotorCfg(
-            joint_names_expr=[".*_hip_joint"],
-            effort_limit=200.0,
-            saturation_effort=200.0,
-            velocity_limit=23.0,
-            stiffness=160.0,
-            damping=5.0,
+        "legs": IdealPDActuatorCfg(
+            joint_names_expr=["^(?!.*_foot_joint).*"],
+            effort_limit={
+                ".*_hip_joint": 200.0,
+                ".*_thigh_joint": 200.0,
+                ".*_calf_joint": 320.0,
+            },
+            velocity_limit={
+                ".*_hip_joint": 23.0,
+                ".*_thigh_joint": 23.0,
+                ".*_calf_joint": 14.0,
+            },
+            stiffness=25.0,
+            damping=0.5,
             friction=0.0,
-        ),
-        "thigh": DCMotorCfg(
-            joint_names_expr=[".*_thigh_joint"],
-            effort_limit=200.0,
-            saturation_effort=200.0,
-            velocity_limit=23.0,
-            stiffness=160.0,
-            damping=5.0,
-            friction=0.0,
-        ),
-        "calf": DCMotorCfg(
-            joint_names_expr=[".*_calf_joint"],
-            effort_limit=320.0,
-            saturation_effort=320.0,
-            velocity_limit=14.0,
-            stiffness=160.0,
-            damping=5.0,
-            friction=0.0,
+            min_delay=0,  # physics time steps (min: 5.0*0=00.0ms)
+            max_delay=5,  # physics time steps (max: 5.0*5=25.0ms)
         ),
         "wheel": ImplicitActuatorCfg(
             joint_names_expr=[".*_foot_joint"],
@@ -371,15 +356,15 @@ UNITREE_G1_29DOF_CFG = ArticulationCfg(
     ),
     soft_joint_pos_limit_factor=0.9,
     actuators={
-        "legs": ImplicitActuatorCfg(
+        "legs": IdealPDActuatorCfg(
             joint_names_expr=[
                 ".*_hip_pitch_joint",
                 ".*_hip_roll_joint",
                 ".*_hip_yaw_joint",
                 ".*_knee_joint",
             ],
-            effort_limit_sim=300,
-            velocity_limit_sim=100.0,
+            effort_limit=300,
+            velocity_limit=100.0,
             stiffness={
                 ".*_hip_pitch_joint": 200.0,
                 ".*_hip_roll_joint": 150.0,
@@ -396,11 +381,13 @@ UNITREE_G1_29DOF_CFG = ArticulationCfg(
                 ".*_hip_.*": 0.01,
                 ".*_knee_joint": 0.01,
             },
+            min_delay=0,  # physics time steps (min: 5.0*0=00.0ms)
+            max_delay=5,  # physics time steps (max: 5.0*5=25.0ms)
         ),
-        "waist": ImplicitActuatorCfg(
+        "waist": IdealPDActuatorCfg(
             joint_names_expr=["waist_.*_joint"],
-            effort_limit_sim=300,
-            velocity_limit_sim=100.0,
+            effort_limit=300,
+            velocity_limit=100.0,
             stiffness={
                 "waist_yaw_joint": 200.0,
                 "waist_roll_joint": 200.0,
@@ -416,15 +403,19 @@ UNITREE_G1_29DOF_CFG = ArticulationCfg(
                 "waist_roll_joint": 0.01,
                 "waist_pitch_joint": 0.01,
             },
+            min_delay=0,  # physics time steps (min: 5.0*0=00.0ms)
+            max_delay=5,  # physics time steps (max: 5.0*5=25.0ms)
         ),
-        "feet": ImplicitActuatorCfg(
-            effort_limit_sim=20,
+        "feet": IdealPDActuatorCfg(
+            effort_limit=20,
             joint_names_expr=[".*_ankle_pitch_joint", ".*_ankle_roll_joint"],
             stiffness=20.0,
             damping=2.0,
             armature=0.01,
+            min_delay=0,  # physics time steps (min: 5.0*0=00.0ms)
+            max_delay=5,  # physics time steps (max: 5.0*5=25.0ms)
         ),
-        "arms": ImplicitActuatorCfg(
+        "arms": IdealPDActuatorCfg(
             joint_names_expr=[
                 ".*_shoulder_pitch_joint",
                 ".*_shoulder_roll_joint",
@@ -432,8 +423,8 @@ UNITREE_G1_29DOF_CFG = ArticulationCfg(
                 ".*_elbow_joint",
                 ".*_wrist_.*",
             ],
-            effort_limit_sim=300,
-            velocity_limit_sim=100.0,
+            effort_limit=300,
+            velocity_limit=100.0,
             stiffness=40.0,
             damping=10.0,
             armature={
@@ -441,6 +432,8 @@ UNITREE_G1_29DOF_CFG = ArticulationCfg(
                 ".*_elbow_.*": 0.01,
                 ".*_wrist_.*": 0.01,
             },
+            min_delay=0,  # physics time steps (min: 5.0*0=00.0ms)
+            max_delay=5,  # physics time steps (max: 5.0*5=25.0ms)
         ),
     },
 )
