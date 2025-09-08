@@ -167,15 +167,15 @@ class UnitreeGo2WRoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         self.rewards.joint_power.params["asset_cfg"].joint_names = self.leg_joint_names
         self.rewards.stand_still.weight = -2.0
         self.rewards.stand_still.params["asset_cfg"].joint_names = self.leg_joint_names
-        self.rewards.joint_pos_penalty.weight = -1.0
+        self.rewards.joint_pos_penalty.weight = -0.5
         self.rewards.joint_pos_penalty.params["asset_cfg"].joint_names = self.leg_joint_names
         self.rewards.wheel_vel_penalty.weight = 0
         self.rewards.wheel_vel_penalty.params["sensor_cfg"].body_names = [self.foot_link_name]
         self.rewards.wheel_vel_penalty.params["asset_cfg"].joint_names = self.wheel_joint_names
-        self.rewards.joint_mirror.weight = -0.05
+        self.rewards.joint_mirror.weight = 0
         self.rewards.joint_mirror.params["mirror_joints"] = [
-            ["FR_(hip|thigh|calf).*", "RL_(hip|thigh|calf).*"],
-            ["FL_(hip|thigh|calf).*", "RR_(hip|thigh|calf).*"],
+            ["FR_(thigh|calf).*", "RL_(thigh|calf).*"],
+            ["FL_(thigh|calf).*", "RR_(thigh|calf).*"],
         ]
 
         # Action penalties
@@ -197,7 +197,7 @@ class UnitreeGo2WRoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         self.rewards.feet_air_time.params["sensor_cfg"].body_names = [self.foot_link_name]
         self.rewards.feet_contact.weight = 0
         self.rewards.feet_contact.params["sensor_cfg"].body_names = [self.foot_link_name]
-        self.rewards.feet_contact_without_cmd.weight = 0.1
+        self.rewards.feet_contact_without_cmd.weight = 0
         self.rewards.feet_contact_without_cmd.params["sensor_cfg"].body_names = [self.foot_link_name]
         self.rewards.feet_stumble.weight = 0
         self.rewards.feet_stumble.params["sensor_cfg"].body_names = [self.foot_link_name]
@@ -227,6 +227,6 @@ class UnitreeGo2WRoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         self.curriculum.command_levels = None
 
         # ------------------------------Commands------------------------------
-        # self.commands.base_velocity.ranges.lin_vel_x = (-1.5, 1.5)
+        # self.commands.base_velocity.ranges.lin_vel_x = (-2.0, 2.0)
         # self.commands.base_velocity.ranges.lin_vel_y = (-1.0, 1.0)
         # self.commands.base_velocity.ranges.ang_vel_z = (-1.0, 1.0)
