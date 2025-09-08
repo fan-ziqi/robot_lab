@@ -28,7 +28,8 @@
     <collision>
       <origin xyz="0 0 0" rpy="0 0 0" />
       <geometry>
-        <cylinder radius="0.06" length="0.09" />
+        <!-- <cylinder radius="0.06" length="0.09" /> -->
+        <sphere radius="0.06" />
       </geometry>
     </collision>
   </link>
@@ -72,7 +73,8 @@
     <collision>
       <origin rpy="1.5707963267948966 0 0" xyz="0 0.08 0" />
       <geometry>
-        <cylinder length="0.04" radius="0.046" />
+        <!-- <cylinder length="0.04" radius="0.046" /> -->
+        <sphere radius="0.046" />
       </geometry>
     </collision>
   </link>
@@ -127,7 +129,8 @@
     <collision>
       <origin rpy="0 -0.21 0" xyz="0.008 0 -0.06" />
       <geometry>
-        <cylinder length="0.12" radius="0.012" />
+        <!-- <cylinder length="0.12" radius="0.012" /> -->
+        <box size="0.026 0.026 0.25" />
       </geometry>
     </collision>
   </link>
@@ -138,7 +141,7 @@
     <axis xyz="0 1 0" />
     <limit lower="-2.7227" upper="-0.83776" effort="35.55" velocity="20.07" />
   </joint>
-  <link name="FL_calflower">
+  <!-- <link name="FL_calflower">
     <collision>
       <origin rpy="0 0 0" xyz="0 0 0" />
       <geometry>
@@ -165,7 +168,7 @@
     <parent link="FL_calflower" />
     <child link="FL_calflower1" />
     <axis xyz="0 0 0" />
-  </joint>
+  </joint> -->
 
   <link name="FL_foot_motor">
     <inertial>
@@ -173,12 +176,12 @@
       <mass value="0.646" />
       <inertia ixx="0.001" ixy="0" ixz="0" iyy="0.0016" iyz="0" izz="0.001" />
     </inertial>
-    <collision>
+    <!-- <collision>
       <origin rpy="1.5707963267948966 0 0" xyz="0 0 0" />
       <geometry>
         <cylinder length="0.05" radius="0.05" />
       </geometry>
-    </collision>
+    </collision> -->
   </link>
 
   <joint name="FL_foot_motor_joint" type="fixed">
@@ -232,7 +235,8 @@
     <collision>
       <origin rpy="1.5707963267948966 0 0" xyz="0 -0.08 0" />
       <geometry>
-        <cylinder length="0.04" radius="0.046" />
+        <!-- <cylinder length="0.04" radius="0.046" /> -->
+        <sphere radius="0.046" />
       </geometry>
     </collision>
   </link>
@@ -287,7 +291,8 @@
     <collision>
       <origin rpy="0 -0.2 0" xyz="0.01 0 -0.06" />
       <geometry>
-        <cylinder length="0.12" radius="0.013" />
+        <!-- <cylinder length="0.12" radius="0.013" /> -->
+        <box size="0.026 0.026 0.25" />
       </geometry>
     </collision>
   </link>
@@ -298,7 +303,7 @@
     <axis xyz="0 1 0" />
     <limit lower="-2.7227" upper="-0.83776" effort="35.55" velocity="20.07" />
   </joint>
-  <link name="FR_calflower">
+  <!-- <link name="FR_calflower">
     <collision>
       <origin rpy="0 0 0" xyz="0 0 0" />
       <geometry>
@@ -325,7 +330,7 @@
     <parent link="FR_calflower" />
     <child link="FR_calflower1" />
     <axis xyz="0 0 0" />
-  </joint>
+  </joint> -->
 
   <link name="FR_foot_motor">
     <inertial>
@@ -333,12 +338,12 @@
       <mass value="0.646" />
       <inertia ixx="0.001" ixy="0" ixz="0" iyy="0.0016" iyz="0" izz="0.001" />
     </inertial>
-    <collision>
+    <!-- <collision>
       <origin rpy="1.5707963267948966 0 0" xyz="0 0 0" />
       <geometry>
         <cylinder length="0.05" radius="0.05" />
       </geometry>
-    </collision>
+    </collision> -->
   </link>
 
   <joint name="FR_foot_motor_joint" type="fixed">
@@ -392,7 +397,8 @@
     <collision>
       <origin rpy="1.5707963267948966 0 0" xyz="0 0.08 0" />
       <geometry>
-        <cylinder length="0.04" radius="0.046" />
+        <!-- <cylinder length="0.04" radius="0.046" /> -->
+        <sphere radius="0.046" />
       </geometry>
     </collision>
   </link>
@@ -447,7 +453,8 @@
     <collision>
       <origin rpy="0 -0.2 0" xyz="0.01 0 -0.06" />
       <geometry>
-        <cylinder length="0.12" radius="0.013" />
+        <!-- <cylinder length="0.12" radius="0.013" /> -->
+        <box size="0.026 0.026 0.25" />
       </geometry>
     </collision>
   </link>
@@ -458,7 +465,7 @@
     <axis xyz="0 1 0" />
     <limit lower="-2.7227" upper="-0.83776" effort="35.55" velocity="20.07" />
   </joint>
-  <link name="RL_calflower">
+  <!-- <link name="RL_calflower">
     <collision>
       <origin rpy="0 0 0" xyz="0 0 0" />
       <geometry>
@@ -485,7 +492,7 @@
     <parent link="RL_calflower" />
     <child link="RL_calflower1" />
     <axis xyz="0 0 0" />
-  </joint>
+  </joint> -->
 
   <link name="RL_foot_motor">
   <inertial>
@@ -493,12 +500,12 @@
     <mass value="0.646" />
     <inertia ixx="0.001" ixy="0" ixz="0" iyy="0.0016" iyz="0" izz="0.001" />
   </inertial>
-  <collision>
+  <!-- <collision>
     <origin rpy="1.5707963267948966 0 0" xyz="0 0 0" />
     <geometry>
       <cylinder length="0.05" radius="0.05" />
     </geometry>
-  </collision>
+  </collision> -->
 </link>
 
 <joint name="RL_foot_motor_joint" type="fixed">
@@ -553,7 +560,8 @@
     <collision>
       <origin rpy="1.5707963267948966 0 0" xyz="0 -0.08 0" />
       <geometry>
-        <cylinder length="0.04" radius="0.046" />
+        <!-- <cylinder length="0.04" radius="0.046" /> -->
+        <sphere radius="0.046" />
       </geometry>
     </collision>
   </link>
@@ -608,7 +616,8 @@
     <collision>
       <origin rpy="0 -0.2 0" xyz="0.01 0 -0.06" />
       <geometry>
-        <cylinder length="0.12" radius="0.013" />
+        <!-- <cylinder length="0.12" radius="0.013" /> -->
+        <box size="0.026 0.026 0.25" />
       </geometry>
     </collision>
   </link>
@@ -619,7 +628,7 @@
     <axis xyz="0 1 0" />
     <limit lower="-2.7227" upper="-0.83776" effort="35.55" velocity="20.07" />
   </joint>
-  <link name="RR_calflower">
+  <!-- <link name="RR_calflower">
     <collision>
       <origin rpy="0 0 0" xyz="0 0 0" />
       <geometry>
@@ -646,7 +655,7 @@
     <parent link="RR_calflower" />
     <child link="RR_calflower1" />
     <axis xyz="0 0 0" />
-  </joint>
+  </joint> -->
 
   <link name="RR_foot_motor">
   <inertial>
@@ -654,12 +663,12 @@
     <mass value="0.646" />
     <inertia ixx="0.001" ixy="0" ixz="0" iyy="0.0016" iyz="0" izz="0.001" />
   </inertial>
-  <collision>
+  <!-- <collision>
     <origin rpy="1.5707963267948966 0 0" xyz="0 0 0" />
     <geometry>
       <cylinder length="0.05" radius="0.05" />
     </geometry>
-  </collision>
+  </collision> -->
 </link>
 
 <joint name="RR_foot_motor_joint" type="fixed">
