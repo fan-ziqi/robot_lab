@@ -11,6 +11,7 @@
 """Launch Isaac Sim Simulator first."""
 
 import argparse
+import os
 import sys
 
 from isaaclab.app import AppLauncher
@@ -61,7 +62,6 @@ simulation_app = app_launcher.app
 """Rest everything follows."""
 
 import gymnasium as gym
-import os
 import time
 import torch
 
@@ -80,9 +80,7 @@ from isaaclab.terrains import TerrainImporterCfg
 from isaaclab.utils.assets import retrieve_file_path
 from isaaclab.utils.dict import print_dict
 from isaaclab.utils.pretrained_checkpoint import get_published_pretrained_checkpoint
-
 from isaaclab_rl.rsl_rl import RslRlBaseRunnerCfg, RslRlVecEnvWrapper, export_policy_as_jit, export_policy_as_onnx
-
 from isaaclab_tasks.utils import get_checkpoint_path
 from isaaclab_tasks.utils.hydra import hydra_task_config
 
