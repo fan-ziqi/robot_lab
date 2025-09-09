@@ -28,7 +28,8 @@
     <collision>
       <origin xyz="0 0 0" rpy="0 0 0" />
       <geometry>
-        <cylinder radius="0.06" length="0.09" />
+        <!-- <cylinder radius="0.06" length="0.09" /> -->
+        <sphere radius="0.06" />
       </geometry>
     </collision>
   </link>
@@ -72,7 +73,8 @@
     <collision>
       <origin rpy="1.5707963267948966 0 0" xyz="0 0.08 0" />
       <geometry>
-        <cylinder length="0.04" radius="0.046" />
+        <!-- <cylinder length="0.04" radius="0.046" /> -->
+        <sphere radius="0.046" />
       </geometry>
     </collision>
   </link>
@@ -127,7 +129,8 @@
     <collision>
       <origin rpy="0 -0.21 0" xyz="0.008 0 -0.06" />
       <geometry>
-        <cylinder length="0.12" radius="0.012" />
+        <!-- <cylinder length="0.12" radius="0.013" /> -->
+        <box size="0.026 0.026 0.12" />
       </geometry>
     </collision>
   </link>
@@ -142,7 +145,8 @@
     <collision>
       <origin rpy="0 0 0" xyz="0 0 0" />
       <geometry>
-        <cylinder length="0.065" radius="0.011" />
+        <!-- <cylinder length="0.065" radius="0.011" /> -->
+        <box size="0.022 0.022 0.065" />
       </geometry>
     </collision>
   </link>
@@ -156,7 +160,8 @@
     <collision>
       <origin rpy="0 0 0" xyz="0 0 0" />
       <geometry>
-        <cylinder length="0.03" radius="0.0155" />
+        <!-- <cylinder length="0.03" radius="0.0155" /> -->
+        <box size="0.031 0.031 0.03" />
       </geometry>
     </collision>
   </link>
@@ -173,12 +178,12 @@
       <mass value="0.646" />
       <inertia ixx="0.001" ixy="0" ixz="0" iyy="0.0016" iyz="0" izz="0.001" />
     </inertial>
-    <collision>
+    <!-- <collision>
       <origin rpy="1.5707963267948966 0 0" xyz="0 0 0" />
       <geometry>
         <cylinder length="0.05" radius="0.05" />
       </geometry>
-    </collision>
+    </collision> -->
   </link>
 
   <joint name="FL_foot_motor_joint" type="fixed">
@@ -207,6 +212,12 @@
         <mesh filename="package://go2w_description/meshes/left_wheel.dae" />
       </geometry>
     </collision>
+    <!-- <collision>
+      <origin rpy="1.5707963267948966 0 0" xyz="0 0.048 0" />
+      <geometry>
+        <cylinder length="0.045" radius="0.086" />
+      </geometry>
+    </collision> -->
   </link>
   <joint name="FL_foot_joint" type="continuous">
     <origin xyz="0 0 -0.2264" rpy="0 0 0" />
@@ -232,7 +243,8 @@
     <collision>
       <origin rpy="1.5707963267948966 0 0" xyz="0 -0.08 0" />
       <geometry>
-        <cylinder length="0.04" radius="0.046" />
+        <!-- <cylinder length="0.04" radius="0.046" /> -->
+        <sphere radius="0.046" />
       </geometry>
     </collision>
   </link>
@@ -287,7 +299,8 @@
     <collision>
       <origin rpy="0 -0.2 0" xyz="0.01 0 -0.06" />
       <geometry>
-        <cylinder length="0.12" radius="0.013" />
+        <!-- <cylinder length="0.12" radius="0.013" /> -->
+        <box size="0.026 0.026 0.12" />
       </geometry>
     </collision>
   </link>
@@ -302,7 +315,8 @@
     <collision>
       <origin rpy="0 0 0" xyz="0 0 0" />
       <geometry>
-        <cylinder length="0.065" radius="0.011" />
+        <!-- <cylinder length="0.065" radius="0.011" /> -->
+        <box size="0.022 0.022 0.065" />
       </geometry>
     </collision>
   </link>
@@ -316,7 +330,8 @@
     <collision>
       <origin rpy="0 0 0" xyz="0 0 0" />
       <geometry>
-        <cylinder length="0.03" radius="0.0155" />
+        <!-- <cylinder length="0.03" radius="0.0155" /> -->
+        <box size="0.031 0.031 0.03" />
       </geometry>
     </collision>
   </link>
@@ -333,12 +348,12 @@
       <mass value="0.646" />
       <inertia ixx="0.001" ixy="0" ixz="0" iyy="0.0016" iyz="0" izz="0.001" />
     </inertial>
-    <collision>
+    <!-- <collision>
       <origin rpy="1.5707963267948966 0 0" xyz="0 0 0" />
       <geometry>
         <cylinder length="0.05" radius="0.05" />
       </geometry>
-    </collision>
+    </collision> -->
   </link>
 
   <joint name="FR_foot_motor_joint" type="fixed">
@@ -365,9 +380,14 @@
       <origin rpy="0 0 0" xyz="0 -0.0 0" />
       <geometry>
         <mesh filename="package://go2w_description/meshes/right_wheel.dae" />
-
       </geometry>
     </collision>
+    <!-- <collision>
+      <origin rpy="1.5707963267948966 0 0" xyz="0 -0.048 0" />
+      <geometry>
+        <cylinder length="0.045" radius="0.086" />
+      </geometry>
+    </collision> -->
   </link>
   <joint name="FR_foot_joint" type="continuous">
     <origin xyz="0 0 -0.2264" rpy="0 0 0" />
@@ -392,7 +412,8 @@
     <collision>
       <origin rpy="1.5707963267948966 0 0" xyz="0 0.08 0" />
       <geometry>
-        <cylinder length="0.04" radius="0.046" />
+        <!-- <cylinder length="0.04" radius="0.046" /> -->
+        <sphere radius="0.046" />
       </geometry>
     </collision>
   </link>
@@ -447,7 +468,8 @@
     <collision>
       <origin rpy="0 -0.2 0" xyz="0.01 0 -0.06" />
       <geometry>
-        <cylinder length="0.12" radius="0.013" />
+        <!-- <cylinder length="0.12" radius="0.013" /> -->
+        <box size="0.026 0.026 0.12" />
       </geometry>
     </collision>
   </link>
@@ -462,7 +484,8 @@
     <collision>
       <origin rpy="0 0 0" xyz="0 0 0" />
       <geometry>
-        <cylinder length="0.065" radius="0.011" />
+        <!-- <cylinder length="0.065" radius="0.011" /> -->
+        <box size="0.022 0.022 0.065" />
       </geometry>
     </collision>
   </link>
@@ -476,7 +499,8 @@
     <collision>
       <origin rpy="0 0 0" xyz="0 0 0" />
       <geometry>
-        <cylinder length="0.03" radius="0.0155" />
+        <!-- <cylinder length="0.03" radius="0.0155" /> -->
+        <box size="0.031 0.031 0.03" />
       </geometry>
     </collision>
   </link>
@@ -493,12 +517,12 @@
     <mass value="0.646" />
     <inertia ixx="0.001" ixy="0" ixz="0" iyy="0.0016" iyz="0" izz="0.001" />
   </inertial>
-  <collision>
+  <!-- <collision>
     <origin rpy="1.5707963267948966 0 0" xyz="0 0 0" />
     <geometry>
       <cylinder length="0.05" radius="0.05" />
     </geometry>
-  </collision>
+  </collision> -->
 </link>
 
 <joint name="RL_foot_motor_joint" type="fixed">
@@ -526,9 +550,14 @@
       <origin rpy="0 0 0" xyz="0 0.0 0" />
       <geometry>
         <mesh filename="package://go2w_description/meshes/left_wheel.dae" />
-
       </geometry>
     </collision>
+    <!-- <collision>
+      <origin rpy="1.5707963267948966 0 0" xyz="0 0.048 0" />
+      <geometry>
+        <cylinder length="0.045" radius="0.086" />
+      </geometry>
+    </collision> -->
   </link>
   <joint name="RL_foot_joint" type="continuous">
     <origin xyz="0.0 0 -0.2264" rpy="0 0 0" />
@@ -553,7 +582,8 @@
     <collision>
       <origin rpy="1.5707963267948966 0 0" xyz="0 -0.08 0" />
       <geometry>
-        <cylinder length="0.04" radius="0.046" />
+        <!-- <cylinder length="0.04" radius="0.046" /> -->
+        <sphere radius="0.046" />
       </geometry>
     </collision>
   </link>
@@ -608,7 +638,8 @@
     <collision>
       <origin rpy="0 -0.2 0" xyz="0.01 0 -0.06" />
       <geometry>
-        <cylinder length="0.12" radius="0.013" />
+        <!-- <cylinder length="0.12" radius="0.013" /> -->
+        <box size="0.026 0.026 0.12" />
       </geometry>
     </collision>
   </link>
@@ -623,7 +654,8 @@
     <collision>
       <origin rpy="0 0 0" xyz="0 0 0" />
       <geometry>
-        <cylinder length="0.065" radius="0.011" />
+        <!-- <cylinder length="0.065" radius="0.011" /> -->
+        <box size="0.022 0.022 0.065" />
       </geometry>
     </collision>
   </link>
@@ -637,7 +669,8 @@
     <collision>
       <origin rpy="0 0 0" xyz="0 0 0" />
       <geometry>
-        <cylinder length="0.03" radius="0.0155" />
+        <!-- <cylinder length="0.03" radius="0.0155" /> -->
+        <box size="0.031 0.031 0.03" />
       </geometry>
     </collision>
   </link>
@@ -654,12 +687,12 @@
     <mass value="0.646" />
     <inertia ixx="0.001" ixy="0" ixz="0" iyy="0.0016" iyz="0" izz="0.001" />
   </inertial>
-  <collision>
+  <!-- <collision>
     <origin rpy="1.5707963267948966 0 0" xyz="0 0 0" />
     <geometry>
       <cylinder length="0.05" radius="0.05" />
     </geometry>
-  </collision>
+  </collision> -->
 </link>
 
 <joint name="RR_foot_motor_joint" type="fixed">
@@ -686,9 +719,14 @@
       <origin rpy="0 0 0" xyz="0 -0.0 0" />
       <geometry>
         <mesh filename="package://go2w_description/meshes/right_wheel.dae" />
-
       </geometry>
     </collision>
+    <!-- <collision>
+      <origin rpy="1.5707963267948966 0 0" xyz="0 -0.048 0" />
+      <geometry>
+        <cylinder length="0.045" radius="0.086" />
+      </geometry>
+    </collision> -->
   </link>
   <joint name="RR_foot_joint" type="continuous">
     <origin xyz="-0.0 0 -0.2264" rpy="0 0 0" />
