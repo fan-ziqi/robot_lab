@@ -129,8 +129,8 @@
     <collision>
       <origin rpy="0 -0.21 0" xyz="0.008 0 -0.06" />
       <geometry>
-        <!-- <cylinder length="0.12" radius="0.012" /> -->
-        <box size="0.026 0.026 0.25" />
+        <!-- <cylinder length="0.12" radius="0.013" /> -->
+        <box size="0.026 0.026 0.12" />
       </geometry>
     </collision>
   </link>
@@ -141,11 +141,12 @@
     <axis xyz="0 1 0" />
     <limit lower="-2.7227" upper="-0.83776" effort="35.55" velocity="20.07" />
   </joint>
-  <!-- <link name="FL_calflower">
+  <link name="FL_calflower">
     <collision>
       <origin rpy="0 0 0" xyz="0 0 0" />
       <geometry>
-        <cylinder length="0.065" radius="0.011" />
+        <!-- <cylinder length="0.065" radius="0.011" /> -->
+        <box size="0.022 0.022 0.065" />
       </geometry>
     </collision>
   </link>
@@ -159,7 +160,8 @@
     <collision>
       <origin rpy="0 0 0" xyz="0 0 0" />
       <geometry>
-        <cylinder length="0.03" radius="0.0155" />
+        <!-- <cylinder length="0.03" radius="0.0155" /> -->
+        <box size="0.031 0.031 0.03" />
       </geometry>
     </collision>
   </link>
@@ -168,7 +170,7 @@
     <parent link="FL_calflower" />
     <child link="FL_calflower1" />
     <axis xyz="0 0 0" />
-  </joint> -->
+  </joint>
 
   <link name="FL_foot_motor">
     <inertial>
@@ -210,6 +212,12 @@
         <mesh filename="package://go2w_description/meshes/left_wheel.dae" />
       </geometry>
     </collision>
+    <!-- <collision>
+      <origin rpy="1.5707963267948966 0 0" xyz="0 0.048 0" />
+      <geometry>
+        <cylinder length="0.045" radius="0.086" />
+      </geometry>
+    </collision> -->
   </link>
   <joint name="FL_foot_joint" type="continuous">
     <origin xyz="0 0 -0.2264" rpy="0 0 0" />
@@ -292,7 +300,7 @@
       <origin rpy="0 -0.2 0" xyz="0.01 0 -0.06" />
       <geometry>
         <!-- <cylinder length="0.12" radius="0.013" /> -->
-        <box size="0.026 0.026 0.25" />
+        <box size="0.026 0.026 0.12" />
       </geometry>
     </collision>
   </link>
@@ -303,11 +311,12 @@
     <axis xyz="0 1 0" />
     <limit lower="-2.7227" upper="-0.83776" effort="35.55" velocity="20.07" />
   </joint>
-  <!-- <link name="FR_calflower">
+  <link name="FR_calflower">
     <collision>
       <origin rpy="0 0 0" xyz="0 0 0" />
       <geometry>
-        <cylinder length="0.065" radius="0.011" />
+        <!-- <cylinder length="0.065" radius="0.011" /> -->
+        <box size="0.022 0.022 0.065" />
       </geometry>
     </collision>
   </link>
@@ -321,7 +330,8 @@
     <collision>
       <origin rpy="0 0 0" xyz="0 0 0" />
       <geometry>
-        <cylinder length="0.03" radius="0.0155" />
+        <!-- <cylinder length="0.03" radius="0.0155" /> -->
+        <box size="0.031 0.031 0.03" />
       </geometry>
     </collision>
   </link>
@@ -330,7 +340,7 @@
     <parent link="FR_calflower" />
     <child link="FR_calflower1" />
     <axis xyz="0 0 0" />
-  </joint> -->
+  </joint>
 
   <link name="FR_foot_motor">
     <inertial>
@@ -370,9 +380,14 @@
       <origin rpy="0 0 0" xyz="0 -0.0 0" />
       <geometry>
         <mesh filename="package://go2w_description/meshes/right_wheel.dae" />
-
       </geometry>
     </collision>
+    <!-- <collision>
+      <origin rpy="1.5707963267948966 0 0" xyz="0 -0.048 0" />
+      <geometry>
+        <cylinder length="0.045" radius="0.086" />
+      </geometry>
+    </collision> -->
   </link>
   <joint name="FR_foot_joint" type="continuous">
     <origin xyz="0 0 -0.2264" rpy="0 0 0" />
@@ -454,7 +469,7 @@
       <origin rpy="0 -0.2 0" xyz="0.01 0 -0.06" />
       <geometry>
         <!-- <cylinder length="0.12" radius="0.013" /> -->
-        <box size="0.026 0.026 0.25" />
+        <box size="0.026 0.026 0.12" />
       </geometry>
     </collision>
   </link>
@@ -465,11 +480,12 @@
     <axis xyz="0 1 0" />
     <limit lower="-2.7227" upper="-0.83776" effort="35.55" velocity="20.07" />
   </joint>
-  <!-- <link name="RL_calflower">
+  <link name="RL_calflower">
     <collision>
       <origin rpy="0 0 0" xyz="0 0 0" />
       <geometry>
-        <cylinder length="0.065" radius="0.011" />
+        <!-- <cylinder length="0.065" radius="0.011" /> -->
+        <box size="0.022 0.022 0.065" />
       </geometry>
     </collision>
   </link>
@@ -483,7 +499,8 @@
     <collision>
       <origin rpy="0 0 0" xyz="0 0 0" />
       <geometry>
-        <cylinder length="0.03" radius="0.0155" />
+        <!-- <cylinder length="0.03" radius="0.0155" /> -->
+        <box size="0.031 0.031 0.03" />
       </geometry>
     </collision>
   </link>
@@ -492,7 +509,7 @@
     <parent link="RL_calflower" />
     <child link="RL_calflower1" />
     <axis xyz="0 0 0" />
-  </joint> -->
+  </joint>
 
   <link name="RL_foot_motor">
   <inertial>
@@ -533,9 +550,14 @@
       <origin rpy="0 0 0" xyz="0 0.0 0" />
       <geometry>
         <mesh filename="package://go2w_description/meshes/left_wheel.dae" />
-
       </geometry>
     </collision>
+    <!-- <collision>
+      <origin rpy="1.5707963267948966 0 0" xyz="0 0.048 0" />
+      <geometry>
+        <cylinder length="0.045" radius="0.086" />
+      </geometry>
+    </collision> -->
   </link>
   <joint name="RL_foot_joint" type="continuous">
     <origin xyz="0.0 0 -0.2264" rpy="0 0 0" />
@@ -617,7 +639,7 @@
       <origin rpy="0 -0.2 0" xyz="0.01 0 -0.06" />
       <geometry>
         <!-- <cylinder length="0.12" radius="0.013" /> -->
-        <box size="0.026 0.026 0.25" />
+        <box size="0.026 0.026 0.12" />
       </geometry>
     </collision>
   </link>
@@ -628,11 +650,12 @@
     <axis xyz="0 1 0" />
     <limit lower="-2.7227" upper="-0.83776" effort="35.55" velocity="20.07" />
   </joint>
-  <!-- <link name="RR_calflower">
+  <link name="RR_calflower">
     <collision>
       <origin rpy="0 0 0" xyz="0 0 0" />
       <geometry>
-        <cylinder length="0.065" radius="0.011" />
+        <!-- <cylinder length="0.065" radius="0.011" /> -->
+        <box size="0.022 0.022 0.065" />
       </geometry>
     </collision>
   </link>
@@ -646,7 +669,8 @@
     <collision>
       <origin rpy="0 0 0" xyz="0 0 0" />
       <geometry>
-        <cylinder length="0.03" radius="0.0155" />
+        <!-- <cylinder length="0.03" radius="0.0155" /> -->
+        <box size="0.031 0.031 0.03" />
       </geometry>
     </collision>
   </link>
@@ -655,7 +679,7 @@
     <parent link="RR_calflower" />
     <child link="RR_calflower1" />
     <axis xyz="0 0 0" />
-  </joint> -->
+  </joint>
 
   <link name="RR_foot_motor">
   <inertial>
@@ -695,9 +719,14 @@
       <origin rpy="0 0 0" xyz="0 -0.0 0" />
       <geometry>
         <mesh filename="package://go2w_description/meshes/right_wheel.dae" />
-
       </geometry>
     </collision>
+    <!-- <collision>
+      <origin rpy="1.5707963267948966 0 0" xyz="0 -0.048 0" />
+      <geometry>
+        <cylinder length="0.045" radius="0.086" />
+      </geometry>
+    </collision> -->
   </link>
   <joint name="RR_foot_joint" type="continuous">
     <origin xyz="-0.0 0 -0.2264" rpy="0 0 0" />
