@@ -80,11 +80,13 @@ class CameraFollowPlayerHook(cusrl.Player.Hook):
 @hydra_task_config(args_cli.task, args_cli.agent)
 def main(env_cfg: ManagerBasedRLEnvCfg | DirectRLEnvCfg | DirectMARLEnvCfg, agent_cfg: TrainerCfg):
     """Play with CusRL-RL agent."""
-    env_cfg.scene.num_envs = args_cli.num_envs if args_cli.num_envs is not None else 50
-
     # set the environment seed
     # note: certain randomizations occur in the environment initialization so we set the seed here
     cusrl.set_global_seed(args_cli.seed)
+
+    # modify environment configurations based on CLI args
+    env_cfg.scene.num_envs = args_cli.num_envs if args_cli.num_envs is not None else 50
+    env_cfg.sim.use_fabric = not args_cli.disable_fabric
     env_cfg.sim.device = args_cli.device if args_cli.device is not None else env_cfg.sim.device
 
     # spawn the robot randomly in the grid (instead of their terrain levels)

@@ -43,7 +43,7 @@ if args_cli.video:
 # clear out sys.argv for Hydra
 sys.argv = [sys.argv[0]] + hydra_args
 
-# Set distributed to True if LOCAL_RANK is set
+# set distributed to True if LOCAL_RANK is set
 if os.environ.get("LOCAL_RANK") is not None:
     args_cli.distributed = True
     args_cli.device = f"cuda:{os.environ['LOCAL_RANK']}"
