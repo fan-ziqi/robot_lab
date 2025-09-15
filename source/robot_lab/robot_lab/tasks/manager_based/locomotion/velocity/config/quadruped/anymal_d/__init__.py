@@ -16,10 +16,13 @@ gym.register(
     kwargs={
         "env_cfg_entry_point": f"{__name__}.flat_env_cfg:AnymalDFlatEnvCfg",
         "rsl_rl_cfg_entry_point": f"{agents.__name__}.rsl_rl_ppo_cfg:AnymalDFlatPPORunnerCfg",
-        "rsl_rl_with_symmetry_cfg_entry_point": f"{agents.__name__}.rsl_rl_ppo_cfg:AnymalDFlatPPORunnerWithSymmetryCfg",
-        "cusrl_cfg_entry_point": f"{agents.__name__}.cusrl_ppo_cfg:AnymalDFlatTrainerCfg",
         "rsl_rl_distillation_cfg_entry_point": (
             f"{agents.__name__}.rsl_rl_distillation_cfg:AnymalDFlatDistillationRunnerCfg"
+        ),
+        "rsl_rl_with_symmetry_cfg_entry_point": f"{agents.__name__}.rsl_rl_ppo_cfg:AnymalDFlatPPORunnerWithSymmetryCfg",
+        "cusrl_cfg_entry_point": f"{agents.__name__}.cusrl_ppo_cfg:AnymalDFlatTrainerCfg",
+        "cusrl_distillation_cfg_entry_point": (
+            f"{agents.__name__}.cusrl_distillation_cfg:AnymalDFlatDistillationTrainerCfg"
         ),
         "cusrl_with_symmetry_cfg_entry_point": (
             f"{agents.__name__}.cusrl_ppo_cfg:AnymalDFlatTrainerCfgWithSymmetryAugmentation"

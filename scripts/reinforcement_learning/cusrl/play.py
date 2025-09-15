@@ -58,6 +58,7 @@ import gymnasium as gym
 import torch
 
 import cusrl
+from cusrl.environment.isaaclab import TrainerCfg
 
 from isaaclab.devices import Se2Keyboard, Se2KeyboardCfg
 from isaaclab.envs import DirectMARLEnvCfg  # noqa: F401
@@ -66,9 +67,7 @@ from isaaclab.envs import ManagerBasedRLEnvCfg  # noqa: F401
 from isaaclab.envs import DirectMARLEnv, multi_agent_to_single_agent
 from isaaclab.managers import ObservationTermCfg as ObsTerm
 from isaaclab.utils.dict import print_dict
-from isaaclab_tasks.utils import parse_env_cfg
 from isaaclab_tasks.utils.hydra import hydra_task_config  # noqa: F401
-from isaaclab_tasks.utils.parse_cfg import load_cfg_from_registry
 
 import robot_lab.tasks  # noqa: F401
 
@@ -79,21 +78,15 @@ class CameraFollowPlayerHook(cusrl.Player.Hook):
 
 
 @hydra_task_config(args_cli.task, args_cli.agent)
-def main(env_cfg: ManagerBasedRLEnvCfg | DirectRLEnvCfg | DirectMARLEnvCfg):
+def main(env_cfg: ManagerBasedRLEnvCfg | DirectRLEnvCfg | DirectMARLEnvCfg, agent_cfg: TrainerCfg):
     """Play with CusRL-RL agent."""
-    # parse configuration
-    env_cfg = parse_env_cfg(
-        args_cli.task,
-        device=args_cli.device,
-        num_envs=args_cli.num_envs,
-        use_fabric=not args_cli.disable_fabric,
-    )
-    agent_cfg = load_cfg_from_registry(args_cli.task, args_cli.agent)
-    env_cfg.scene.num_envs = args_cli.num_envs if args_cli.num_envs is not None else 50
-
     # set the environment seed
     # note: certain randomizations occur in the environment initialization so we set the seed here
     cusrl.set_global_seed(args_cli.seed)
+
+    # modify environment configurations based on CLI args
+    env_cfg.scene.num_envs = args_cli.num_envs if args_cli.num_envs is not None else 50
+    env_cfg.sim.use_fabric = not args_cli.disable_fabric
     env_cfg.sim.device = args_cli.device if args_cli.device is not None else env_cfg.sim.device
 
     # spawn the robot randomly in the grid (instead of their terrain levels)

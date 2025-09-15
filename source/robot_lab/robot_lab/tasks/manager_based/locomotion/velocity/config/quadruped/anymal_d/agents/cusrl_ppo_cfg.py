@@ -1,15 +1,15 @@
 # Copyright (c) 2024-2025 Ziqi Fan
 # SPDX-License-Identifier: Apache-2.0
 
+from dataclasses import dataclass
+
 import cusrl
 from cusrl.environment.isaaclab import TrainerCfg
-
-from isaaclab.utils import configclass
 
 from robot_lab.tasks.manager_based.locomotion.velocity.mdp.symmetry import anymal
 
 
-@configclass
+@dataclass
 class AnymalDRoughTrainerCfg(TrainerCfg):
     max_iterations = 3000
     save_interval = 100
@@ -44,12 +44,10 @@ class AnymalDRoughTrainerCfg(TrainerCfg):
     )
 
 
-@configclass
+@dataclass
 class AnymalDFlatTrainerCfg(AnymalDRoughTrainerCfg):
-    def __post_init__(self):
-        super().__post_init__()
-        self.max_iterations = 1500
-        self.experiment_name = "anymal_d_flat"
+    max_iterations = 1500
+    experiment_name = "anymal_d_flat"
 
 
 def get_environment_mirrors(environment):
@@ -71,7 +69,7 @@ def get_environment_mirrors(environment):
     }
 
 
-@configclass
+@dataclass
 class AnymalDRoughTrainerCfgWithSymmetryAugmentation(AnymalDRoughTrainerCfg):
     """Configuration for the PPO agent with symmetry augmentation."""
 
@@ -107,9 +105,7 @@ class AnymalDRoughTrainerCfgWithSymmetryAugmentation(AnymalDRoughTrainerCfg):
     )
 
 
-@configclass
+@dataclass
 class AnymalDFlatTrainerCfgWithSymmetryAugmentation(AnymalDRoughTrainerCfgWithSymmetryAugmentation):
-    def __post_init__(self):
-        super().__post_init__()
-        self.max_iterations = 1500
-        self.experiment_name = "anymal_d_flat"
+    max_iterations = 1500
+    experiment_name = "anymal_d_flat"
