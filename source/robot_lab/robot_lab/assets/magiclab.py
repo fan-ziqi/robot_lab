@@ -5,7 +5,7 @@
 """
 
 import isaaclab.sim as sim_utils
-from isaaclab.actuators import DCMotorCfg, ImplicitActuatorCfg
+from isaaclab.actuators import IdealPDActuatorCfg, ImplicitActuatorCfg  # noqa: F401
 from isaaclab.assets.articulation import ArticulationCfg
 
 from robot_lab.assets import ISAACLAB_ASSETS_DATA_DIR
@@ -52,15 +52,15 @@ MAGICLAB_BOT_GEN1_CFG = ArticulationCfg(
     ),
     soft_joint_pos_limit_factor=0.9,
     actuators={
-        "legs": ImplicitActuatorCfg(
+        "legs": IdealPDActuatorCfg(
             joint_names_expr=[
                 "JOINT_HIP_ROLL_.*",
                 "JOINT_HIP_YAW_.*",
                 "JOINT_HIP_PITCH_.*",
                 "JOINT_KNEE_PITCH_.*",
             ],
-            effort_limit_sim=300,
-            velocity_limit_sim=100.0,
+            effort_limit=300,
+            velocity_limit=100.0,
             stiffness={
                 "JOINT_HIP_PITCH_.*": 200.0,
                 "JOINT_HIP_ROLL_.*": 150.0,
@@ -77,25 +77,31 @@ MAGICLAB_BOT_GEN1_CFG = ArticulationCfg(
                 "JOINT_HIP_.*": 0.01,
                 "JOINT_KNEE_.*": 0.01,
             },
+            min_delay=0,  # physics time steps (min: 5.0*0=00.0ms)
+            max_delay=5,  # physics time steps (max: 5.0*5=25.0ms)
         ),
-        "feet": ImplicitActuatorCfg(
-            effort_limit_sim=20,
+        "feet": IdealPDActuatorCfg(
+            effort_limit=20,
             joint_names_expr=["JOINT_ANKLE_PITCH_.*", "JOINT_ANKLE_ROLL_.*"],
             stiffness=20.0,
             damping=2.0,
             armature=0.01,
+            min_delay=0,  # physics time steps (min: 5.0*0=00.0ms)
+            max_delay=5,  # physics time steps (max: 5.0*5=25.0ms)
         ),
-        "arms": ImplicitActuatorCfg(
+        "arms": IdealPDActuatorCfg(
             joint_names_expr=[
                 "joint_.*a1",
             ],
-            effort_limit_sim=300,
-            velocity_limit_sim=100.0,
+            effort_limit=300,
+            velocity_limit=100.0,
             stiffness=40.0,
             damping=10.0,
             armature={
                 "joint_.*a1": 0.01,
             },
+            min_delay=0,  # physics time steps (min: 5.0*0=00.0ms)
+            max_delay=5,  # physics time steps (max: 5.0*5=25.0ms)
         ),
     },
 )
@@ -139,15 +145,15 @@ MAGICLAB_BOT_Z1_CFG = ArticulationCfg(
     ),
     soft_joint_pos_limit_factor=0.9,
     actuators={
-        "legs": ImplicitActuatorCfg(
+        "legs": IdealPDActuatorCfg(
             joint_names_expr=[
                 "JOINT_HIP_ROLL_.*",
                 "JOINT_HIP_YAW_.*",
                 "JOINT_HIP_PITCH_.*",
                 "JOINT_KNEE_PITCH_.*",
             ],
-            effort_limit_sim=300,
-            velocity_limit_sim=100.0,
+            effort_limit=300,
+            velocity_limit=100.0,
             stiffness={
                 "JOINT_HIP_PITCH_.*": 200.0,
                 "JOINT_HIP_ROLL_.*": 150.0,
@@ -164,25 +170,31 @@ MAGICLAB_BOT_Z1_CFG = ArticulationCfg(
                 "JOINT_HIP_.*": 0.01,
                 "JOINT_KNEE_.*": 0.01,
             },
+            min_delay=0,  # physics time steps (min: 5.0*0=00.0ms)
+            max_delay=5,  # physics time steps (max: 5.0*5=25.0ms)
         ),
-        "feet": ImplicitActuatorCfg(
-            effort_limit_sim=20,
+        "feet": IdealPDActuatorCfg(
+            effort_limit=20,
             joint_names_expr=["JOINT_ANKLE_PITCH_.*", "JOINT_ANKLE_ROLL_.*"],
             stiffness=20.0,
             damping=2.0,
             armature=0.01,
+            min_delay=0,  # physics time steps (min: 5.0*0=00.0ms)
+            max_delay=5,  # physics time steps (max: 5.0*5=25.0ms)
         ),
-        "arms": ImplicitActuatorCfg(
+        "arms": IdealPDActuatorCfg(
             joint_names_expr=[
                 "joint_.*a1",
             ],
-            effort_limit_sim=300,
-            velocity_limit_sim=100.0,
+            effort_limit=300,
+            velocity_limit=100.0,
             stiffness=40.0,
             damping=10.0,
             armature={
                 "joint_.*a1": 0.01,
             },
+            min_delay=0,  # physics time steps (min: 5.0*0=00.0ms)
+            max_delay=5,  # physics time steps (max: 5.0*5=25.0ms)
         ),
     },
 )
@@ -224,14 +236,15 @@ MAGICDOG_CFG = ArticulationCfg(
     ),
     soft_joint_pos_limit_factor=1.0,
     actuators={
-        "legs": DCMotorCfg(
+        "legs": IdealPDActuatorCfg(
             joint_names_expr=[".*"],
             effort_limit=25.0,
-            saturation_effort=25.0,
             velocity_limit=22.0,
             stiffness=30.0,
             damping=1.0,
             friction=0.0,
+            min_delay=0,  # physics time steps (min: 5.0*0=00.0ms)
+            max_delay=5,  # physics time steps (max: 5.0*5=25.0ms)
         ),
     },
 )
@@ -274,14 +287,15 @@ MAGICDOG_W_CFG = ArticulationCfg(
     ),
     soft_joint_pos_limit_factor=1.0,
     actuators={
-        "legs": DCMotorCfg(
+        "legs": IdealPDActuatorCfg(
             joint_names_expr=["^(?!.*_foot_joint).*"],
             effort_limit=37.5,
-            saturation_effort=37.5,
             velocity_limit=15.0,
             stiffness=30.0,
             damping=1.0,
             friction=0.0,
+            min_delay=0,  # physics time steps (min: 5.0*0=00.0ms)
+            max_delay=5,  # physics time steps (max: 5.0*5=25.0ms)
         ),
         "wheels": ImplicitActuatorCfg(
             joint_names_expr=[".*_wheel_joint"],

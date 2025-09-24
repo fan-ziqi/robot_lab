@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import isaaclab.sim as sim_utils
-from isaaclab.actuators import DCMotorCfg
+from isaaclab.actuators import IdealPDActuatorCfg, ImplicitActuatorCfg  # noqa: F401
 from isaaclab.assets.articulation import ArticulationCfg
 
 from robot_lab.assets import ISAACLAB_ASSETS_DATA_DIR
@@ -41,23 +41,25 @@ DEEPROBOTICS_LITE3_CFG = ArticulationCfg(
     ),
     soft_joint_pos_limit_factor=0.9,
     actuators={
-        "Hip": DCMotorCfg(
+        "Hip": IdealPDActuatorCfg(
             joint_names_expr=[".*_Hip[X,Y]_joint"],
             effort_limit=24.0,
-            saturation_effort=24.0,
             velocity_limit=26.2,
             stiffness=30.0,
             damping=0.5,
             friction=0.0,
+            min_delay=0,  # physics time steps (min: 5.0*0=00.0ms)
+            max_delay=5,  # physics time steps (max: 5.0*5=25.0ms)
         ),
-        "Knee": DCMotorCfg(
+        "Knee": IdealPDActuatorCfg(
             joint_names_expr=[".*_Knee_joint"],
             effort_limit=36.0,
-            saturation_effort=36.0,
             velocity_limit=17.3,
             stiffness=30.0,
             damping=0.5,
             friction=0.0,
+            min_delay=0,  # physics time steps (min: 5.0*0=00.0ms)
+            max_delay=5,  # physics time steps (max: 5.0*5=25.0ms)
         ),
     },
 )
@@ -99,23 +101,25 @@ DEEPROBOTICS_M20_CFG = ArticulationCfg(
     ),
     soft_joint_pos_limit_factor=0.9,
     actuators={
-        "joint": DCMotorCfg(
+        "joint": IdealPDActuatorCfg(
             joint_names_expr=[".*hipx_joint", ".*hipy_joint", ".*knee_joint"],
             effort_limit=76.4,
-            saturation_effort=76.4,
             velocity_limit=22.4,
             stiffness=80.0,
             damping=2.0,
             friction=0.0,
+            min_delay=0,  # physics time steps (min: 5.0*0=00.0ms)
+            max_delay=5,  # physics time steps (max: 5.0*5=25.0ms)
         ),
-        "wheel": DCMotorCfg(
+        "wheel": IdealPDActuatorCfg(
             joint_names_expr=[".*_wheel_joint"],
             effort_limit=21.6,
-            saturation_effort=21.6,
             velocity_limit=79.3,
             stiffness=0.0,
             damping=0.6,
             friction=0.0,
+            min_delay=0,  # physics time steps (min: 5.0*0=00.0ms)
+            max_delay=5,  # physics time steps (max: 5.0*5=25.0ms)
         ),
     },
 )
