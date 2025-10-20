@@ -24,7 +24,7 @@ Guidelines for modifications:
 * [Zhenbiao Huang](https://github.com/legubiao)
 * [Zhihao Liu](https://github.com/Luo1imasi)
 * [Zsibot](https://www.zsibot.com)
-
+* [Linden713](https://github.com/linden713)
 ## Acknowledgements
 
 * Shiyu Zhou
