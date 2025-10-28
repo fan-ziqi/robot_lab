@@ -213,6 +213,40 @@ python scripts/reinforcement_learning/cusrl/train.py --task=<ENV_NAME> --headles
 python scripts/reinforcement_learning/cusrl/play.py --task=<ENV_NAME>
 ```
 
+BeyondMimic for Unitree G1:
+
+Motion Preprocessing & Registry Setup
+
+- Gather the reference motion datasets (please follow the original licenses), we use the same convention as .csv of Unitree's dataset
+
+    - Unitree-retargeted LAFAN1 Dataset is available
+      on [HuggingFace](https://huggingface.co/datasets/lvhaidong/LAFAN1_Retargeting_Dataset)
+    - Sidekicks are from [KungfuBot](https://kungfu-bot.github.io/)
+    - Christiano Ronaldo celebration is from [ASAP](https://github.com/LeCAR-Lab/ASAP).
+    - Balance motions are from [HuB](https://hub-robot.github.io/)
+
+- Convert retargeted motions to include the maximum coordinates information (body pose, body velocity, and body acceleration) via forward kinematics
+
+  ```bash
+  python scripts/tools/beyondmimic/csv_to_npz.py -f path_to_input.csv --input_fps 60 --headless
+  ```
+
+- Replaying the motion in Isaac Sim:
+
+  ```bash
+  python scripts/tools/beyondmimic/replay_npz.py -f path_to_motion.npz
+  ```
+
+- Training and Evaluation
+
+  ```bash
+  # Train
+  python scripts/reinforcement_learning/rsl_rl/train.py --task=RobotLab-Isaac-BeyondMimic-Flat-Unitree-G1-v0 --headless
+
+  # Play
+  python scripts/reinforcement_learning/rsl_rl/play.py --task=RobotLab-Isaac-BeyondMimic-Flat-Unitree-G1-v0 --num_envs 2
+  ```
+
 Others (**Experimental**)
 
 - Train AMP Dance for Unitree G1
@@ -424,3 +458,4 @@ Please cite the following if you use this code or parts of it:
 The project uses some code from the following open-source code repositories:
 
 - [linden713/humanoid_amp](https://github.com/linden713/humanoid_amp)
+- [HybridRobotics/whole_body_tracking](https://github.com/HybridRobotics/whole_body_tracking)
