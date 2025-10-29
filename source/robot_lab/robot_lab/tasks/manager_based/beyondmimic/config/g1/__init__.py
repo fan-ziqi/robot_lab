@@ -14,7 +14,7 @@ gym.register(
     entry_point="isaaclab.envs:ManagerBasedRLEnv",
     disable_env_checker=True,
     kwargs={
-        "env_cfg_entry_point": flat_env_cfg.UnitreeG1BeyondMimicFlatEnvCfg,
+        "env_cfg_entry_point": f"{__name__}.flat_env_cfg:UnitreeG1BeyondMimicFlatEnvCfg",
         "rsl_rl_cfg_entry_point": f"{agents.__name__}.rsl_rl_ppo_cfg:UnitreeG1BeyondMimicFlatPPORunnerCfg",
     },
 )
