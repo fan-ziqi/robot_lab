@@ -43,6 +43,11 @@ if args_cli.video:
 # clear out sys.argv for Hydra
 sys.argv = [sys.argv[0]] + hydra_args
 
+# set distributed to True if LOCAL_RANK is set
+if os.environ.get("LOCAL_RANK") is not None:
+    args_cli.distributed = True
+    args_cli.device = f"cuda:{os.environ['LOCAL_RANK']}"
+
 # launch omniverse app
 app_launcher = AppLauncher(args_cli)
 simulation_app = app_launcher.app
@@ -83,6 +88,7 @@ def main(env_cfg: ManagerBasedRLEnvCfg | DirectRLEnvCfg | DirectMARLEnvCfg, agen
     # note: certain randomizations occur in the environment initialization so we set the seed here
     env_cfg.sim.device = args_cli.device if args_cli.device is not None else env_cfg.sim.device
     cusrl.set_global_seed(args_cli.seed)
+    env_cfg.scene.num_envs = int(env_cfg.scene.num_envs / cusrl.utils.distributed.world_size())
 
     # specify directory for logging experiments
     log_root_path = os.path.join("logs", "cusrl", agent_cfg.experiment_name)
@@ -119,7 +125,7 @@ def main(env_cfg: ManagerBasedRLEnvCfg | DirectRLEnvCfg | DirectMARLEnvCfg, agen
         agent_factory=agent_cfg.agent_factory.override(
             device=args_cli.device, autocast=args_cli.autocast, compile=args_cli.compile
         ),
-        logger_factory=cusrl.logger.make_factory(args_cli.logger, log_dir, add_datetime_prefix=False),
+        logger_factory=cusrl.make_logger_factory(args_cli.logger, log_dir, add_datetime_prefix=False),
         num_iterations=agent_cfg.max_iterations,
         save_interval=agent_cfg.save_interval,
         checkpoint_path=args_cli.checkpoint,

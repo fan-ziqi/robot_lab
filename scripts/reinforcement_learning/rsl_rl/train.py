@@ -55,7 +55,6 @@ simulation_app = app_launcher.app
 """Check for minimum supported RSL-RL version."""
 
 import importlib.metadata as metadata
-import platform
 
 from packaging import version
 
@@ -74,7 +73,6 @@ if version.parse(installed_version) < version.parse(RSL_RL_VERSION):
 """Rest everything follows."""
 
 import gymnasium as gym
-import os
 import torch
 from datetime import datetime
 
@@ -90,9 +88,7 @@ from isaaclab.envs import (
 )
 from isaaclab.utils.dict import print_dict
 from isaaclab.utils.io import dump_pickle, dump_yaml
-
 from isaaclab_rl.rsl_rl import RslRlBaseRunnerCfg, RslRlVecEnvWrapper
-
 from isaaclab_tasks.utils import get_checkpoint_path
 from isaaclab_tasks.utils.hydra import hydra_task_config
 
@@ -141,14 +137,16 @@ def main(env_cfg: ManagerBasedRLEnvCfg | DirectRLEnvCfg | DirectMARLEnvCfg, agen
         log_dir += f"_{agent_cfg.run_name}"
     log_dir = os.path.join(log_root_path, log_dir)
 
-    # set the IO descriptors output directory if requested
+    # set the IO descriptors export flag if requested
     if isinstance(env_cfg, ManagerBasedRLEnvCfg):
         env_cfg.export_io_descriptors = args_cli.export_io_descriptors
-        env_cfg.io_descriptors_output_dir = log_dir
     else:
         omni.log.warn(
             "IO descriptors are only supported for manager based RL environments. No IO descriptors will be exported."
         )
+
+    # set the log directory for the environment (works for all environment types)
+    env_cfg.log_dir = log_dir
 
     # create isaac environment
     env = gym.make(args_cli.task, cfg=env_cfg, render_mode="rgb_array" if args_cli.video else None)

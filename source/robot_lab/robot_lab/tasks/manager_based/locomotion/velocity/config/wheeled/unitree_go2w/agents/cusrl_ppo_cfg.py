@@ -1,13 +1,13 @@
 # Copyright (c) 2024-2025 Ziqi Fan
 # SPDX-License-Identifier: Apache-2.0
 
+from dataclasses import dataclass
+
 import cusrl
 from cusrl.environment.isaaclab import TrainerCfg
 
-from isaaclab.utils import configclass
 
-
-@configclass
+@dataclass
 class UnitreeGo2WRoughTrainerCfg(TrainerCfg):
     max_iterations = 20000
     save_interval = 100
@@ -42,9 +42,7 @@ class UnitreeGo2WRoughTrainerCfg(TrainerCfg):
     )
 
 
-@configclass
+@dataclass
 class UnitreeGo2WFlatTrainerCfg(UnitreeGo2WRoughTrainerCfg):
-    def __post_init__(self):
-        super().__post_init__()
-        self.max_iterations = 5000
-        self.experiment_name = "unitree_go2w_flat"
+    max_iterations = 5000
+    experiment_name = "unitree_go2w_flat"
