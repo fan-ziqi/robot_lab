@@ -27,10 +27,7 @@ def _get_terrain_column_range(terrain_cfg, terrain_name: str, device) -> tuple[i
         return None
 
     sub_terrain_names = list(terrain_cfg.sub_terrains.keys())
-    proportions = torch.tensor(
-        [sub_cfg.proportion for sub_cfg in terrain_cfg.sub_terrains.values()],
-        device=device
-    )
+    proportions = torch.tensor([sub_cfg.proportion for sub_cfg in terrain_cfg.sub_terrains.values()], device=device)
     proportions = proportions / proportions.sum()
     cumsum_props = torch.cumsum(proportions, dim=0)
 

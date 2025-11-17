@@ -105,8 +105,8 @@ class UnitreeA1HandStandRoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         ]
         self.events.randomize_com_positions.params["asset_cfg"].body_names = [self.base_link_name]
         self.events.randomize_apply_external_force_torque.params["asset_cfg"].body_names = [self.base_link_name]
-
-        self.events.randomize_rigid_body_mass = None
+        self.events.randomize_rigid_body_mass_base = None
+        self.events.randomize_rigid_body_mass_others = None
         self.events.randomize_com_positions = None
         self.events.randomize_apply_external_force_torque = None
 
