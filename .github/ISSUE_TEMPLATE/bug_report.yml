@@ -31,14 +31,14 @@ body:
   attributes:
     label: Isaac Lab version
     description: It can be found in the `VERSION` file located in either the repository or the build folder.
-    placeholder: e.g. 2.2.0
+    placeholder: e.g. 2.3.0
   validations:
     required: true
 - type: input
   attributes:
     label: Isaac Sim version
     description: It can be found in the `VERSION` file located in either the repository or the build folder.
-    placeholder: e.g. 5.0.0
+    placeholder: e.g. 5.1.0
   validations:
     required: true
 - type: input

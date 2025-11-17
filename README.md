@@ -1,7 +1,7 @@
 # robot_lab
 
-[![IsaacSim](https://img.shields.io/badge/IsaacSim-5.0.0-silver.svg)](https://docs.omniverse.nvidia.com/isaacsim/latest/overview.html)
-[![Isaac Lab](https://img.shields.io/badge/IsaacLab-2.2.0-silver)](https://isaac-sim.github.io/IsaacLab)
+[![IsaacSim](https://img.shields.io/badge/IsaacSim-5.1.0-silver.svg)](https://docs.omniverse.nvidia.com/isaacsim/latest/overview.html)
+[![Isaac Lab](https://img.shields.io/badge/IsaacLab-2.3.0-silver)](https://isaac-sim.github.io/IsaacLab)
 [![Python](https://img.shields.io/badge/python-3.11-blue.svg)](https://docs.python.org/3/whatsnew/3.11.html)
 [![Linux platform](https://img.shields.io/badge/platform-linux--64-orange.svg)](https://releases.ubuntu.com/22.04/)
 [![Windows platform](https://img.shields.io/badge/platform-windows--64-orange.svg)](https://www.microsoft.com/en-us/)
@@ -47,12 +47,13 @@ The table below lists all available environments:
 
 ## Version Dependency
 
-| robot_lab Version | Isaac Lab Version             | Isaac Sim Version       |
-|------------------ | ----------------------------- | ----------------------- |
-| `main` branch     | `main` branch                 | Isaac Sim 4.5 / 5.0     |
-| `v2.2.0`          | `v2.2.0`                      | Isaac Sim 4.5 / 5.0     |
-| `v2.1.1`          | `v2.1.1`                      | Isaac Sim 4.5           |
-| `v1.1`            | `v1.4.1`                      | Isaac Sim 4.2           |
+| robot_lab Version | Isaac Lab Version             | Isaac Sim Version         |
+|------------------ | ----------------------------- | ------------------------- |
+| `main` branch     | `main` branch                 | Isaac Sim 4.5 / 5.0 / 5.1 |
+| `v2.3.0`          | `v2.3.0`                      | Isaac Sim 4.5 / 5.0 / 5.1 |
+| `v2.2.2`          | `v2.2.1`                      | Isaac Sim 4.5 / 5.0       |
+| `v2.1.1`          | `v2.1.1`                      | Isaac Sim 4.5             |
+| `v1.1`            | `v1.4.1`                      | Isaac Sim 4.2             |
 
 ## Installation
 
