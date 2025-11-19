@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import isaaclab.sim as sim_utils
-from isaaclab.actuators import DCMotorCfg
+from isaaclab.actuators import DCMotorCfg, DelayedPDActuatorCfg
 from isaaclab.assets.articulation import ArticulationCfg
 
 from robot_lab.assets import ISAACLAB_ASSETS_DATA_DIR
@@ -11,7 +11,7 @@ DEEPROBOTICS_LITE3_CFG = ArticulationCfg(
     spawn=sim_utils.UrdfFileCfg(
         fix_base=False,
         merge_fixed_joints=True,
-        replace_cylinders_with_capsules=False,
+        replace_cylinders_with_capsules=True,
         asset_path=f"{ISAACLAB_ASSETS_DATA_DIR}/Robots/deeprobotics/lite3_description/urdf/lite3.urdf",
         activate_contact_sensors=True,
         rigid_props=sim_utils.RigidBodyPropertiesCfg(
@@ -24,7 +24,7 @@ DEEPROBOTICS_LITE3_CFG = ArticulationCfg(
             max_depenetration_velocity=1.0,
         ),
         articulation_props=sim_utils.ArticulationRootPropertiesCfg(
-            enabled_self_collisions=False, solver_position_iteration_count=4, solver_velocity_iteration_count=0
+            enabled_self_collisions=False, solver_position_iteration_count=4, solver_velocity_iteration_count=1
         ),
         joint_drive=sim_utils.UrdfConverterCfg.JointDriveCfg(
             gains=sim_utils.UrdfConverterCfg.JointDriveCfg.PDGainsCfg(stiffness=0, damping=0)
@@ -41,23 +41,25 @@ DEEPROBOTICS_LITE3_CFG = ArticulationCfg(
     ),
     soft_joint_pos_limit_factor=0.9,
     actuators={
-        "Hip": DCMotorCfg(
+        "Hip": DelayedPDActuatorCfg(
             joint_names_expr=[".*_Hip[X,Y]_joint"],
             effort_limit=24.0,
-            saturation_effort=24.0,
             velocity_limit=26.2,
             stiffness=30.0,
-            damping=0.5,
+            damping=1.0,
             friction=0.0,
+            min_delay=0,  # physics time steps (min: 5.0*0=00.0ms)
+            max_delay=5,  # physics time steps (max: 5.0*5=25.0ms)
         ),
-        "Knee": DCMotorCfg(
+        "Knee": DelayedPDActuatorCfg(
             joint_names_expr=[".*_Knee_joint"],
             effort_limit=36.0,
-            saturation_effort=36.0,
             velocity_limit=17.3,
             stiffness=30.0,
-            damping=0.5,
+            damping=1.0,
             friction=0.0,
+            min_delay=0,  # physics time steps (min: 5.0*0=00.0ms)
+            max_delay=5,  # physics time steps (max: 5.0*5=25.0ms)
         ),
     },
 )
@@ -79,7 +81,7 @@ DEEPROBOTICS_M20_CFG = ArticulationCfg(
             max_depenetration_velocity=1.0,
         ),
         articulation_props=sim_utils.ArticulationRootPropertiesCfg(
-            enabled_self_collisions=False, solver_position_iteration_count=4, solver_velocity_iteration_count=0
+            enabled_self_collisions=False, solver_position_iteration_count=4, solver_velocity_iteration_count=1
         ),
         joint_drive=sim_utils.UrdfConverterCfg.JointDriveCfg(
             gains=sim_utils.UrdfConverterCfg.JointDriveCfg.PDGainsCfg(stiffness=0, damping=0)
