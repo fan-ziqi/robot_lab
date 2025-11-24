@@ -8,5 +8,6 @@
 		"ms-iot.vscode-ros",
 		"ms-python.black-formatter",
 		"ms-python.flake8",
+		"anthropic.claude-code",
 	]
 }

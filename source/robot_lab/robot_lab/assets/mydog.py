@@ -25,7 +25,7 @@ MYDOG_CFG = ArticulationCfg(
     # spawn: 指定 URDF 以及转换参数
     spawn=sim_utils.UrdfFileCfg(
         fix_base=False,  # False 表示机器人有浮动基座（可整体移动）
-        merge_fixed_joints=False,
+        merge_fixed_joints=True,  # 合并固定关节以提高仿真性能
         asset_path=MYDOG_URDF_PATH,
         activate_contact_sensors=True,  # 启用接触传感器（常用于接地检测等）
         # joint_drive: 明确指定转换时的驱动类型和 PD 增益（帮助通过验证）
@@ -87,18 +87,18 @@ MYDOG_CFG = ArticulationCfg(
         "legs": ImplicitActuatorCfg(
             joint_names_expr=[".*_hip_joint", ".*_thigh_joint", ".*_calf_joint"],
             # stiffness/damping 为隐式驱动的 PD 特性（较高 stiffness 意味着更刚的伺服行为）
-            stiffness=80.0,
-            damping=2.0,
-            effort_limit_sim=100.0,
-            velocity_limit_sim=20.0,
+            stiffness=25.0,
+            damping=0.5,
+            effort_limit_sim=23.5,  # 参考GO2W，避免过大力矩导致不稳定
+            velocity_limit_sim=30.0,  # 提高速度限制以获得更灵活的运动
         ),
         # wheels: 将 foot_joint 视为轮子进行速度驱动
         "wheels": ImplicitActuatorCfg(
             joint_names_expr=[".*_foot_joint"],
             stiffness=0.0,  # 轮子不需要高刚度
-            damping=4.0,
-            effort_limit_sim=50.0,
-            velocity_limit_sim=50.0,
+            damping=0.5,
+            effort_limit_sim=20.0,  # 参考GO2W，轮子力矩限制
+            velocity_limit_sim=30.0,  # 参考GO2W，适当的轮子转速
         ),
     },
 )

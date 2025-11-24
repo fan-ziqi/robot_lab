@@ -13,9 +13,9 @@ class MyDogFlatEnvCfg(MyDogRoughEnvCfg):
         super().__post_init__()
 
         # 覆盖奖励
-        self.rewards.base_height_l2.weight = -1.0 # 平地训练可以开启高度保持
+        
         self.rewards.base_height_l2.params["sensor_cfg"] = None
-        self.rewards.flat_orientation_l2.weight = -1.0 # 保持水平
+       
         
         # 强制平面地形
         self.scene.terrain.terrain_type = "plane"

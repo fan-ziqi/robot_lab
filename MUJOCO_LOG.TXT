@@ -67,3 +67,12 @@ ERROR: could not create window
 Sun Nov 23 01:31:04 2025
 ERROR: could not create window
 
+Mon Nov 24 17:59:09 2025
+WARNING: File size over 2GB is not supported. File: 'source/robot_lab/data/Robots/myrobots/mydog/mjcf/'
+
+Mon Nov 24 17:59:24 2025
+WARNING: File size over 2GB is not supported. File: 'source/robot_lab/data/Robots/myrobots/mydog/mjcf/'
+
+Mon Nov 24 17:59:33 2025
+WARNING: File size over 2GB is not supported. File: 'source/robot_lab/data/Robots/myrobots/mydog/mjcf/'
+
