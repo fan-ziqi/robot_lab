@@ -32,7 +32,7 @@ class MyDogActionsCfg(ActionsCfg):
     joint_vel = mdp.JointVelocityActionCfg(
         asset_name="robot", 
         joint_names=[".*_foot_joint"], 
-        scale=10.0, # 轮子速度缩放，可根据需要调整
+        scale=5.0, # 轮子速度缩放，可根据需要调整
         use_default_offset=True, 
         clip=None, 
         preserve_order=True
@@ -113,7 +113,7 @@ class MyDogRoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         # ------------------------------Actions------------------------------
         # 动作缩放：腿部动作为位置，轮子动作为速度
         self.actions.joint_pos.scale = {".*_hip_joint": 0.125, "^(?!.*_hip_joint).*": 0.25}
-        self.actions.joint_vel.scale = 10.0 # 轮子速度增益
+        self.actions.joint_vel.scale = 5.0 # 轮子速度增益
         
         self.actions.joint_pos.clip = {".*": (-100.0, 100.0)}
         self.actions.joint_vel.clip = {".*": (-100.0, 100.0)}
