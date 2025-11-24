@@ -9,5 +9,6 @@
 		"ms-python.black-formatter",
 		"ms-python.flake8",
 		"anthropic.claude-code",
+		"openai.chatgpt",
 	]
 }
