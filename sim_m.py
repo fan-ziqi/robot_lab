@@ -52,14 +52,14 @@ class RobotConfig:
         # Individual joint stiffness (kp) [Nm/rad]
         # NOTE: Hip values increased for better tracking (differs from training)
         self.kp = {
-            "FR_hip_joint": 2000.0, "FL_hip_joint": 2000.0,
-            "RR_hip_joint": 2000.0, "RL_hip_joint": 2000.0,
-            "FR_thigh_joint": 2000.0, "FL_thigh_joint": 2000.0,
-            "RR_thigh_joint": 2000.0, "RL_thigh_joint": 2000.0,
-            "FR_calf_joint": 2000.0, "FL_calf_joint": 2000.0,
-            "RR_calf_joint": 2000.0, "RL_calf_joint": 2000.0,
-            "FR_foot_joint": 2000.0, "FL_foot_joint": 1000.0,
-            "RR_foot_joint": 1000.0, "RL_foot_joint": 1000.0,
+            "FR_hip_joint": 70.0, "FL_hip_joint": 70.0,
+            "RR_hip_joint": 70.0, "RL_hip_joint": 70.0,
+            "FR_thigh_joint": 100.0, "FL_thigh_joint": 100.0,
+            "RR_thigh_joint": 100.0, "RL_thigh_joint": 100.0,
+            "FR_calf_joint": 150.0, "FL_calf_joint": 150.0,
+            "RR_calf_joint": 150.0, "RL_calf_joint": 150.0,
+            "FR_foot_joint": 1.0, "FL_foot_joint": 1.0,
+            "RR_foot_joint": 1.0, "RL_foot_joint": 1.0,
         }
         
         # Individual joint damping (kd) [Nm·s/rad]
@@ -67,12 +67,12 @@ class RobotConfig:
         self.kd = {
             "FR_hip_joint": 10.0, "FL_hip_joint": 10.0,
             "RR_hip_joint": 10.0, "RL_hip_joint": 10.0,
-            "FR_thigh_joint": 10.0, "FL_thigh_joint": 10.0,
-            "RR_thigh_joint": 10.0, "RL_thigh_joint": 10.0,
-            "FR_calf_joint": 15.0, "FL_calf_joint": 15.0,
-            "RR_calf_joint": 15.0, "RL_calf_joint": 15.0,
-            "FR_foot_joint": 0.1, "FL_foot_joint": 0.1,
-            "RR_foot_joint": 0.1, "RL_foot_joint": 0.1,
+            "FR_thigh_joint": 15.0, "FL_thigh_joint": 15.0,
+            "RR_thigh_joint": 15.0, "RL_thigh_joint": 15.0,
+            "FR_calf_joint": 20.0, "FL_calf_joint": 20.0,
+            "RR_calf_joint": 20.0, "RL_calf_joint": 20.0,
+            "FR_foot_joint": 1.0, "FL_foot_joint": 1.0,
+            "RR_foot_joint": 1.0, "RL_foot_joint": 1.0,
         }
         
         # Individual joint effort limits [Nm]
@@ -91,7 +91,7 @@ class RobotConfig:
         # Action scales (must match training config!)
         self.hip_scale = 0.125            # hip joints
         self.thigh_calf_scale = 0.25     # thigh/calf joints  
-        self.wheel_scale = 10.0           # wheel joints
+        self.wheel_scale = 5.0           # wheel joints
         
         # Initial height
         self.init_height = 0.55          # [m]
@@ -173,7 +173,7 @@ class PDTuner:
 
         # 调节步长
         self.kp_step = 10.0
-        self.kd_step = 1.0
+        self.kd_step = 0.1
 
         # 构建关节类型到索引的映射
         self.type_to_indices = {
@@ -707,8 +707,8 @@ def run_mujoco(policy, mujoco_model_path, sim_duration, dt, decimation, debug=Fa
             #tau[:]=0
             # tau[14]=5
             #tau[15]=5
-            print("target_q[12:]:", target_q[:])
-            print("dq[12:]:", dq[:])
+            print("target_q[12:]:", target_q[12:])
+            print("dq[12:]:", dq[12:])
             tau = np.clip(tau, -tau_limit, tau_limit)
 
             # 计算误差（用于绘图）
@@ -764,7 +764,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Mujoco deployment')
     parser.add_argument('--model-path', type=str, default='/home/liu/Desktop/robot_lab/source/robot_lab/data/Robots/myrobots/mydog/mjcf/thunder2_v1.xml',
                         help='Path to MuJoCo XML model. Available terrains: thunder2_v1.xml (complex), thunder2_v1_simple.xml (stairs only)')
-    parser.add_argument('--policy-path', type=str, default='/home/liu/Desktop/robot_lab/logs/rsl_rl/mydog_rough/2025-11-21_17-47-39/exported/policy.pt')
+    parser.add_argument('--policy-path', type=str, default='/home/liu/Desktop/robot_lab/logs/rsl_rl/mydog_flat/2025-11-24_22-06-15/exported/policy.pt')
     parser.add_argument('--duration', type=float, default=120.0)
     parser.add_argument('--dt', type=float, default=0.001)
     parser.add_argument('--decimation', type=int, default=5)
