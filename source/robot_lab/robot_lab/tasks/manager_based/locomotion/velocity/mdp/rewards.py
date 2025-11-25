@@ -200,7 +200,7 @@ class GaitReward(ManagerTermBase):
         """Compute the reward.
 
         This reward is defined as a multiplication between six terms where two of them enforce pair feet
-        being in sync and the other four rewards if all the other remaining pairs are out of sync
+        being in sync and the other four rewards if all the o·ther remaining pairs are out of sync
 
         Args:
             env: The RL environment instance.
@@ -677,4 +677,290 @@ def flat_orientation_l2(env: ManagerBasedRLEnv, asset_cfg: SceneEntityCfg = Scen
     asset: RigidObject = env.scene[asset_cfg.name]
     reward = torch.sum(torch.square(asset.data.projected_gravity_b[:, :2]), dim=1)
     reward *= torch.clamp(-env.scene["robot"].data.projected_gravity_b[:, 2], 0, 0.7) / 0.7
+    return reward
+
+
+# ====================================================================================
+# 倒立训练专用 Reward 函数 (Handstand Training Rewards)
+# ====================================================================================
+
+
+def handstand_feet_height_exp(
+    env: ManagerBasedRLEnv,
+    target_height: float,
+    std: float,
+    asset_cfg: SceneEntityCfg = SceneEntityCfg("robot"),
+) -> torch.Tensor:
+    """引导机器人将后腿抬起至目标高度 (使用指数核函数)
+
+    Reward the robot for lifting its hind feet to a target height using exponential kernel.
+    This guides the robot to raise its back legs during handstand training.
+
+    Args:
+        env: ManagerBasedRLEnv 实例
+        target_height: 目标足部高度 [m] (例如 0.5 表示足部应抬至0.5米高)
+        std: 高斯核标准差，控制奖励曲线的陡峭程度
+        asset_cfg: 机器人场景实体配置 (必须包含 body_ids 指定足部刚体)
+
+    Returns:
+        torch.Tensor: 奖励值 (batch_size,) - 足部越接近目标高度奖励越高
+
+    原理:
+        使用高斯核函数 exp(-error^2 / std^2) 将高度误差转化为奖励
+        当误差很大时奖励接近0，只有接近目标时奖励才急剧增加
+    """
+    # 提取机器人资产
+    asset: RigidObject = env.scene[asset_cfg.name]
+
+    # 获取足部的世界坐标位置 (batch_size, num_feet, 3)
+    feet_pos_w = asset.data.body_pos_w[:, asset_cfg.body_ids, :]
+
+    # 提取Z轴高度 (batch_size, num_feet)
+    feet_height = feet_pos_w[:, :, 2]
+
+    # 计算高度误差的平方和 (batch_size,)
+    height_error = torch.sum(torch.square(feet_height - target_height), dim=1)
+
+    # 使用指数核函数将误差转换为奖励
+    reward = torch.exp(-height_error / (std**2))
+
+    # 应用重力方向权重（保持机器人朝上）
+    reward *= torch.clamp(-env.scene["robot"].data.projected_gravity_b[:, 2], 0, 0.7) / 0.7
+
+    return reward
+
+
+def handstand_feet_on_air(
+    env: ManagerBasedRLEnv,
+    threshold: float,
+    sensor_cfg: SceneEntityCfg,
+    knee_body_names: list[str] | None = None,
+    asset_cfg: SceneEntityCfg = SceneEntityCfg("robot"),
+) -> torch.Tensor:
+    """足部悬空奖励 - 防止机器人用膝盖或腿部其他部位作弊
+
+    Reward for keeping feet in the air while preventing cheating with knees/thighs.
+    Ensures only front limbs touch the ground during handstand.
+
+    Args:
+        env: ManagerBasedRLEnv 实例
+        threshold: 接触力阈值 [N] (大于此值视为接触)
+        sensor_cfg: 接触传感器配置 (body_ids 应包含足部刚体索引)
+        knee_body_names: 膝盖/腿部刚体名称列表 (例如 [".*[Kk]nee.*", ".*[Tt]high.*", ".*[Ss]hank.*"])
+                        如果为 None，则不检查膝盖接触
+        asset_cfg: 机器人场景实体配置
+
+    Returns:
+        torch.Tensor: 奖励值 (batch_size,) - 所有脚部和膝盖悬空时为1.0，否则为0.0
+
+    逻辑:
+        奖励 = (所有脚部未接触) × (所有膝盖未接触)
+        这防止机器人通过跪地或坐姿来"作弊"完成任务
+    """
+    # 提取接触传感器
+    contact_sensor = env.scene.sensors[sensor_cfg.name]
+
+    # 检查足部接触状态 (batch_size, num_feet)
+    feet_contact = torch.norm(
+        contact_sensor.data.net_forces_w[:, sensor_cfg.body_ids, :], dim=-1
+    ) > threshold
+
+    # 所有足部悬空的奖励 (batch_size,)
+    feet_in_air = (~feet_contact).float().prod(dim=1)
+
+    # 如果指定了膝盖刚体，检查膝盖接触
+    if knee_body_names is not None and len(knee_body_names) > 0:
+        asset: RigidObject = env.scene[asset_cfg.name]
+
+        # 查找所有膝盖刚体索引 (使用正则表达式匹配)
+        knee_body_ids = []
+        for pattern in knee_body_names:
+            import re
+            matched_ids = [
+                idx for idx, name in enumerate(asset.body_names)
+                if re.match(pattern, name, re.IGNORECASE)
+            ]
+            knee_body_ids.extend(matched_ids)
+
+        if len(knee_body_ids) > 0:
+            knee_body_ids = list(set(knee_body_ids))  # 去重
+
+            # 检查膝盖接触状态 (batch_size, num_knees)
+            knee_contact = torch.norm(
+                contact_sensor.data.net_forces_w[:, knee_body_ids, :], dim=-1
+            ) > threshold
+
+            # 所有膝盖悬空的奖励 (batch_size,)
+            knees_in_air = (~knee_contact).float().prod(dim=1)
+
+            # 最终奖励 = 脚部悬空 AND 膝盖悬空
+            reward = feet_in_air * knees_in_air
+        else:
+            reward = feet_in_air
+    else:
+        reward = feet_in_air
+
+    # 应用重力方向权重
+    reward *= torch.clamp(-env.scene["robot"].data.projected_gravity_b[:, 2], 0, 0.7) / 0.7
+
+    return reward
+
+
+class HandstandFeetAirTimeReward(ManagerTermBase):
+    """手倒立足部空中时间奖励 (带膝盖接触惩罚)
+
+    Reward for keeping feet in the air for extended periods during handstand.
+    Penalizes knee contact to prevent cheating.
+
+    此奖励鼓励机器人长时间保持倒立姿态，并在足部落地时结算奖励。
+    如果在滞空期间膝盖接触地面，奖励将被清零。
+
+    原理:
+        1. 维护每个足部的空中时间计时器
+        2. 当足部首次接触地面时，结算 (air_time - threshold) 作为奖励
+        3. 如果膝盖在滞空期间接触过地面，奖励强制为0
+    """
+
+    def __init__(self, cfg: RewTerm, env: ManagerBasedRLEnv):
+        """初始化奖励项
+
+        Args:
+            cfg: 奖励配置，params 应包含:
+                - threshold: 最小滞空时间阈值 [s]
+                - sensor_cfg: 接触传感器配置 (包含足部 body_ids)
+                - knee_body_names: 膝盖刚体名称列表 (可选)
+                - asset_cfg: 机器人实体配置
+            env: RL环境实例
+        """
+        super().__init__(cfg, env)
+
+        # 提取配置参数
+        self.threshold = cfg.params["threshold"]
+        self.contact_sensor = env.scene.sensors[cfg.params["sensor_cfg"].name]
+        self.sensor_cfg = cfg.params["sensor_cfg"]
+        self.asset = env.scene[cfg.params["asset_cfg"].name]
+        self.knee_body_names = cfg.params.get("knee_body_names", None)
+
+        # 获取膝盖刚体索引
+        if self.knee_body_names is not None and len(self.knee_body_names) > 0:
+            self.knee_body_ids = []
+            import re
+            for pattern in self.knee_body_names:
+                matched_ids = [
+                    idx for idx, name in enumerate(self.asset.body_names)
+                    if re.match(pattern, name, re.IGNORECASE)
+                ]
+                self.knee_body_ids.extend(matched_ids)
+            self.knee_body_ids = list(set(self.knee_body_ids))  # 去重
+        else:
+            self.knee_body_ids = []
+
+        # 初始化状态变量 (batch_size, num_feet)
+        # 从接触传感器获取足部数量（兼容 list 和 slice 类型的 body_ids）
+        if isinstance(self.sensor_cfg.body_ids, slice):
+            # 如果是 slice，从 body_names 长度推断
+            num_bodies = len(self.contact_sensor.body_names)
+            start, stop, step = self.sensor_cfg.body_ids.indices(num_bodies)
+            num_feet = len(range(start, stop, step))
+        else:
+            # 如果是 list，直接获取长度
+            num_feet = len(self.sensor_cfg.body_ids)
+
+        self.last_contacts = torch.zeros(env.num_envs, num_feet, dtype=torch.bool, device=env.device)
+        self.feet_air_time = torch.zeros(env.num_envs, num_feet, dtype=torch.float, device=env.device)
+
+    def __call__(
+        self,
+        env: ManagerBasedRLEnv,
+        _threshold: float,
+        _sensor_cfg: SceneEntityCfg,
+        _knee_body_names: list[str] | None,
+        _asset_cfg: SceneEntityCfg,
+    ) -> torch.Tensor:
+        """计算奖励
+
+        注意: threshold, sensor_cfg, knee_body_names, asset_cfg 参数从 __init__ 中的 self 属性获取，
+        这里的参数仅用于保持奖励管理器的接口兼容性。
+
+        Returns:
+            torch.Tensor: 奖励值 (batch_size,)
+        """
+        # 检查足部接触状态 (batch_size, num_feet)
+        feet_contact = self.contact_sensor.data.net_forces_w[:, self.sensor_cfg.body_ids, 2] > 1.0
+
+        # 检查膝盖接触状态 (batch_size, num_knees 或 batch_size)
+        if len(self.knee_body_ids) > 0:
+            knee_contact = self.contact_sensor.data.net_forces_w[:, self.knee_body_ids, 2] > 1.0
+            # 任意膝盖接触就惩罚 (batch_size,)
+            any_knee_contact = knee_contact.any(dim=1)
+        else:
+            any_knee_contact = torch.zeros(env.num_envs, dtype=torch.bool, device=env.device)
+
+        # 接触滤波器 (考虑上一帧接触状态)
+        contact_filt = torch.logical_or(feet_contact, self.last_contacts)
+        self.last_contacts = feet_contact
+
+        # 首次接触检测 (batch_size, num_feet)
+        first_contact = (self.feet_air_time > 0.0) * contact_filt
+
+        # 更新空中时间
+        self.feet_air_time += env.step_dt
+
+        # 计算基础空中时间奖励 (batch_size,)
+        rew_air_time = torch.sum((self.feet_air_time - self.threshold) * first_contact, dim=1)
+
+        # 膝盖接触惩罚：有膝盖接触时奖励为0
+        rew_air_time = rew_air_time * (~any_knee_contact).float()
+
+        # 重置已接触足部的计时器
+        self.feet_air_time *= ~contact_filt
+
+        # 应用重力方向权重
+        rew_air_time *= torch.clamp(-env.scene["robot"].data.projected_gravity_b[:, 2], 0, 0.7) / 0.7
+
+        return rew_air_time
+
+
+def handstand_orientation_l2(
+    env: ManagerBasedRLEnv,
+    target_gravity: list[float],
+    asset_cfg: SceneEntityCfg = SceneEntityCfg("robot"),
+) -> torch.Tensor:
+    """倒立姿态奖励 - 约束机器人躯干保持垂直
+
+    Reward for maintaining vertical orientation during handstand.
+    Penalizes deviation from target gravity direction.
+
+    Args:
+        env: ManagerBasedRLEnv 实例
+        target_gravity: 目标重力方向向量 (机器人基座坐标系)
+                       例如 [1.0, 0.0, 0.0] 表示倒立时重力沿X轴正方向
+                       例如 [-1.0, 0.0, 0.0] 表示重力沿X轴负方向
+        asset_cfg: 机器人场景实体配置
+
+    Returns:
+        torch.Tensor: 惩罚值 (batch_size,) - L2距离越大惩罚越大
+
+    原理:
+        通过对比当前重力投影向量与目标方向的欧氏距离，引导机器人调整躯干的俯仰角，
+        使其保持笔直的倒立姿态，防止身体过度倾斜或翻转。
+
+    背景:
+        - 机器人平趴时: projected_gravity ≈ [0, 0, -1]
+        - 机器人倒立时: projected_gravity ≈ [±1, 0, 0] (取决于坐标系定义)
+    """
+    # 提取机器人资产
+    asset: RigidObject = env.scene[asset_cfg.name]
+
+    # 将目标重力方向转换为张量
+    target_gravity_tensor = torch.tensor(
+        target_gravity, dtype=torch.float32, device=env.device
+    ).unsqueeze(0)  # (1, 3)
+
+    # 获取当前重力投影向量 (batch_size, 3)
+    current_gravity = asset.data.projected_gravity_b
+
+    # 计算L2距离的平方 (batch_size,)
+    reward = torch.sum(torch.square(current_gravity - target_gravity_tensor), dim=1)
+
     return reward

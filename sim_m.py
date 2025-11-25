@@ -52,12 +52,12 @@ class RobotConfig:
         # Individual joint stiffness (kp) [Nm/rad]
         # NOTE: Hip values increased for better tracking (differs from training)
         self.kp = {
-            "FR_hip_joint": 70.0, "FL_hip_joint": 70.0,
-            "RR_hip_joint": 70.0, "RL_hip_joint": 70.0,
-            "FR_thigh_joint": 100.0, "FL_thigh_joint": 100.0,
-            "RR_thigh_joint": 100.0, "RL_thigh_joint": 100.0,
-            "FR_calf_joint": 150.0, "FL_calf_joint": 150.0,
-            "RR_calf_joint": 150.0, "RL_calf_joint": 150.0,
+            "FR_hip_joint": 200.0, "FL_hip_joint": 200.0,
+            "RR_hip_joint": 200.0, "RL_hip_joint": 200.0,
+            "FR_thigh_joint": 90.0, "FL_thigh_joint": 90.0,
+            "RR_thigh_joint": 90.0, "RL_thigh_joint": 90.0,
+            "FR_calf_joint": 200.0, "FL_calf_joint": 200.0,
+            "RR_calf_joint": 200.0, "RL_calf_joint": 200.0,
             "FR_foot_joint": 1.0, "FL_foot_joint": 1.0,
             "RR_foot_joint": 1.0, "RL_foot_joint": 1.0,
         }
@@ -65,16 +65,42 @@ class RobotConfig:
         # Individual joint damping (kd) [Nm·s/rad]
         # NOTE: Hip values increased for better tracking (differs from training)
         self.kd = {
-            "FR_hip_joint": 10.0, "FL_hip_joint": 10.0,
-            "RR_hip_joint": 10.0, "RL_hip_joint": 10.0,
-            "FR_thigh_joint": 15.0, "FL_thigh_joint": 15.0,
-            "RR_thigh_joint": 15.0, "RL_thigh_joint": 15.0,
-            "FR_calf_joint": 20.0, "FL_calf_joint": 20.0,
-            "RR_calf_joint": 20.0, "RL_calf_joint": 20.0,
+            "FR_hip_joint": 0.0, "FL_hip_joint": 0.0,
+            "RR_hip_joint": 0.0, "RL_hip_joint": 0.0,
+            "FR_thigh_joint": 0.0, "FL_thigh_joint": 0.0,
+            "RR_thigh_joint": 0.0, "RL_thigh_joint": 0.0,
+            "FR_calf_joint": 0.0, "FL_calf_joint": 0.0,
+            "RR_calf_joint": 0.0, "RL_calf_joint": 0.0,
             "FR_foot_joint": 1.0, "FL_foot_joint": 1.0,
             "RR_foot_joint": 1.0, "RL_foot_joint": 1.0,
         }
-        
+
+        # Individual joint integral gain (ki) [Nm/(rad·s)]
+        # 积分增益用于消除稳态误差
+        self.ki = {
+            "FR_hip_joint": 5.0, "FL_hip_joint": 5.0,
+            "RR_hip_joint": 5.0, "RL_hip_joint": 5.0,
+            "FR_thigh_joint": 3.0, "FL_thigh_joint": 3.0,
+            "RR_thigh_joint": 3.0, "RL_thigh_joint": 3.0,
+            "FR_calf_joint": 5.0, "FL_calf_joint": 5.0,
+            "RR_calf_joint": 5.0, "RL_calf_joint": 5.0,
+            "FR_foot_joint": 0.0, "FL_foot_joint": 0.0,
+            "RR_foot_joint": 0.0, "RL_foot_joint": 0.0,
+        }
+
+        # Integral anti-windup limits [rad·s]
+        # 积分饱和限制，防止积分项过大
+        self.integral_limit = {
+            "FR_hip_joint": 0.5, "FL_hip_joint": 0.5,
+            "RR_hip_joint": 0.5, "RL_hip_joint": 0.5,
+            "FR_thigh_joint": 0.5, "FL_thigh_joint": 0.5,
+            "RR_thigh_joint": 0.5, "RL_thigh_joint": 0.5,
+            "FR_calf_joint": 0.5, "FL_calf_joint": 0.5,
+            "RR_calf_joint": 0.5, "RL_calf_joint": 0.5,
+            "FR_foot_joint": 0.0, "FL_foot_joint": 0.0,
+            "RR_foot_joint": 0.0, "RL_foot_joint": 0.0,
+        }
+
         # Individual joint effort limits [Nm]
         self.tau_limit = {
             "FR_hip_joint": 120.0, "FL_hip_joint": 120.0,
@@ -99,18 +125,21 @@ class RobotConfig:
         # Convert dicts to arrays (ordered by joint_names)
         self.kp_array = np.array([self.kp[name] for name in self.joint_names])
         self.kd_array = np.array([self.kd[name] for name in self.joint_names])
+        self.ki_array = np.array([self.ki[name] for name in self.joint_names])
+        self.integral_limit_array = np.array([self.integral_limit[name] for name in self.joint_names])
         self.tau_limit_array = np.array([self.tau_limit[name] for name in self.joint_names])
     
     def print_parameters(self):
-        """Print all PD control parameters for verification"""
-        print("\n" + "="*70)
-        print("PD Control Parameters Configuration")
-        print("="*70)
-        print(f"{'Joint Name':<20} {'Kp [Nm/rad]':>12} {'Kd [Nm·s/rad]':>15} {'τ_limit [Nm]':>15}")
-        print("-"*70)
+        """Print all PID control parameters for verification"""
+        print("\n" + "="*90)
+        print("PID Control Parameters Configuration")
+        print("="*90)
+        print(f"{'Joint Name':<20} {'Kp':>10} {'Kd':>10} {'Ki':>10} {'I_limit':>10} {'τ_limit':>12}")
+        print(f"{'':20} {'[Nm/rad]':>10} {'[Nm·s/rad]':>10} {'[Nm/(rad·s)]':>10} {'[rad·s]':>10} {'[Nm]':>12}")
+        print("-"*90)
         for name in self.joint_names:
-            print(f"{name:<20} {self.kp[name]:>12.1f} {self.kd[name]:>15.1f} {self.tau_limit[name]:>15.1f}")
-        print("="*70 + "\n")
+            print(f"{name:<20} {self.kp[name]:>10.1f} {self.kd[name]:>10.1f} {self.ki[name]:>10.1f} {self.integral_limit[name]:>10.2f} {self.tau_limit[name]:>12.1f}")
+        print("="*90 + "\n")
 
 class Config:
     def __init__(self):
@@ -174,6 +203,7 @@ class PDTuner:
         # 调节步长
         self.kp_step = 10.0
         self.kd_step = 0.1
+        self.ki_step = 0.5  # Ki调节步长
 
         # 构建关节类型到索引的映射
         self.type_to_indices = {
@@ -233,6 +263,26 @@ class PDTuner:
             self.cfg.kd_array[idx] = max(0, self.cfg.kd_array[idx] - self.kd_step)
         self._print_status()
 
+    def increase_ki(self):
+        """增加当前选中类型所有关节的 Ki"""
+        joint_type = self.joint_types[self.selected_type]
+        indices = self.type_to_indices[joint_type]
+        for idx in indices:
+            name = self.joint_names[idx]
+            self.cfg.ki[name] += self.ki_step
+            self.cfg.ki_array[idx] += self.ki_step
+        self._print_status()
+
+    def decrease_ki(self):
+        """减少当前选中类型所有关节的 Ki"""
+        joint_type = self.joint_types[self.selected_type]
+        indices = self.type_to_indices[joint_type]
+        for idx in indices:
+            name = self.joint_names[idx]
+            self.cfg.ki[name] = max(0, self.cfg.ki[name] - self.ki_step)
+            self.cfg.ki_array[idx] = max(0, self.cfg.ki_array[idx] - self.ki_step)
+        self._print_status()
+
     def _print_status(self):
         """打印当前选中类型的参数"""
         joint_type = self.joint_types[self.selected_type]
@@ -241,24 +291,24 @@ class PDTuner:
         print(f"\n=== Selected Type: {joint_type.upper()} ===")
         for idx in indices:
             name = self.joint_names[idx]
-            print(f"  [{idx:2d}] {name:<18} Kp={self.cfg.kp[name]:>7.1f}  Kd={self.cfg.kd[name]:>6.1f}")
+            print(f"  [{idx:2d}] {name:<18} Kp={self.cfg.kp[name]:>7.1f}  Kd={self.cfg.kd[name]:>6.1f}  Ki={self.cfg.ki[name]:>6.1f}")
 
     def print_all_params(self):
-        """打印所有关节的 PD 参数（按类型分组）"""
-        print("\n" + "="*70)
-        print("Current PD Parameters (by Joint Type)")
-        print("="*70)
+        """打印所有关节的 PID 参数（按类型分组）"""
+        print("\n" + "="*80)
+        print("Current PID Parameters (by Joint Type)")
+        print("="*80)
 
         for joint_type in self.joint_types:
             indices = self.type_to_indices[joint_type]
             marker = " *SELECTED*" if joint_type == self.joint_types[self.selected_type] else ""
             print(f"\n{joint_type.upper()}{marker}:")
-            print(f"  {'Idx':<4} {'Joint Name':<18} {'Kp':>10} {'Kd':>10}")
-            print("  " + "-"*44)
+            print(f"  {'Idx':<4} {'Joint Name':<18} {'Kp':>10} {'Kd':>10} {'Ki':>10}")
+            print("  " + "-"*54)
             for idx in indices:
                 name = self.joint_names[idx]
-                print(f"  {idx:<4} {name:<18} {self.cfg.kp[name]:>10.1f} {self.cfg.kd[name]:>10.1f}")
-        print("="*70 + "\n")
+                print(f"  {idx:<4} {name:<18} {self.cfg.kp[name]:>10.1f} {self.cfg.kd[name]:>10.1f} {self.cfg.ki[name]:>10.1f}")
+        print("="*80 + "\n")
 
 
 # 全局 PDTuner 实例（稍后初始化）
@@ -314,11 +364,153 @@ class Cmd:
 vel_cmd = Cmd()
 
 
+# Control mode state machine
+class ControlMode:
+    NORMAL = 0      # Policy control (default)
+    FROZEN = 1      # Freeze target_q updates
+    INTERPOLATING = 2  # Smooth interpolation to preset pose
+
+class PoseController:
+    """Manages smooth interpolation to preset poses"""
+    def __init__(self):
+        # Preset target pose for 12 leg joints (excluding 4 wheel joints)
+        # Order: FR_hip, FR_thigh, FR_calf, FL_hip, FL_thigh, FL_calf,
+        #        RR_hip, RR_thigh, RR_calf, RL_hip, RL_thigh, RL_calf
+        self.preset_pose = np.array([
+            -0.1, -0.8, 1.8,   # FR leg
+            0.1, 0.8, -1.8,    # FL leg
+            0.1, 0.8, -1.8,    # RR leg
+            -0.1, -0.8, 1.8    # RL leg
+        ], dtype=np.double)
+
+        # Joint motion speed [rad/s] for each joint
+        self.joint_speed = 0.5  # rad/s (will be overridden by command line arg)
+
+        # Control mode state
+        self.mode = ControlMode.NORMAL
+
+        # Interpolation state
+        self.start_q = None
+        self.target_q_preset = None
+        self.interpolation_progress = 0.0
+        self.interpolation_duration = None
+        self.interpolation_completed = False  # Track if interpolation has finished
+
+    def start_interpolation(self, current_q):
+        """Start smooth interpolation from current_q to preset pose"""
+        self.mode = ControlMode.INTERPOLATING
+        self.interpolation_completed = False  # Reset completion flag
+        self.start_q = current_q[:12].copy()  # Only leg joints
+        self.target_q_preset = self.preset_pose.copy()
+
+        # Calculate interpolation duration based on max joint displacement
+        max_displacement = np.max(np.abs(self.target_q_preset - self.start_q))
+        self.interpolation_duration = max_displacement / self.joint_speed
+        self.interpolation_progress = 0.0
+
+        print(f"\n▶ Starting interpolation to preset pose (duration: {self.interpolation_duration:.2f}s)")
+        print(f"  Max joint displacement: {max_displacement:.3f} rad")
+        print(f"  Joint speed: {self.joint_speed:.2f} rad/s")
+
+    def update_interpolation(self, dt):
+        """Update interpolation progress and return interpolated target_q"""
+        if self.mode != ControlMode.INTERPOLATING:
+            return None
+
+        self.interpolation_progress += dt
+
+        # Compute interpolation factor (0 to 1)
+        alpha = min(1.0, self.interpolation_progress / self.interpolation_duration)
+
+        # Linear interpolation (can be replaced with smoother curves)
+        interpolated_q = self.start_q + alpha * (self.target_q_preset - self.start_q)
+
+        # Print progress every 0.5 seconds
+        if int(self.interpolation_progress * 2) > int((self.interpolation_progress - dt) * 2):
+            remaining = self.interpolation_duration - self.interpolation_progress
+            print(f"  Progress: {alpha*100:.1f}% | Remaining: {remaining:.2f}s")
+
+        # Check if interpolation is complete
+        if alpha >= 1.0:
+            self.mode = ControlMode.FROZEN
+            self.interpolation_completed = True  # Mark as completed
+            print("✓ Interpolation complete - pose locked at preset position")
+            print("  Press Space again to resume normal policy control")
+
+        return interpolated_q
+
+    def toggle_mode(self, current_q):
+        """Toggle between control modes when space is pressed
+
+        Space key behavior:
+        1st press: NORMAL -> FROZEN (stop target_q updates)
+        2nd press: FROZEN -> INTERPOLATING (start smooth motion to preset)
+        3rd press: FROZEN -> NORMAL (resume policy control after interpolation completes)
+        """
+        if self.mode == ControlMode.NORMAL:
+            # First press: Normal -> Frozen (stop policy updates)
+            self.mode = ControlMode.FROZEN
+            self.interpolation_completed = False  # Reset flag
+            print("\n⏸ [1st press] Control FROZEN - target_q locked")
+            print("  Press Space again to start interpolation to preset pose")
+
+        elif self.mode == ControlMode.FROZEN:
+            if not self.interpolation_completed:
+                # Second press: Frozen -> Interpolating (start smooth motion)
+                print("\n▶ [2nd press] Starting interpolation...")
+                self.start_interpolation(current_q)
+            else:
+                # Third press: Frozen -> Normal (resume after interpolation done)
+                self.mode = ControlMode.NORMAL
+                self.interpolation_completed = False  # Reset flag
+                print("\n▶ [3rd press] Resuming NORMAL policy control")
+
+        elif self.mode == ControlMode.INTERPOLATING:
+            # Manual abort during interpolation -> back to Normal
+            self.mode = ControlMode.NORMAL
+            self.interpolation_completed = False
+            print("\n⏹ Interpolation aborted - resuming NORMAL policy control")
+
+    def increase_speed(self):
+        """Increase joint motion speed"""
+        self.joint_speed = min(5.0, self.joint_speed + 0.1)
+        print(f"\n⚡ Joint speed increased: {self.joint_speed:.2f} rad/s")
+
+    def decrease_speed(self):
+        """Decrease joint motion speed"""
+        self.joint_speed = max(0.1, self.joint_speed - 0.1)
+        print(f"\n🐌 Joint speed decreased: {self.joint_speed:.2f} rad/s")
+
+    def print_preset_pose(self):
+        """Print the preset target pose configuration"""
+        joint_names = ["FR_hip", "FR_thigh", "FR_calf",
+                      "FL_hip", "FL_thigh", "FL_calf",
+                      "RR_hip", "RR_thigh", "RR_calf",
+                      "RL_hip", "RL_thigh", "RL_calf"]
+
+        print("\n" + "="*70)
+        print("Preset Target Pose Configuration")
+        print("="*70)
+        print(f"{'Joint Name':<15} {'Target Angle [rad]':>20}")
+        print("-"*70)
+        for i, name in enumerate(joint_names):
+            print(f"{name:<15} {self.preset_pose[i]:>20.3f}")
+        print("-"*70)
+        print(f"Joint Speed: {self.joint_speed} rad/s")
+        print("="*70 + "\n")
+
+# Global pose controller instance
+pose_ctrl = PoseController()
+
+# Global variable to store current joint positions for keyboard control
+current_q_global = None
+
+
 def start_keyboard_listener():
     from pynput import keyboard as pynput_keyboard
 
     def on_press(key):
-        global pd_tuner
+        global pd_tuner, pose_ctrl, current_q_global
         try:
             k = key.char.lower()  # 普通字母键
         except AttributeError:
@@ -364,10 +556,22 @@ def start_keyboard_listener():
             if pd_tuner:
                 pd_tuner.print_all_params()
 
+        # Print preset pose configuration
+        elif k == 'm':
+            pose_ctrl.print_preset_pose()
+
+        # Adjust interpolation speed
+        elif k == '+' or k == '=':  # '+' key (with or without shift)
+            pose_ctrl.increase_speed()
+        elif k == '-' or k == '_':  # '-' key (with or without shift)
+            pose_ctrl.decrease_speed()
+
         # 特殊键控制
         if key == pynput_keyboard.Key.space:
-            vel_cmd.stop_all()
-            print("Emergency stop")
+            # Toggle control mode (Normal -> Frozen -> Interpolating -> Normal)
+            if current_q_global is not None:
+                pose_ctrl.toggle_mode(current_q_global)
+                vel_cmd.stop_all()  # Also stop velocity commands
         elif key == pynput_keyboard.Key.up:
             if pd_tuner:
                 pd_tuner.increase_kp()
@@ -380,6 +584,14 @@ def start_keyboard_listener():
         elif key == pynput_keyboard.Key.left:
             if pd_tuner:
                 pd_tuner.decrease_kd()
+        elif key == pynput_keyboard.Key.page_up:
+            # Page Up: 增加 Ki
+            if pd_tuner:
+                pd_tuner.increase_ki()
+        elif key == pynput_keyboard.Key.page_down:
+            # Page Down: 减少 Ki
+            if pd_tuner:
+                pd_tuner.decrease_ki()
 
     listener = pynput_keyboard.Listener(on_press=on_press)
     listener.daemon = True
@@ -633,8 +845,8 @@ def run_mujoco(policy, mujoco_model_path, sim_duration, dt, decimation, debug=Fa
     data = mujoco.MjData(model)
     mujoco.mj_step(model, data)
     viewer = mujoco_viewer.MujocoViewer(model, data)
-    viewer.vopt.flags[mujoco.mjtVisFlag.mjVIS_ACTUATOR] = 1
-    viewer.vopt.flags[mujoco.mjtVisFlag.mjVIS_TRANSPARENT] = 1
+    # viewer.vopt.flags[mujoco.mjtVisFlag.mjVIS_ACTUATOR] = 1
+    # viewer.vopt.flags[mujoco.mjtVisFlag.mjVIS_TRANSPARENT] = 1
 
     # 初始化 PDTuner
     pd_tuner = PDTuner(cfg.robot_config)
@@ -646,10 +858,33 @@ def run_mujoco(policy, mujoco_model_path, sim_duration, dt, decimation, debug=Fa
         print("\nRealtime plot enabled")
 
     if keyboard_control:
-        print("\nKeyboard controls:")
-        print("  Velocity: W/S (vx), A/D (vy), Q/E (yaw), Space (stop)")
-        print("  PD Tuning: [/] (select type: hip/thigh/calf/foot)")
-        print("             Up/Down (Kp), Left/Right (Kd), P (print all)\n")
+        print("\n" + "="*70)
+        print("Keyboard Controls")
+        print("="*70)
+        print("  Velocity Control:")
+        print("    W/S: Forward/Backward (vx)")
+        print("    A/D: Left/Right (vy)")
+        print("    Q/E: Counter-Clockwise/Clockwise (yaw)")
+        print("")
+        print("  Control Mode Toggle (Space):")
+        print("    1st press: FREEZE - Stop target_q updates (lock current position)")
+        print("    2nd press: INTERPOLATE - Smooth motion from current q to preset pose")
+        print("    (automatic) - When interpolation completes, stays at preset position")
+        print("    3rd press: RESUME - Return to normal policy control")
+        print("")
+        print("  PID Tuning:")
+        print("    [/]: Select joint type (hip/thigh/calf/foot)")
+        print("    Up/Down: Increase/Decrease Kp (比例增益)")
+        print("    Left/Right: Decrease/Increase Kd (微分增益)")
+        print("    PageUp/PageDown: Increase/Decrease Ki (积分增益)")
+        print("    P: Print all PID parameters")
+        print("")
+        print("  Interpolation Speed:")
+        print("    +/-: Increase/Decrease joint motion speed (0.1-5.0 rad/s)")
+        print("")
+        print("  Info:")
+        print("    M: Show preset pose configuration")
+        print("="*70 + "\n")
 
     # Set initial state
     data.qpos[:3] = [0, 0, cfg.robot_config.init_height]
@@ -660,6 +895,9 @@ def run_mujoco(policy, mujoco_model_path, sim_duration, dt, decimation, debug=Fa
     target_q = default_angle.copy()
     action = np.zeros(16, dtype=np.float32)
     last_action = np.zeros(16, dtype=np.float32)
+
+    # PID control state - 积分误差累积
+    integral_error = np.zeros(16, dtype=np.double)  # 积分项累积误差
 
     # Data recording for plotting
     if plot:
@@ -672,43 +910,80 @@ def run_mujoco(policy, mujoco_model_path, sim_duration, dt, decimation, debug=Fa
         }
     steps = int(sim_duration / dt)
     try:
-        for step in tqdm(range(steps), desc="Simulating..."):
-            if step % decimation == 0:
-                # 构建单帧观测张量 (1, obs_dim)
-                obs = get_obs(data, vel_cmd, last_action, debug=debug)
-                obs_tensor = torch.from_numpy(obs).to(dtype=torch.float32).unsqueeze(0)
-                with torch.no_grad():
-                    raw_action = policy(obs_tensor).cpu().numpy().squeeze()
-                action[:] = raw_action
-                if debug:
-                    print("raw_action:", action)
-                if step > 100:
-                    scaled_action = scale_action(action, cfg)
-                    target_q = scaled_action + default_angle
-                else:
-                    target_q = default_angle
-                last_action = action.copy()
-
+        for step in tqdm(range(steps), desc="Simulating...", disable=True):
+            # Update current joint positions for keyboard control
+            global current_q_global
             q = data.qpos[dof_ids]
             dq = data.qvel[dof_vel]
+            current_q_global = q.copy()
 
-            # 使用实时更新的 PD 参数（可通过键盘调节）
+            # Update interpolation every step for smooth motion
+            if pose_ctrl.mode == ControlMode.INTERPOLATING:
+                interpolated_q = pose_ctrl.update_interpolation(dt)
+                if interpolated_q is not None:
+                    # Apply interpolated positions to leg joints only
+                    # Note: interpolated_q is already in absolute coordinates
+                    target_q[:12] = interpolated_q
+                    # Keep wheel velocities at zero during interpolation
+                    target_q[12:] = 0.0
+
+            # Policy control updates at decimation rate
+            if step % decimation == 0:
+                # Normal policy control mode
+                if pose_ctrl.mode == ControlMode.NORMAL:
+                    # 构建单帧观测张量 (1, obs_dim)
+                    obs = get_obs(data, vel_cmd, last_action, debug=debug)
+                    obs_tensor = torch.from_numpy(obs).to(dtype=torch.float32).unsqueeze(0)
+                    with torch.no_grad():
+                        raw_action = policy(obs_tensor).cpu().numpy().squeeze()
+                    action[:] = raw_action
+                    if debug:
+                        print("raw_action:", action)
+                    if step > 100:
+                        scaled_action = scale_action(action, cfg)
+                        target_q = scaled_action + default_angle
+                    else:
+                        target_q = default_angle
+                    last_action = action.copy()
+
+                # Frozen mode: target_q remains unchanged (do nothing)
+
+            # 使用实时更新的 PID 参数（可通过键盘调节）
             kp = cfg.robot_config.kp_array
             kd = cfg.robot_config.kd_array
+            ki = cfg.robot_config.ki_array
+            integral_limit = cfg.robot_config.integral_limit_array
             tau_limit = cfg.robot_config.tau_limit_array
+
+            # 计算位置误差
+            position_error = target_q[:12] - q[:12]
+            velocity_error = 0.2 - dq[:12]  # 目标速度为0（静止）
+
+            # 更新积分误差（仅对腿部关节，轮子不使用积分）
+            integral_error[:12] += position_error * dt
+
+            # 积分抗饱和（Anti-windup）- 限制积分项累积
+            integral_error[:12] = np.clip(integral_error[:12], -integral_limit[:12], integral_limit[:12])
+
+            # 插值模式或冻结模式时重置积分误差，避免积分累积
+            if pose_ctrl.mode == ControlMode.INTERPOLATING or pose_ctrl.mode == ControlMode.FROZEN:
+                integral_error[:12] = 0.0
 
             tau = np.zeros(16)
 
-            # Leg joints (0-11): position control
-            tau[:12] = kp[:12] * (target_q[:12] - q[:12]) #+ kd[:12] * (0 - dq[:12])
+            # Leg joints (0-11): PID position control
+            # tau = Kp * e_pos + Ki * ∫e_pos·dt + Kd * e_vel
+            tau[:12] = (kp[:12] * position_error +
+                       ki[:12] * integral_error[:12] +
+                       kd[:12] * velocity_error)
 
             # Wheel joints (12-15): velocity control (target_q stores target velocity for wheels)
             tau[12:] = kd[12:] * (target_q[12:] - dq[12:])
             #tau[:]=0
             # tau[14]=5
             #tau[15]=5
-            print("target_q[12:]:", target_q[12:])
-            print("dq[12:]:", dq[12:])
+            # print("target_q[12:]:", target_q[12:])
+            # print("dq[12:]:", dq[12:])
             tau = np.clip(tau, -tau_limit, tau_limit)
 
             # 计算误差（用于绘图）
@@ -754,17 +1029,17 @@ def run_mujoco(policy, mujoco_model_path, sim_duration, dt, decimation, debug=Fa
         if plot and len(plot_data['time']) > 0:
             plot_joint_data(plot_data)
 
-        # 打印最终 PD 参数（如果有修改）
+        # 打印最终 PID 参数（如果有修改）
         if keyboard_control:
-            print("\nFinal PD Parameters:")
+            print("\nFinal PID Parameters:")
             pd_tuner.print_all_params()
 
 if __name__ == '__main__':
     import argparse
     parser = argparse.ArgumentParser(description='Mujoco deployment')
-    parser.add_argument('--model-path', type=str, default='/home/liu/Desktop/robot_lab/source/robot_lab/data/Robots/myrobots/mydog/mjcf/thunder2_v1.xml',
+    parser.add_argument('--model-path', type=str, default='/home/liu/Desktop/robot_lab/source/robot_lab/data/Robots/myrobots/mydog/mjcf/thunder2_v1_complex_terrain.xml',
                         help='Path to MuJoCo XML model. Available terrains: thunder2_v1.xml (complex), thunder2_v1_simple.xml (stairs only)')
-    parser.add_argument('--policy-path', type=str, default='/home/liu/Desktop/robot_lab/logs/rsl_rl/mydog_flat/2025-11-24_22-06-15/exported/policy.pt')
+    parser.add_argument('--policy-path', type=str, default='/home/liu/Desktop/robot_lab/logs/rsl_rl/mydog_flat/2025-11-25_16-58-56/exported/policy.pt')
     parser.add_argument('--duration', type=float, default=120.0)
     parser.add_argument('--dt', type=float, default=0.001)
     parser.add_argument('--decimation', type=int, default=5)
@@ -775,6 +1050,7 @@ if __name__ == '__main__':
     parser.add_argument('--plot', action='store_true', help='Generate plots of joint errors and torques after simulation')
     parser.add_argument('--realtime-plot', action='store_true', help='Enable realtime PD control visualization')
     parser.add_argument('--keyboard', action='store_true', help='Enable keyboard control (WASD/QE + PD tuning)')
+    parser.add_argument('--joint-speed', type=float, default=0.5, help='Joint motion speed for interpolation [rad/s] (default: 0.5)')
 
     args = parser.parse_args()
     args.keyboard = True  # 默认启用键盘控制
@@ -785,8 +1061,14 @@ if __name__ == '__main__':
     vel_cmd.vy = args.vy
     vel_cmd.dyaw = args.vyaw
 
+    # Configure pose controller joint speed
+    pose_ctrl.joint_speed = args.joint_speed
+
     # Print PD control parameters
     cfg.robot_config.print_parameters()
+
+    # Print preset pose configuration
+    pose_ctrl.print_preset_pose()
 
     print(f"Loading policy from: {args.policy_path}")
     policy = torch.jit.load(args.policy_path)
@@ -794,10 +1076,15 @@ if __name__ == '__main__':
 
     if args.keyboard:
         start_keyboard_listener()
-        print("\nKeyboard control enabled:")
-        print("  Velocity: W/S (vx), A/D (vy), Q/E (yaw), Space (stop)")
-        print("  PD Tuning: [/] (select type: hip/thigh/calf/foot)")
-        print("             Up/Down (Kp), Left/Right (Kd), P (print all)")
+        print("\n" + "="*70)
+        print("Keyboard Control Enabled")
+        print("="*70)
+        print("  Velocity: W/S (vx), A/D (vy), Q/E (yaw)")
+        print("  Mode: Space×1=Freeze, Space×2=Interpolate, Space×3=Resume")
+        print("  PID Tuning: [/] (select), Up/Down (Kp), Left/Right (Kd),")
+        print("              PageUp/PageDown (Ki), P (print)")
+        print("  Speed: +/- (adjust interpolation speed), M (show preset pose)")
+        print("="*70)
 
     if args.plot:
         print("\nPost-simulation plot enabled")

@@ -1,9 +1,10 @@
-<mujoco model="thunder">
+<?xml version="1.0" encoding="UTF-8"?>
+<mujoco model="thunder2_v1_complex_terrain">
   <compiler angle="radian" meshdir="../meshes/" eulerseq="zyx"/>
-    <option timestep='0.001' iterations='50' solver='PGS' gravity='0 0 -9.81'>
+  <option timestep='0.001' iterations='50' solver='PGS' gravity='0 0 -9.81'>
     <flag frictionloss="enable" sensor="enable"/>
-    </option>
-   <visual>
+  </option>
+  <visual>
     <quality shadowsize="4096"/>
     <map znear="0.05"/>
   </visual>
@@ -16,10 +17,12 @@
     <default class="leg_joint_param">
       <joint damping="0.01" frictionloss="0.01" armature="0.01"/>
     </default>
+    <default class="terrain">
+      <geom type="box" rgba="0.6 0.6 0.6 1" friction="0.9 0.2 0.2"/>
+    </default>
   </default>
 
-  <statistic meansize="0.164352" extent="1.07561" center="-0.00820016 -1.48012e-05 -0.160784"/>
-
+  <statistic meansize="0.164352" extent="2.5" center="0 0 0"/>
   <asset>
     <mesh name="base_link" file="base_link.STL"/>
     <mesh name="FR_hip" file="FR_hip.STL"/>
@@ -40,7 +43,10 @@
     <mesh name="RL_foot" file="RL_foot.STL"/>
     <material name="matplane" reflectance="0.3" texture="texplane" texrepeat="1 1" texuniform="true"/>
     <material name="matgeom" texture="texgeom" texuniform="true" rgba="0.8 0.6 .4 1"/>
-    <texture name="texplane" type="2d" builtin="checker" rgb1=".2 .3 .4" rgb2=".1 0.15 0.2" width="512" height="512" mark="cross" markrgb=".8 .8 .8"/>  
+    <material name="stairs" rgba="0.5 0.5 0.7 1"/>
+    <material name="ramp" rgba="0.7 0.5 0.5 1"/>
+    <material name="platform" rgba="0.5 0.7 0.5 1"/>
+    <texture name="texplane" type="2d" builtin="checker" rgb1=".2 .3 .4" rgb2=".1 0.15 0.2" width="512" height="512" mark="cross" markrgb=".8 .8 .8"/>
     <texture name="texgeom" type="cube" builtin="flat" mark="cross" width="127" height="1278" rgb1="0.8 0.6 0.4" rgb2="0.8 0.6 0.4" markrgb="1 1 1" random="0.01"/>
     <texture type="skybox" builtin="gradient" rgb1="1 1 1" rgb2=".6 .8 1" width="256" height="256"/>
   </asset>
@@ -48,44 +54,73 @@
   <worldbody>
     <light directional="true" diffuse=".4 .4 .4" specular="0.1 0.1 0.1" pos="0 0 5.0" dir="0 0 -1" castshadow="false"/>
     <light directional="true" diffuse=".6 .6 .6" specular="0.2 0.2 0.2" pos="0 0 4" dir="0 0 -1"/>
-    <geom name="ground" type="plane" size="0 0 1" pos="0.001 0 0" quat="1 0 0 0" material="matplane" condim="1" conaffinity='15'/>
 
-    <!-- 台阶地形 - 测试爬台阶能力 -->
-    <geom name="step1" type="box" pos="1.0 0 0.025" size="0.4 0.6 0.025" rgba="0.6 0.6 0.6 1" condim="3"/>
-    <geom name="step2" type="box" pos="1.5 0 0.05" size="0.4 0.6 0.025" rgba="0.6 0.6 0.6 1" condim="3"/>
-    <geom name="step3" type="box" pos="2.0 0 0.075" size="0.4 0.6 0.025" rgba="0.6 0.6 0.6 1" condim="3"/>
-    <geom name="step4" type="box" pos="2.5 0 0.1" size="0.4 0.6 0.025" rgba="0.6 0.6 0.6 1" condim="3"/>
-    <geom name="step5" type="box" pos="3.0 0 0.125" size="0.4 0.6 0.025" rgba="0.6 0.6 0.6 1" condim="3"/>
+    <!-- Main ground plane -->
+    <geom name="ground" type="plane" size="20 20 1" pos="0 0 0" quat="1 0 0 0" material="matplane" condim="1" conaffinity='15'/>
 
-    <!-- 平台区域 -->
-    <geom name="platform" type="box" pos="3.8 0 0.15" size="0.8 0.8 0.025" rgba="0.5 0.7 0.5 1" condim="3"/>
+    <!-- ===== STAIRS SECTION ===== -->
 
-    <!-- 下降台阶 -->
-    <geom name="step_down1" type="box" pos="4.8 0 0.125" size="0.4 0.6 0.025" rgba="0.6 0.6 0.6 1" condim="3"/>
-    <geom name="step_down2" type="box" pos="5.3 0 0.1" size="0.4 0.6 0.025" rgba="0.6 0.6 0.6 1" condim="3"/>
-    <geom name="step_down3" type="box" pos="5.8 0 0.075" size="0.4 0.6 0.025" rgba="0.6 0.6 0.6 1" condim="3"/>
-    <geom name="step_down4" type="box" pos="6.3 0 0.05" size="0.4 0.6 0.025" rgba="0.6 0.6 0.6 1" condim="3"/>
+    <!-- Starting flat area (safe zone for robot initialization) -->
+    <geom name="start_area" class="terrain" size="2.0 2.0 0.01" pos="-1.0 0 0.01" rgba="0.4 0.6 0.4 1"/>
 
-    <!-- 斜坡地形 -->
-    <geom name="ramp1" type="box" pos="1.0 1.5 0.05" size="1.0 0.5 0.02" rgba="0.7 0.5 0.3 1" condim="3" quat="0.9962 0 -0.0872 0"/>  <!-- 10度上坡 -->
-    <geom name="ramp2" type="box" pos="3.5 1.5 0.05" size="1.0 0.5 0.02" rgba="0.7 0.5 0.3 1" condim="3" quat="0.9962 0 0.0872 0"/>   <!-- 10度下坡 -->
+    <!-- Set 1: Small height stairs (5cm per step) - 6 steps -->
+    <!-- Total rise: 30cm, horizontal width: 3m (1.5m half-width) -->
+    <geom name="stair_5cm_1" class="terrain" size="0.25 1.5 0.025" pos="1.5 0 0.025" material="stairs"/>
+    <geom name="stair_5cm_2" class="terrain" size="0.25 1.5 0.025" pos="2.0 0 0.075" material="stairs"/>
+    <geom name="stair_5cm_3" class="terrain" size="0.25 1.5 0.025" pos="2.5 0 0.125" material="stairs"/>
+    <geom name="stair_5cm_4" class="terrain" size="0.25 1.5 0.025" pos="3.0 0 0.175" material="stairs"/>
+    <geom name="stair_5cm_5" class="terrain" size="0.25 1.5 0.025" pos="3.5 0 0.225" material="stairs"/>
+    <geom name="stair_5cm_6" class="terrain" size="0.25 1.5 0.025" pos="4.0 0 0.275" material="stairs"/>
 
-    <!-- 不规则障碍物 - 测试避障能力 -->
-    <geom name="obstacle1" type="box" pos="2.0 -1.5 0.075" size="0.3 0.3 0.075" rgba="0.8 0.3 0.1 1" condim="3"/>
-    <geom name="obstacle2" type="cylinder" pos="3.5 -1.5 0.1" size="0.15 0.1" rgba="0.8 0.3 0.1 1" condim="3"/>
-    <geom name="obstacle3" type="box" pos="5.0 -1.5 0.05" size="0.4 0.2 0.05" rgba="0.8 0.3 0.1 1" condim="3"/>
+    <!-- Platform after 5cm stairs -->
+    <geom name="platform_5cm" class="terrain" size="1.0 2.0 0.15" pos="5.2 0 0.30" rgba="0.5 0.7 0.5 1"/>
 
-    <!-- 凹凸不平地形块 -->
-    <geom name="rough1" type="box" pos="1.5 -0.8 0.02" size="0.3 0.3 0.02" rgba="0.5 0.5 0.5 1" condim="3"/>
-    <geom name="rough2" type="box" pos="2.2 -1.0 0.015" size="0.25 0.25 0.015" rgba="0.5 0.5 0.5 1" condim="3"/>
-    <geom name="rough3" type="box" pos="2.8 -0.9 0.025" size="0.3 0.3 0.025" rgba="0.5 0.5 0.5 1" condim="3"/>
-    <geom name="rough4" type="box" pos="3.5 -0.7 0.02" size="0.28 0.28 0.02" rgba="0.5 0.5 0.5 1" condim="3"/>
-    <geom name="rough5" type="box" pos="4.2 -0.85 0.018" size="0.26 0.26 0.018" rgba="0.5 0.5 0.5 1" condim="3"/>
+    <!-- Set 2: Medium height stairs (8cm per step) - 5 steps -->
+    <!-- Total rise: 40cm, horizontal width: 3m -->
+    <geom name="stair_8cm_1" class="terrain" size="0.3 1.5 0.04" pos="6.8 0 0.34" material="stairs"/>
+    <geom name="stair_8cm_2" class="terrain" size="0.3 1.5 0.04" pos="7.4 0 0.42" material="stairs"/>
+    <geom name="stair_8cm_3" class="terrain" size="0.3 1.5 0.04" pos="8.0 0 0.50" material="stairs"/>
+    <geom name="stair_8cm_4" class="terrain" size="0.3 1.5 0.04" pos="8.6 0 0.58" material="stairs"/>
+    <geom name="stair_8cm_5" class="terrain" size="0.3 1.5 0.04" pos="9.2 0 0.66" material="stairs"/>
 
-    <!-- 窄通道 - 测试精确控制 -->
-    <geom name="wall_left" type="box" pos="7.0 0.4 0.15" size="0.8 0.05 0.15" rgba="0.3 0.3 0.8 1" condim="3"/>
-    <geom name="wall_right" type="box" pos="7.0 -0.4 0.15" size="0.8 0.05 0.15" rgba="0.3 0.3 0.8 1" condim="3"/>
-    <body name="base_link" pos='0 0 0.55'>
+    <!-- Platform after 8cm stairs -->
+    <geom name="platform_8cm" class="terrain" size="1.0 2.0 0.35" pos="10.5 0 0.70" rgba="0.5 0.6 0.7 1"/>
+
+    <!-- Set 3: Large height stairs (10cm per step) - 4 steps -->
+    <!-- Total rise: 40cm, horizontal width: 3m -->
+    <geom name="stair_10cm_1" class="terrain" size="0.35 1.5 0.05" pos="12.2 0 0.75" material="stairs"/>
+    <geom name="stair_10cm_2" class="terrain" size="0.35 1.5 0.05" pos="12.9 0 0.85" material="stairs"/>
+    <geom name="stair_10cm_3" class="terrain" size="0.35 1.5 0.05" pos="13.6 0 0.95" material="stairs"/>
+    <geom name="stair_10cm_4" class="terrain" size="0.35 1.5 0.05" pos="14.3 0 1.05" material="stairs"/>
+
+    <!-- Platform after 10cm stairs -->
+    <geom name="platform_10cm" class="terrain" size="1.0 2.0 0.55" pos="15.5 0 1.10" rgba="0.6 0.5 0.7 1"/>
+
+    <!-- Set 4: Challenging stairs (12cm per step) - 4 steps -->
+    <!-- Total rise: 48cm, horizontal width: 3m -->
+    <geom name="stair_12cm_1" class="terrain" size="0.4 1.5 0.06" pos="17.2 0 1.16" material="stairs"/>
+    <geom name="stair_12cm_2" class="terrain" size="0.4 1.5 0.06" pos="18.0 0 1.28" material="stairs"/>
+    <geom name="stair_12cm_3" class="terrain" size="0.4 1.5 0.06" pos="18.8 0 1.40" material="stairs"/>
+    <geom name="stair_12cm_4" class="terrain" size="0.4 1.5 0.06" pos="19.6 0 1.52" material="stairs"/>
+
+    <!-- Final platform -->
+    <geom name="platform_final" class="terrain" size="1.5 2.0 0.78" pos="21.5 0 1.58" rgba="0.6 0.4 0.4 1"/>
+
+    <!-- Descending stairs (8cm per step) - back to ground -->
+    <geom name="stair_down_1" class="terrain" size="0.3 1.5 0.04" pos="23.5 0 1.50" material="stairs"/>
+    <geom name="stair_down_2" class="terrain" size="0.3 1.5 0.04" pos="24.1 0 1.42" material="stairs"/>
+    <geom name="stair_down_3" class="terrain" size="0.3 1.5 0.04" pos="24.7 0 1.34" material="stairs"/>
+    <geom name="stair_down_4" class="terrain" size="0.3 1.5 0.04" pos="25.3 0 1.26" material="stairs"/>
+    <geom name="stair_down_5" class="terrain" size="0.3 1.5 0.04" pos="25.9 0 1.18" material="stairs"/>
+    <geom name="stair_down_6" class="terrain" size="0.3 1.5 0.04" pos="26.5 0 1.10" material="stairs"/>
+    <geom name="stair_down_7" class="terrain" size="0.3 1.5 0.04" pos="27.1 0 1.02" material="stairs"/>
+    <geom name="stair_down_8" class="terrain" size="0.3 1.5 0.04" pos="27.7 0 0.94" material="stairs"/>
+    <geom name="stair_down_9" class="terrain" size="0.3 1.5 0.04" pos="28.3 0 0.86" material="stairs"/>
+    <geom name="stair_down_10" class="terrain" size="0.3 1.5 0.04" pos="28.9 0 0.78" material="stairs"/>
+
+    <!-- ===== ROBOT SECTION ===== -->
+    <!-- Robot spawns at safe location away from obstacles -->
+    <body name="base_link" pos='-1.0 0 0.55'>
       <site name='imu' size='0.01' pos='0.0 0 0.0' quat='1 0 0 0'/>
       <inertial pos="-0.00018 0.00759 0.06615" mass="15.05964" fullinertia="0.16838 0.45784 0.44489 0.00036 0.00047 -0.00598"/>
       <joint name="floating_base_joint" type="free" limited='false'/>
@@ -161,6 +196,7 @@
         <geom size="0.0655 0.028" pos="0.2485 -0.032 -0.0135" quat="0.707105 0.707108 0 0" type="cylinder" rgba="0.89804 0.91765 0.92941 1"/>
         <body name="RR_calf" pos="0.24964 -0.057 -0.0135">
           <inertial pos="-0.1774 -0.02903 0.0121" quat="0.446264 0.484577 0.54675 0.516815" mass="1.89382" diaginertia="0.0858074 0.0849661 0.00239649"/>
+          <!-- Joint limits synchronized with thunder_nohead_pose2.urdf: lower=-3.14, upper=3.14 -->
           <joint name="RR_calf_joint" pos="0 0 0" axis="0 1 0" limited="true" range="-3.14 3.14" actuatorfrcrange="-120 120" class="leg_joint_param"/>
           <geom type="mesh" contype="0" conaffinity="0" group="1" density="0" rgba="0.89804 0.91765 0.92941 1" mesh="RR_calf"/>
           <geom size="0.0635 0.015" pos="0 -0.02653 0" quat="0.707105 0.707108 0 0" type="cylinder" rgba="0.89804 0.91765 0.92941 1"/>
@@ -189,6 +225,7 @@
         <geom size="0.0655 0.028" pos="0.2485 0.032 -0.0135" quat="0.707105 0.707108 0 0" type="cylinder" rgba="0.89804 0.91765 0.92941 1"/>
         <body name="RL_calf" pos="0.24964 0.057 -0.0135">
           <inertial pos="-0.1774 0.02903 0.01208" quat="0.514581 0.549163 0.481766 0.448918" mass="1.89382" diaginertia="0.0858073 0.0849747 0.00239804"/>
+          <!-- Joint limits synchronized with thunder_nohead_pose2.urdf: lower=-3.14, upper=3.14 -->
           <joint name="RL_calf_joint" pos="0 0 0" axis="0 -1 0" limited="true" range="-3.14 3.14" actuatorfrcrange="-120 120" class="leg_joint_param"/>
           <geom type="mesh" contype="0" conaffinity="0" group="1" density="0" rgba="0.89804 0.91765 0.92941 1" mesh="RL_calf"/>
           <geom size="0.0635 0.015" pos="0 0.02653 0" quat="0.707105 0.707108 0 0" type="cylinder" rgba="0.89804 0.91765 0.92941 1"/>
@@ -205,7 +242,7 @@
     </body>
     </body>
   </worldbody>
-  
+
   <actuator>
 
     <!-- FR leg joints - 120Nm -->
@@ -235,12 +272,12 @@
     <motor name="RL_foot_joint" joint="RL_foot_joint" gear="1" ctrllimited="true" ctrlrange="-60 60"/>
   </actuator>
 
-    <sensor>
-      <framequat     name='orientation' objtype='site' noise='0.001' objname='imu'/>
-        <framepos     name='position' objtype='site' noise='0.001' objname='imu'/>
-        <gyro          name='angular-velocity'    site='imu' noise='0.005' cutoff='34.9'/>
-        <velocimeter   name='linear-velocity'     site='imu' noise='0.001' cutoff='30'/>
-        <accelerometer name='linear-acceleration' site='imu' noise='0.005' cutoff='157'/>
-        <magnetometer  name='magnetometer'        site='imu'/>
-    </sensor>
+  <sensor>
+    <framequat     name='orientation' objtype='site' noise='0.001' objname='imu'/>
+    <framepos     name='position' objtype='site' noise='0.001' objname='imu'/>
+    <gyro          name='angular-velocity'    site='imu' noise='0.005' cutoff='34.9'/>
+    <velocimeter   name='linear-velocity'     site='imu' noise='0.001' cutoff='30'/>
+    <accelerometer name='linear-acceleration' site='imu' noise='0.005' cutoff='157'/>
+    <magnetometer  name='magnetometer'        site='imu'/>
+  </sensor>
 </mujoco>

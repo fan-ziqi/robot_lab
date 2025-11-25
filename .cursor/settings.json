@@ -1,0 +1,21 @@
+{   
+    "python.languageServer": "Pylance",
+    "python.analysis.extraPaths": [
+        "${workspaceFolder}/source/robot_lab",
+        "/home/liu/Desktop/IsaacLab/source/isaaclab",
+        "/home/liu/Desktop/IsaacLab/source/isaaclab_assets",
+        "/home/liu/Desktop/IsaacLab/source/isaaclab_mimic",
+        "/home/liu/Desktop/IsaacLab/source/isaaclab_rl",
+        "/home/liu/Desktop/IsaacLab/source/isaaclab_tasks"
+    ],
+    "python.analysis.typeCheckingMode": "basic",
+    "python.analysis.diagnosticMode": "workspace",
+    "python.analysis.useLibraryCodeForTypes": true,
+    "python.analysis.autoImportCompletions": true,
+    "python.analysis.indexing": true,
+    "python.analysis.stubPath": "${workspaceFolder}/.cursor/typings",
+    "files.associations": {
+        "settings.json": "jsonc"
+    },
+    "editor.formatOnSave": false
+}
