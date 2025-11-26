@@ -3,6 +3,7 @@
 
 from __future__ import annotations
 
+import re
 import torch
 from typing import TYPE_CHECKING
 
@@ -724,9 +725,6 @@ def handstand_feet_height_exp(
     # 使用指数核函数将误差转换为奖励
     reward = torch.exp(-height_error / (std**2))
 
-    # 应用重力方向权重（保持机器人朝上）
-    reward *= torch.clamp(-env.scene["robot"].data.projected_gravity_b[:, 2], 0, 0.7) / 0.7
-
     return reward
 
 
@@ -735,7 +733,6 @@ def handstand_feet_on_air(
     threshold: float,
     sensor_cfg: SceneEntityCfg,
     knee_body_names: list[str] | None = None,
-    asset_cfg: SceneEntityCfg = SceneEntityCfg("robot"),
 ) -> torch.Tensor:
     """足部悬空奖励 - 防止机器人用膝盖或腿部其他部位作弊
 
@@ -748,7 +745,6 @@ def handstand_feet_on_air(
         sensor_cfg: 接触传感器配置 (body_ids 应包含足部刚体索引)
         knee_body_names: 膝盖/腿部刚体名称列表 (例如 [".*[Kk]nee.*", ".*[Tt]high.*", ".*[Ss]hank.*"])
                         如果为 None，则不检查膝盖接触
-        asset_cfg: 机器人场景实体配置
 
     Returns:
         torch.Tensor: 奖励值 (batch_size,) - 所有脚部和膝盖悬空时为1.0，否则为0.0
@@ -768,22 +764,19 @@ def handstand_feet_on_air(
     # 所有足部悬空的奖励 (batch_size,)
     feet_in_air = (~feet_contact).float().prod(dim=1)
 
+    reward = feet_in_air
+
     # 如果指定了膝盖刚体，检查膝盖接触
     if knee_body_names is not None and len(knee_body_names) > 0:
-        asset: RigidObject = env.scene[asset_cfg.name]
-
-        # 查找所有膝盖刚体索引 (使用正则表达式匹配)
-        knee_body_ids = []
+        body_names = contact_sensor.body_names
+        knee_body_ids: list[int] = []
         for pattern in knee_body_names:
-            import re
-            matched_ids = [
-                idx for idx, name in enumerate(asset.body_names)
-                if re.match(pattern, name, re.IGNORECASE)
-            ]
-            knee_body_ids.extend(matched_ids)
+            regex = re.compile(pattern, re.IGNORECASE)
+            knee_body_ids.extend([idx for idx, name in enumerate(body_names) if regex.match(name)])
 
         if len(knee_body_ids) > 0:
-            knee_body_ids = list(set(knee_body_ids))  # 去重
+            # 去重保持顺序
+            knee_body_ids = list(dict.fromkeys(knee_body_ids))
 
             # 检查膝盖接触状态 (batch_size, num_knees)
             knee_contact = torch.norm(
@@ -794,14 +787,7 @@ def handstand_feet_on_air(
             knees_in_air = (~knee_contact).float().prod(dim=1)
 
             # 最终奖励 = 脚部悬空 AND 膝盖悬空
-            reward = feet_in_air * knees_in_air
-        else:
-            reward = feet_in_air
-    else:
-        reward = feet_in_air
-
-    # 应用重力方向权重
-    reward *= torch.clamp(-env.scene["robot"].data.projected_gravity_b[:, 2], 0, 0.7) / 0.7
+            reward = reward * knees_in_air
 
     return reward
 
@@ -836,6 +822,7 @@ class HandstandFeetAirTimeReward(ManagerTermBase):
 
         # 提取配置参数
         self.threshold = cfg.params["threshold"]
+        self.force_threshold = cfg.params.get("contact_force_threshold", 1.0)
         self.contact_sensor = env.scene.sensors[cfg.params["sensor_cfg"].name]
         self.sensor_cfg = cfg.params["sensor_cfg"]
         self.asset = env.scene[cfg.params["asset_cfg"].name]
@@ -844,14 +831,13 @@ class HandstandFeetAirTimeReward(ManagerTermBase):
         # 获取膝盖刚体索引
         if self.knee_body_names is not None and len(self.knee_body_names) > 0:
             self.knee_body_ids = []
-            import re
+            body_names = self.contact_sensor.body_names
             for pattern in self.knee_body_names:
-                matched_ids = [
-                    idx for idx, name in enumerate(self.asset.body_names)
-                    if re.match(pattern, name, re.IGNORECASE)
-                ]
+                regex = re.compile(pattern, re.IGNORECASE)
+                matched_ids = [idx for idx, name in enumerate(body_names) if regex.match(name)]
                 self.knee_body_ids.extend(matched_ids)
-            self.knee_body_ids = list(set(self.knee_body_ids))  # 去重
+            # 去重保持顺序
+            self.knee_body_ids = list(dict.fromkeys(self.knee_body_ids))
         else:
             self.knee_body_ids = []
 
@@ -872,10 +858,11 @@ class HandstandFeetAirTimeReward(ManagerTermBase):
     def __call__(
         self,
         env: ManagerBasedRLEnv,
-        _threshold: float,
-        _sensor_cfg: SceneEntityCfg,
-        _knee_body_names: list[str] | None,
-        _asset_cfg: SceneEntityCfg,
+        threshold: float,
+        sensor_cfg: SceneEntityCfg,
+        knee_body_names: list[str] | None,
+        asset_cfg: SceneEntityCfg,
+        contact_force_threshold: float | None = None,
     ) -> torch.Tensor:
         """计算奖励
 
@@ -885,12 +872,15 @@ class HandstandFeetAirTimeReward(ManagerTermBase):
         Returns:
             torch.Tensor: 奖励值 (batch_size,)
         """
+        _ = (threshold, sensor_cfg, knee_body_names, asset_cfg)  # parameters kept for interface compatibility
+        force_threshold = self.force_threshold if contact_force_threshold is None else contact_force_threshold
+
         # 检查足部接触状态 (batch_size, num_feet)
-        feet_contact = self.contact_sensor.data.net_forces_w[:, self.sensor_cfg.body_ids, 2] > 1.0
+        feet_contact = self.contact_sensor.data.net_forces_w[:, self.sensor_cfg.body_ids, 2] > force_threshold
 
         # 检查膝盖接触状态 (batch_size, num_knees 或 batch_size)
         if len(self.knee_body_ids) > 0:
-            knee_contact = self.contact_sensor.data.net_forces_w[:, self.knee_body_ids, 2] > 1.0
+            knee_contact = self.contact_sensor.data.net_forces_w[:, self.knee_body_ids, 2] > force_threshold
             # 任意膝盖接触就惩罚 (batch_size,)
             any_knee_contact = knee_contact.any(dim=1)
         else:
@@ -915,10 +905,16 @@ class HandstandFeetAirTimeReward(ManagerTermBase):
         # 重置已接触足部的计时器
         self.feet_air_time *= ~contact_filt
 
-        # 应用重力方向权重
-        rew_air_time *= torch.clamp(-env.scene["robot"].data.projected_gravity_b[:, 2], 0, 0.7) / 0.7
-
         return rew_air_time
+
+    def reset(self, env_ids: torch.Tensor | None = None):
+        """复位足部状态，避免旧的滞空时间泄露到下一个 episode。"""
+        if env_ids is None:
+            self.last_contacts.zero_()
+            self.feet_air_time.zero_()
+        else:
+            self.last_contacts[env_ids] = False
+            self.feet_air_time[env_ids] = 0.0
 
 
 def handstand_orientation_l2(

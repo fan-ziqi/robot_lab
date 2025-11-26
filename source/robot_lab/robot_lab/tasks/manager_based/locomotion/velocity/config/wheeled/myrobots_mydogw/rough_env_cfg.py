@@ -1,6 +1,8 @@
 # Copyright (c) 2024-2025 Ziqi Fan
 # SPDX-License-Identifier: Apache-2.0
 
+import math
+
 from isaaclab.managers import RewardTermCfg as RewTerm
 from isaaclab.managers import SceneEntityCfg
 from isaaclab.utils import configclass
@@ -52,6 +54,44 @@ class MyDogRewardsCfg(RewardsCfg):
     )
     joint_torques_wheel_l2 = RewTerm(
         func=mdp.joint_torques_l2, weight=0.0, params={"asset_cfg": SceneEntityCfg("robot", joint_names=".*_foot_joint")}
+    )
+
+    # Handstand-specific shapers (默认权重为0，只有在倒立场景下启用)
+    handstand_feet_height_exp = RewTerm(
+        func=mdp.handstand_feet_height_exp,
+        weight=0.0,
+        params={
+            "asset_cfg": SceneEntityCfg("robot", body_names=[ ".*_foot" ]),
+            "target_height": 0.5,
+            "std": math.sqrt(0.25),
+        },
+    )
+    handstand_feet_on_air = RewTerm(
+        func=mdp.handstand_feet_on_air,
+        weight=0.0,
+        params={
+            "sensor_cfg": SceneEntityCfg("contact_forces", body_names=[ ".*_foot" ]),
+            "threshold": 10.0,
+            "knee_body_names": [".*(thigh|calf).*"],
+        },
+    )
+    handstand_feet_air_time = RewTerm(
+        func=mdp.HandstandFeetAirTimeReward,
+        weight=0.0,
+        params={
+            "sensor_cfg": SceneEntityCfg("contact_forces", body_names=[ ".*_foot" ]),
+            "asset_cfg": SceneEntityCfg("robot"),
+            "threshold": 0.4,
+            "knee_body_names": [".*(thigh|calf).*"],
+            "contact_force_threshold": 5.0,
+        },
+    )
+    handstand_orientation_l2 = RewTerm(
+        func=mdp.handstand_orientation_l2,
+        weight=0.0,
+        params={
+            "target_gravity": [1.0, 0.0, 0.0],
+        },
     )
 
 

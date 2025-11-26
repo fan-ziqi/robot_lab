@@ -126,7 +126,7 @@
         <body name="RR_calf" pos="0.24964 -0.057 -0.0135">
           <inertial pos="-0.1774 -0.02903 0.0121" quat="0.446264 0.484577 0.54675 0.516815" mass="1.89382" diaginertia="0.0858074 0.0849661 0.00239649"/>
           <!-- Joint limits synchronized with thunder_nohead_pose2.urdf: lower=-3.14, upper=3.14 -->
-          <joint name="RR_calf_joint" pos="0 0 0" axis="0 1 0" limited="true" range="-3.14 3.14" actuatorfrcrange="-120 120" class="leg_joint_param"/>
+          <joint name="RR_calf_joint" pos="0 0 0" axis="0 1 0" limited="true" range="-6.28 6.28" actuatorfrcrange="-120 120" class="leg_joint_param"/>
           <geom type="mesh" contype="0" conaffinity="0" group="1" density="0" rgba="0.89804 0.91765 0.92941 1" mesh="RR_calf"/>
           <geom size="0.0635 0.015" pos="0 -0.02653 0" quat="0.707105 0.707108 0 0" type="cylinder" rgba="0.89804 0.91765 0.92941 1"/>
           <geom size="0.09 0.02 0.0225" pos="-0.11 -0.02903 0.0121" type="box" rgba="0.89804 0.91765 0.92941 1"/>
@@ -155,7 +155,7 @@
         <body name="RL_calf" pos="0.24964 0.057 -0.0135">
           <inertial pos="-0.1774 0.02903 0.01208" quat="0.514581 0.549163 0.481766 0.448918" mass="1.89382" diaginertia="0.0858073 0.0849747 0.00239804"/>
           <!-- Joint limits synchronized with thunder_nohead_pose2.urdf: lower=-3.14, upper=3.14 -->
-          <joint name="RL_calf_joint" pos="0 0 0" axis="0 -1 0" limited="true" range="-3.14 3.14" actuatorfrcrange="-120 120" class="leg_joint_param"/>
+          <joint name="RL_calf_joint" pos="0 0 0" axis="0 -1 0" limited="true" range="-6.28 6.28" actuatorfrcrange="-120 120" class="leg_joint_param"/>
           <geom type="mesh" contype="0" conaffinity="0" group="1" density="0" rgba="0.89804 0.91765 0.92941 1" mesh="RL_calf"/>
           <geom size="0.0635 0.015" pos="0 0.02653 0" quat="0.707105 0.707108 0 0" type="cylinder" rgba="0.89804 0.91765 0.92941 1"/>
           <geom size="0.09 0.02 0.0225" pos="-0.11 0.02903 0.0121" type="box" rgba="0.89804 0.91765 0.92941 1"/>

@@ -52,12 +52,12 @@ class RobotConfig:
         # Individual joint stiffness (kp) [Nm/rad]
         # NOTE: Hip values increased for better tracking (differs from training)
         self.kp = {
-            "FR_hip_joint": 200.0, "FL_hip_joint": 200.0,
-            "RR_hip_joint": 200.0, "RL_hip_joint": 200.0,
-            "FR_thigh_joint": 90.0, "FL_thigh_joint": 90.0,
-            "RR_thigh_joint": 90.0, "RL_thigh_joint": 90.0,
-            "FR_calf_joint": 200.0, "FL_calf_joint": 200.0,
-            "RR_calf_joint": 200.0, "RL_calf_joint": 200.0,
+            "FR_hip_joint": 150, "FL_hip_joint": 150,
+            "RR_hip_joint": 150, "RL_hip_joint": 150,
+            "FR_thigh_joint": 150.0, "FL_thigh_joint": 150.0,
+            "RR_thigh_joint": 150.0, "RL_thigh_joint": 150.0,
+            "FR_calf_joint": 100, "FL_calf_joint": 100,
+            "RR_calf_joint": 100, "RL_calf_joint": 100,
             "FR_foot_joint": 1.0, "FL_foot_joint": 1.0,
             "RR_foot_joint": 1.0, "RL_foot_joint": 1.0,
         }
@@ -65,12 +65,12 @@ class RobotConfig:
         # Individual joint damping (kd) [Nm·s/rad]
         # NOTE: Hip values increased for better tracking (differs from training)
         self.kd = {
-            "FR_hip_joint": 0.0, "FL_hip_joint": 0.0,
-            "RR_hip_joint": 0.0, "RL_hip_joint": 0.0,
-            "FR_thigh_joint": 0.0, "FL_thigh_joint": 0.0,
-            "RR_thigh_joint": 0.0, "RL_thigh_joint": 0.0,
-            "FR_calf_joint": 0.0, "FL_calf_joint": 0.0,
-            "RR_calf_joint": 0.0, "RL_calf_joint": 0.0,
+            "FR_hip_joint": 20.0, "FL_hip_joint": 20.0,
+            "RR_hip_joint": 20.0, "RL_hip_joint": 20.0,
+            "FR_thigh_joint": 20.0, "FL_thigh_joint": 20.0,
+            "RR_thigh_joint": 20.0, "RL_thigh_joint": 20.0,
+            "FR_calf_joint": 20.0, "FL_calf_joint": 20.0,
+            "RR_calf_joint": 20.0, "RL_calf_joint": 20.0,
             "FR_foot_joint": 1.0, "FL_foot_joint": 1.0,
             "RR_foot_joint": 1.0, "RL_foot_joint": 1.0,
         }
@@ -371,16 +371,24 @@ class ControlMode:
     INTERPOLATING = 2  # Smooth interpolation to preset pose
 
 class PoseController:
-    """Manages smooth interpolation to preset poses"""
+    """Manages smooth interpolation to preset poses (支持两个预设姿态)"""
     def __init__(self):
-        # Preset target pose for 12 leg joints (excluding 4 wheel joints)
+        # 第一个预设姿态 (12个腿部关节)
         # Order: FR_hip, FR_thigh, FR_calf, FL_hip, FL_thigh, FL_calf,
         #        RR_hip, RR_thigh, RR_calf, RL_hip, RL_thigh, RL_calf
-        self.preset_pose = np.array([
-            -0.1, -0.8, 1.8,   # FR leg
+        self.preset_pose_1 = np.array([
+            -0.05, -0.9, 1.8,   # FR leg
+            0.05, 0.9, -1.8,    # FL leg
+            0.05, 2.2, 1.8,    # RR leg
+            -0.05, -2.2, -1.8    # RL leg
+        ], dtype=np.double)
+
+        # 第二个预设姿态 (12个腿部关节)
+        self.preset_pose_2 = np.array([
+             -0.1, -0.8, 1.8,   # FR leg
             0.1, 0.8, -1.8,    # FL leg
-            0.1, 0.8, -1.8,    # RR leg
-            -0.1, -0.8, 1.8    # RL leg
+            0.1, 0.8, 4.483,    # RR leg
+            -0.1, -0.8, -4.483   # RL leg
         ], dtype=np.double)
 
         # Joint motion speed [rad/s] for each joint
@@ -389,26 +397,33 @@ class PoseController:
         # Control mode state
         self.mode = ControlMode.NORMAL
 
+        # Current stage tracking (0=normal, 1=frozen初始, 2=pose1完成, 3=pose2完成)
+        self.current_stage = 0
+
         # Interpolation state
         self.start_q = None
         self.target_q_preset = None
         self.interpolation_progress = 0.0
         self.interpolation_duration = None
-        self.interpolation_completed = False  # Track if interpolation has finished
 
-    def start_interpolation(self, current_q):
-        """Start smooth interpolation from current_q to preset pose"""
+    def start_interpolation(self, current_q, target_pose):
+        """Start smooth interpolation from current_q to target_pose
+
+        Args:
+            current_q: 当前关节位置 (16维，包含腿部和轮子)
+            target_pose: 目标关节位置 (12维，仅腿部关节)
+        """
         self.mode = ControlMode.INTERPOLATING
-        self.interpolation_completed = False  # Reset completion flag
         self.start_q = current_q[:12].copy()  # Only leg joints
-        self.target_q_preset = self.preset_pose.copy()
+        self.target_q_preset = target_pose.copy()
 
         # Calculate interpolation duration based on max joint displacement
         max_displacement = np.max(np.abs(self.target_q_preset - self.start_q))
         self.interpolation_duration = max_displacement / self.joint_speed
         self.interpolation_progress = 0.0
 
-        print(f"\n▶ Starting interpolation to preset pose (duration: {self.interpolation_duration:.2f}s)")
+        pose_name = "Pose 1" if self.current_stage == 1 else "Pose 2"
+        print(f"\n▶ Starting interpolation to {pose_name} (duration: {self.interpolation_duration:.2f}s)")
         print(f"  Max joint displacement: {max_displacement:.3f} rad")
         print(f"  Joint speed: {self.joint_speed:.2f} rad/s")
 
@@ -433,9 +448,17 @@ class PoseController:
         # Check if interpolation is complete
         if alpha >= 1.0:
             self.mode = ControlMode.FROZEN
-            self.interpolation_completed = True  # Mark as completed
-            print("✓ Interpolation complete - pose locked at preset position")
-            print("  Press Space again to resume normal policy control")
+
+            if self.current_stage == 1:
+                # 完成了到pose1的插值
+                self.current_stage = 2
+                print("✓ Reached Pose 1 - pose locked")
+                print("  Press Space again to interpolate to Pose 2")
+            elif self.current_stage == 2:
+                # 完成了到pose2的插值
+                self.current_stage = 3
+                print("✓ Reached Pose 2 - pose locked")
+                print("  Press Space again to resume normal policy control")
 
         return interpolated_q
 
@@ -444,31 +467,40 @@ class PoseController:
 
         Space key behavior:
         1st press: NORMAL -> FROZEN (stop target_q updates)
-        2nd press: FROZEN -> INTERPOLATING (start smooth motion to preset)
-        3rd press: FROZEN -> NORMAL (resume policy control after interpolation completes)
+        2nd press: FROZEN -> INTERPOLATING to Pose 1
+        (auto) -> FROZEN at Pose 1
+        3rd press: FROZEN -> INTERPOLATING to Pose 2
+        (auto) -> FROZEN at Pose 2
+        4th press: FROZEN -> NORMAL (resume policy control)
         """
         if self.mode == ControlMode.NORMAL:
-            # First press: Normal -> Frozen (stop policy updates)
+            # 第1次按：Normal -> Frozen (停止策略更新)
             self.mode = ControlMode.FROZEN
-            self.interpolation_completed = False  # Reset flag
+            self.current_stage = 1
             print("\n⏸ [1st press] Control FROZEN - target_q locked")
-            print("  Press Space again to start interpolation to preset pose")
+            print("  Press Space again to start interpolation to Pose 1")
 
         elif self.mode == ControlMode.FROZEN:
-            if not self.interpolation_completed:
-                # Second press: Frozen -> Interpolating (start smooth motion)
-                print("\n▶ [2nd press] Starting interpolation...")
-                self.start_interpolation(current_q)
-            else:
-                # Third press: Frozen -> Normal (resume after interpolation done)
+            if self.current_stage == 1:
+                # 第2次按：Frozen -> Interpolating to Pose 1
+                print("\n▶ [2nd press] Starting interpolation to Pose 1...")
+                self.start_interpolation(current_q, self.preset_pose_1)
+
+            elif self.current_stage == 2:
+                # 第3次按：Frozen (at Pose 1) -> Interpolating to Pose 2
+                print("\n▶ [3rd press] Starting interpolation to Pose 2...")
+                self.start_interpolation(current_q, self.preset_pose_2)
+
+            elif self.current_stage == 3:
+                # 第4次按：Frozen (at Pose 2) -> Normal (恢复正常控制)
                 self.mode = ControlMode.NORMAL
-                self.interpolation_completed = False  # Reset flag
-                print("\n▶ [3rd press] Resuming NORMAL policy control")
+                self.current_stage = 0
+                print("\n▶ [4th press] Resuming NORMAL policy control")
 
         elif self.mode == ControlMode.INTERPOLATING:
-            # Manual abort during interpolation -> back to Normal
+            # 插值过程中按空格，中止并返回正常模式
             self.mode = ControlMode.NORMAL
-            self.interpolation_completed = False
+            self.current_stage = 0
             print("\n⏹ Interpolation aborted - resuming NORMAL policy control")
 
     def increase_speed(self):
@@ -482,22 +514,22 @@ class PoseController:
         print(f"\n🐌 Joint speed decreased: {self.joint_speed:.2f} rad/s")
 
     def print_preset_pose(self):
-        """Print the preset target pose configuration"""
+        """Print the preset target pose configurations (两个预设姿态)"""
         joint_names = ["FR_hip", "FR_thigh", "FR_calf",
                       "FL_hip", "FL_thigh", "FL_calf",
                       "RR_hip", "RR_thigh", "RR_calf",
                       "RL_hip", "RL_thigh", "RL_calf"]
 
-        print("\n" + "="*70)
-        print("Preset Target Pose Configuration")
-        print("="*70)
-        print(f"{'Joint Name':<15} {'Target Angle [rad]':>20}")
-        print("-"*70)
+        print("\n" + "="*80)
+        print("Preset Target Pose Configurations (两个预设姿态)")
+        print("="*80)
+        print(f"{'Joint Name':<15} {'Pose 1 [rad]':>20} {'Pose 2 [rad]':>20}")
+        print("-"*80)
         for i, name in enumerate(joint_names):
-            print(f"{name:<15} {self.preset_pose[i]:>20.3f}")
-        print("-"*70)
+            print(f"{name:<15} {self.preset_pose_1[i]:>20.3f} {self.preset_pose_2[i]:>20.3f}")
+        print("-"*80)
         print(f"Joint Speed: {self.joint_speed} rad/s")
-        print("="*70 + "\n")
+        print("="*80 + "\n")
 
 # Global pose controller instance
 pose_ctrl = PoseController()
@@ -866,11 +898,13 @@ def run_mujoco(policy, mujoco_model_path, sim_duration, dt, decimation, debug=Fa
         print("    A/D: Left/Right (vy)")
         print("    Q/E: Counter-Clockwise/Clockwise (yaw)")
         print("")
-        print("  Control Mode Toggle (Space):")
+        print("  Control Mode Toggle (Space - 4 stages):")
         print("    1st press: FREEZE - Stop target_q updates (lock current position)")
-        print("    2nd press: INTERPOLATE - Smooth motion from current q to preset pose")
-        print("    (automatic) - When interpolation completes, stays at preset position")
-        print("    3rd press: RESUME - Return to normal policy control")
+        print("    2nd press: INTERPOLATE - Smooth motion from current q to Pose 1")
+        print("    (automatic) - When interpolation completes, stays at Pose 1")
+        print("    3rd press: INTERPOLATE - Smooth motion from Pose 1 to Pose 2")
+        print("    (automatic) - When interpolation completes, stays at Pose 2")
+        print("    4th press: RESUME - Return to normal policy control")
         print("")
         print("  PID Tuning:")
         print("    [/]: Select joint type (hip/thigh/calf/foot)")
@@ -883,7 +917,7 @@ def run_mujoco(policy, mujoco_model_path, sim_duration, dt, decimation, debug=Fa
         print("    +/-: Increase/Decrease joint motion speed (0.1-5.0 rad/s)")
         print("")
         print("  Info:")
-        print("    M: Show preset pose configuration")
+        print("    M: Show preset pose configurations (Pose 1 & Pose 2)")
         print("="*70 + "\n")
 
     # Set initial state
@@ -1039,7 +1073,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Mujoco deployment')
     parser.add_argument('--model-path', type=str, default='/home/liu/Desktop/robot_lab/source/robot_lab/data/Robots/myrobots/mydog/mjcf/thunder2_v1_complex_terrain.xml',
                         help='Path to MuJoCo XML model. Available terrains: thunder2_v1.xml (complex), thunder2_v1_simple.xml (stairs only)')
-    parser.add_argument('--policy-path', type=str, default='/home/liu/Desktop/robot_lab/logs/rsl_rl/mydog_flat/2025-11-25_16-58-56/exported/policy.pt')
+    parser.add_argument('--policy-path', type=str, default='/home/liu/Desktop/robot_lab/logs/rsl_rl/mydog_rough/2025-11-25_22-45-02/exported/policy.pt')
     parser.add_argument('--duration', type=float, default=120.0)
     parser.add_argument('--dt', type=float, default=0.001)
     parser.add_argument('--decimation', type=int, default=5)
@@ -1080,10 +1114,10 @@ if __name__ == '__main__':
         print("Keyboard Control Enabled")
         print("="*70)
         print("  Velocity: W/S (vx), A/D (vy), Q/E (yaw)")
-        print("  Mode: Space×1=Freeze, Space×2=Interpolate, Space×3=Resume")
+        print("  Mode: Space×1=Freeze, Space×2=ToPose1, Space×3=ToPose2, Space×4=Resume")
         print("  PID Tuning: [/] (select), Up/Down (Kp), Left/Right (Kd),")
         print("              PageUp/PageDown (Ki), P (print)")
-        print("  Speed: +/- (adjust interpolation speed), M (show preset pose)")
+        print("  Speed: +/- (adjust interpolation speed), M (show preset poses)")
         print("="*70)
 
     if args.plot:
