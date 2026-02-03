@@ -51,7 +51,10 @@ def track_ang_vel_z_exp(
 def track_lin_vel_xy_yaw_frame_exp(
     env, std: float, command_name: str, asset_cfg: SceneEntityCfg = SceneEntityCfg("robot")
 ) -> torch.Tensor:
-    """Reward tracking of linear velocity commands (xy axes) in the gravity aligned robot frame using exponential kernel."""
+    """Reward tracking of linear velocity commands (xy axes) in the gravity aligned robot frame.
+
+    Uses exponential kernel for reward computation.
+    """
     # extract the used quantities (to enable type-hinting)
     asset = env.scene[asset_cfg.name]
     vel_yaw = quat_apply_inverse(yaw_quat(asset.data.root_quat_w), asset.data.root_lin_vel_w[:, :3])
@@ -153,9 +156,10 @@ def wheel_vel_penalty(
 class GaitReward(ManagerTermBase):
     """Gait enforcing reward term for quadrupeds.
 
-    This reward penalizes contact timing differences between selected foot pairs defined in :attr:`synced_feet_pair_names`
-    to bias the policy towards a desired gait, i.e trotting, bounding, or pacing. Note that this reward is only for
-    quadrupedal gaits with two pairs of synchronized feet.
+    This reward penalizes contact timing differences between selected foot pairs
+    defined in :attr:`synced_feet_pair_names` to bias the policy towards a desired gait,
+    i.e trotting, bounding, or pacing. Note that this reward is only for quadrupedal gaits
+    with two pairs of synchronized feet.
     """
 
     def __init__(self, cfg: RewTerm, env: ManagerBasedRLEnv):
@@ -592,7 +596,10 @@ def feet_slide(
 
 # def smoothness_2(env: ManagerBasedRLEnv) -> torch.Tensor:
 #     # Penalize changes in actions
-#     diff = torch.square(env.action_manager.action - 2 * env.action_manager.prev_action + env.action_manager.prev_prev_action)
+#     diff = torch.square(
+#         env.action_manager.action - 2 * env.action_manager.prev_action
+#         + env.action_manager.prev_prev_action
+#     )
 #     diff = diff * (env.action_manager.prev_action[:, :] != 0)  # ignore first step
 #     diff = diff * (env.action_manager.prev_prev_action[:, :] != 0)  # ignore second step
 #     return torch.sum(diff, dim=1)

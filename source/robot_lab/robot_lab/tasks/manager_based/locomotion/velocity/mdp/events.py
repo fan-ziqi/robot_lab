@@ -92,7 +92,8 @@ def randomize_com_positions(
 
     Args:
         env (ManagerBasedEnv): The simulation environment.
-        env_ids (torch.Tensor | None): Specific environment indices to apply randomization, or None for all environments.
+        env_ids (torch.Tensor | None): Specific environment indices to apply randomization,
+            or None for all environments.
         asset_cfg (SceneEntityCfg): The configuration for the target asset whose COM will be randomized.
         com_distribution_params (tuple[float, float]): Parameters of the distribution (e.g., min and max for uniform).
         operation (Literal["add", "scale", "abs"]): The operation to apply for randomization.
