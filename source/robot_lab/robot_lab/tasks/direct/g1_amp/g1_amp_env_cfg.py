@@ -13,13 +13,13 @@ from __future__ import annotations
 
 import os
 
-from robot_lab.assets.unitree import UNITREE_G1_29DOF_CFG
-
 from isaaclab.assets import ArticulationCfg
 from isaaclab.envs import DirectRLEnvCfg
 from isaaclab.scene import InteractiveSceneCfg
 from isaaclab.sim import PhysxCfg, SimulationCfg
 from isaaclab.utils import configclass
+
+from robot_lab.assets.unitree import UNITREE_G1_29DOF_CFG
 
 MOTIONS_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "motions")
 

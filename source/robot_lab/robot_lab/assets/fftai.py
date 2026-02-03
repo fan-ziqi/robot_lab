@@ -10,11 +10,11 @@ The following configurations are available:
 Reference: https://github.com/FFTAI
 """
 
-from robot_lab.assets import ISAACLAB_ASSETS_DATA_DIR
-
 import isaaclab.sim as sim_utils
 from isaaclab.actuators import ImplicitActuatorCfg
 from isaaclab.assets.articulation import ArticulationCfg
+
+from robot_lab.assets import ISAACLAB_ASSETS_DATA_DIR
 
 ##
 # Configuration

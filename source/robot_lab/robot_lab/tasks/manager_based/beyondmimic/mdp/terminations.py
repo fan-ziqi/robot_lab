@@ -3,19 +3,20 @@
 
 from __future__ import annotations
 
-import torch
 from typing import TYPE_CHECKING
+
+import torch
 
 import isaaclab.utils.math as math_utils
 
 if TYPE_CHECKING:
     from isaaclab.envs import ManagerBasedRLEnv
 
-from robot_lab.tasks.manager_based.beyondmimic.mdp.commands import MotionCommand
-from robot_lab.tasks.manager_based.beyondmimic.mdp.rewards import _get_body_indexes
-
 from isaaclab.assets import Articulation, RigidObject
 from isaaclab.managers import SceneEntityCfg
+
+from robot_lab.tasks.manager_based.beyondmimic.mdp.commands import MotionCommand
+from robot_lab.tasks.manager_based.beyondmimic.mdp.rewards import _get_body_indexes
 
 
 def bad_anchor_pos(env: ManagerBasedRLEnv, command_name: str, threshold: float) -> torch.Tensor:

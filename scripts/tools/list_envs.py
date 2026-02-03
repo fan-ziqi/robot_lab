@@ -35,11 +35,11 @@ simulation_app = app_launcher.app
 
 """Rest everything follows."""
 
-import gymnasium as gym
 import textwrap
-from prettytable import PrettyTable
 
+import gymnasium as gym
 import robot_lab.tasks  # noqa: F401
+from prettytable import PrettyTable
 
 
 def main():

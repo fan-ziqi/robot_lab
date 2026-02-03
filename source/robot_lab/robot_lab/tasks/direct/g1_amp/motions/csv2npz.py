@@ -33,7 +33,6 @@ MESH_DIR = "/home/ubuntu/workspaces/LAFAN1_Retargeting_Dataset/robot_description
 NPZ_FILE = "/home/ubuntu/workspaces/robot_lab_kill-usd/source/robot_lab/robot_lab/tasks/direct/g1_amp/motions/g1_dance1_subject2_30.npz"
 
 import numpy as np
-
 import pandas as pd
 import pinocchio as pin
 

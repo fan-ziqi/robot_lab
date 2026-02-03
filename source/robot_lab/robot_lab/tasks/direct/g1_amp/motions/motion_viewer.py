@@ -9,10 +9,9 @@
 import matplotlib
 import matplotlib.animation
 import matplotlib.pyplot as plt
+import mpl_toolkits.mplot3d  # noqa: F401
 import numpy as np
 import torch
-
-import mpl_toolkits.mplot3d  # noqa: F401
 
 try:
     from .motion_loader import MotionLoader

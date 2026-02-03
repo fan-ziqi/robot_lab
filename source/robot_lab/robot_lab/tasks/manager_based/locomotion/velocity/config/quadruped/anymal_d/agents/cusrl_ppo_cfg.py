@@ -5,6 +5,7 @@ from dataclasses import dataclass
 
 import cusrl
 from cusrl.environment.isaaclab import TrainerCfg
+
 from robot_lab.tasks.manager_based.locomotion.velocity.mdp.symmetry import anymal
 
 

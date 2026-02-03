@@ -12,6 +12,7 @@
 """Launch Isaac Sim Simulator first."""
 
 import argparse
+
 import numpy as np
 
 from isaaclab.app import AppLauncher

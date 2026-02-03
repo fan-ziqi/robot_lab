@@ -3,12 +3,13 @@
 
 from __future__ import annotations
 
-import torch
 from typing import TYPE_CHECKING
 
-from robot_lab.tasks.manager_based.beyondmimic.mdp.commands import MotionCommand
+import torch
 
 from isaaclab.utils.math import matrix_from_quat, subtract_frame_transforms
+
+from robot_lab.tasks.manager_based.beyondmimic.mdp.commands import MotionCommand
 
 if TYPE_CHECKING:
     from isaaclab.envs import ManagerBasedEnv

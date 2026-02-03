@@ -3,10 +3,10 @@
 
 import os
 
+from isaaclab.utils import configclass
+
 from robot_lab.assets.unitree import UNITREE_G1_29DOF_ACTION_SCALE, UNITREE_G1_29DOF_CFG
 from robot_lab.tasks.manager_based.beyondmimic.tracking_env_cfg import BeyondMimicEnvCfg
-
-from isaaclab.utils import configclass
 
 
 @configclass
