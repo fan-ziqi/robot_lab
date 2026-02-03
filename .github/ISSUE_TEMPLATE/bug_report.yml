@@ -31,7 +31,7 @@ body:
   attributes:
     label: Isaac Lab version
     description: It can be found in the `VERSION` file located in either the repository or the build folder.
-    placeholder: e.g. 2.3.0
+    placeholder: e.g. 2.3.2
   validations:
     required: true
 - type: input
