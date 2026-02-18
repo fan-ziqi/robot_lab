@@ -28,7 +28,7 @@ class AnymalDFlatDistillationTrainerCfg(TrainerCfg):
         hooks=[
             cusrl.hook.ModuleInitialization(init_actor=False, init_critic=False, distribution_std=0.1),
             cusrl.hook.OnPolicyPreparation(),
-            cusrl.hook.PolicyDistillationLoss(""),
+            cusrl.hook.PolicyDistillation(""),
             cusrl.hook.GradientClipping(1.0),
         ],
     )
