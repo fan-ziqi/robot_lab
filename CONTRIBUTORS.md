@@ -24,6 +24,7 @@ Guidelines for modifications:
 * [Zhenbiao Huang](https://github.com/legubiao)
 * [Zhihao Liu](https://github.com/Luo1imasi)
 * [Zsibot](https://www.zsibot.com)
+* [Peili Ma](https://github.com/lovelyyoshino)
 
 ## Acknowledgements
 
