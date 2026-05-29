@@ -25,6 +25,8 @@ INSTALL_REQUIRES = [
     "pinocchio",
     # rl
     "cusrl[all]",
+    # pace (system identification)
+    "cmaes",
 ]
 
 # Installation operation
