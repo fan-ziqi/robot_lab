@@ -256,6 +256,37 @@ BeyondMimic for Unitree G1:
   python scripts/reinforcement_learning/rsl_rl/play.py --task=RobotLab-Isaac-BeyondMimic-Flat-Unitree-G1-v0 --num_envs 2
   ```
 
+PACE for actuator system identification:
+
+PACE (Precise Adaptation through Continuous Evolution) estimates physical actuator and joint parameters (armature, viscous friction, static/dynamic friction, encoder bias, command delay) from chirp-excitation data using CMA-ES, then lets you apply those parameters back into your simulation for higher-fidelity sim-to-real transfer. This integration ports the upstream [leggedrobotics/pace-sim2real](https://github.com/leggedrobotics/pace-sim2real) into `robot_lab` and registers a demo task `Isaac-Pace-Anymal-D-v0`. See the [PACE documentation](https://pace.filipbjelonic.com) for theoretical background and the [paper](https://arxiv.org/pdf/2509.06342).
+
+> [!NOTE]
+> PACE is developed against Isaac Sim 5.0+. On Isaac Sim 4.5 the joint viscous friction setter is silently ignored, which degrades identification quality.
+
+- Step 1: collect chirp excitation data (or place real-robot recordings at `data/<robot_name>/chirp_data.pt`)
+
+  ```bash
+  python scripts/pace/data_collection.py --headless --task=Isaac-Pace-Anymal-D-v0
+  ```
+
+  Output: `data/anymal_d_sim/chirp_data.pt` containing `{time, dof_pos, des_dof_pos}`.
+
+- Step 2: run the CMA-ES parameter fit
+
+  ```bash
+  python scripts/pace/fit.py --headless --task=Isaac-Pace-Anymal-D-v0 --num_envs=4096
+  ```
+
+  Output: `logs/pace/anymal_d_sim/<timestamp>/{config.pt, mean_xxx.pt, best_trajectory.pt}` plus a TensorBoard run.
+
+- Step 3: visualize the best trajectory and score curve
+
+  ```bash
+  python scripts/pace/plot_trajectory.py --plot_trajectory --plot_score --robot_name=anymal_d_sim
+  ```
+
+To set up PACE for a new robot, follow the upstream [PACE basics tutorial](https://pace.filipbjelonic.com/tutorials/basics): create a per-robot env_cfg under `source/robot_lab/robot_lab/tasks/manager_based/pace/config/<robot>/` and register a new `Isaac-Pace-<Robot>-v0` task. The actuator model `PaceDCMotor`/`PaceDCMotorCfg` lives at `robot_lab.actuators` and the optimizer `CMAESOptimizer` at `robot_lab.tasks.manager_based.pace.optim`.
+
 Others (**Experimental**)
 
 - Train AMP Dance for Unitree G1
@@ -468,3 +499,4 @@ The project uses some code from the following open-source code repositories:
 
 - [linden713/humanoid_amp](https://github.com/linden713/humanoid_amp)
 - [HybridRobotics/whole_body_tracking](https://github.com/HybridRobotics/whole_body_tracking)
+- [leggedrobotics/pace-sim2real](https://github.com/leggedrobotics/pace-sim2real)
