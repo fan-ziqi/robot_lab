@@ -11,7 +11,11 @@ from pathlib import Path
 
 import matplotlib.pyplot as plt
 import torch
-from robot_lab.utils.paths import project_root
+
+# Resolve project root from this script's location instead of importing
+# robot_lab.utils.paths, which would pull in the full IsaacLab task registry
+# and require launching the Isaac Sim app for an offline plotting tool.
+_PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
 
 # add argparse arguments
 parser = argparse.ArgumentParser(description="Pace agent for Isaac Lab environments.")
@@ -28,7 +32,7 @@ robot_name = args.robot_name
 plot_trajectory = args.plot_trajectory
 plot_score = args.plot_score
 
-log_dir = project_root() / "logs" / "pace" / robot_name
+log_dir = _PROJECT_ROOT / "logs" / "pace" / robot_name
 
 if not log_dir.exists():
     raise FileNotFoundError(f"No logs for robot {robot_name} under {log_dir}")
