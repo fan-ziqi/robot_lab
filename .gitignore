@@ -38,3 +38,6 @@ _build
 
 # LSP
 pyrightconfig.json
+
+# PACE recorded chirp data (root-level only; do not match source/robot_lab/data/Robots)
+/data/
