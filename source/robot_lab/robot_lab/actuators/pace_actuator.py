@@ -1,16 +1,21 @@
+# Copyright (c) 2024-2026 Ziqi Fan
+# SPDX-License-Identifier: Apache-2.0
+
 # © 2025 ETH Zurich, Robotic Systems Lab
 # Author: Filip Bjelonic
 # Licensed under the Apache License 2.0
 
 from __future__ import annotations
 
-import torch
 from collections.abc import Sequence
 from typing import TYPE_CHECKING
 
+import torch
+
 from isaaclab.actuators import DCMotor
-from isaaclab.utils.types import ArticulationActions
 from isaaclab.utils import DelayBuffer
+from isaaclab.utils.types import ArticulationActions
+
 if TYPE_CHECKING:
     # only for type checking
     from .pace_actuator_cfg import PaceDCMotorCfg
@@ -60,7 +65,8 @@ class PaceDCMotor(DCMotor):
     def compute(
         self, control_action: ArticulationActions, joint_pos: torch.Tensor, joint_vel: torch.Tensor
     ) -> ArticulationActions:
-        # compute actuator model with encoder bias added to joint positions (joint position in encoder frame, not simulation frame)
+        # compute actuator model with encoder bias added to joint positions
+        # (joint position in encoder frame, not simulation frame)
         control_action_sim = super().compute(control_action, joint_pos - self.encoder_bias, joint_vel)
         control_action_sim.joint_efforts = self.torques_delay_buffer.compute(control_action_sim.joint_efforts)
         return control_action_sim

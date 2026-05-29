@@ -1,14 +1,16 @@
+# Copyright (c) 2024-2026 Ziqi Fan
+# SPDX-License-Identifier: Apache-2.0
+
 # © 2025 ETH Zurich, Robotic Systems Lab
 # Author: Filip Bjelonic
 # Licensed under the Apache License 2.0
 
-import torch
-import matplotlib.pyplot as plt
+import argparse
 import re
 from pathlib import Path
 
-import argparse
-
+import matplotlib.pyplot as plt
+import torch
 from robot_lab.utils.paths import project_root
 
 # add argparse arguments
@@ -79,12 +81,12 @@ target_trajectories = config["des_dof_pos"]  # time x joints
 time = config["time"]  # time
 
 print(f"Best parameter set: {mean}")
-print(f"Armature params: {mean[:len(joint_order)]}")
-print(f"Viscous friction params: {mean[len(joint_order):2 * len(joint_order)]}")
-print(f"Static/dynamic friction params: {mean[2 * len(joint_order):3 * len(joint_order)]}")
-print(f"Encoder bias params: {mean[3 * len(joint_order):4 * len(joint_order)]}")
+print(f"Armature params: {mean[: len(joint_order)]}")
+print(f"Viscous friction params: {mean[len(joint_order) : 2 * len(joint_order)]}")
+print(f"Static/dynamic friction params: {mean[2 * len(joint_order) : 3 * len(joint_order)]}")
+print(f"Encoder bias params: {mean[3 * len(joint_order) : 4 * len(joint_order)]}")
 print(f"Delay param: {mean[-1].item()}")
-encoder_bias = mean[3 * len(joint_order):4 * len(joint_order)]  # extract encoder bias
+encoder_bias = mean[3 * len(joint_order) : 4 * len(joint_order)]  # extract encoder bias
 
 if plot_score:
     try:
@@ -100,7 +102,7 @@ if plot_score:
     plt.title("CMA-ES Score over Iterations")
     plt.xlabel("Iteration")
     plt.ylabel("Score")
-    data = torch.min(progress["scores_buffer"][:params_num + 1], dim=1).values.cpu().numpy()
+    data = torch.min(progress["scores_buffer"][: params_num + 1], dim=1).values.cpu().numpy()
     plt.semilogy(data)
     plt.xlim(0, params_num)
     # plt.ylim(0, None)
@@ -110,7 +112,9 @@ if plot_score:
 if plot_trajectory:
     for i in range(len(joint_order)):
         plt.figure(figsize=(8, 4.5))
-        plt.plot(time, trajectories[:, i].cpu().numpy() - encoder_bias[i].item(), c="tab:orange", label="Sim", linewidth=2)  # in encoder frame
+        plt.plot(
+            time, trajectories[:, i].cpu().numpy() - encoder_bias[i].item(), c="tab:orange", label="Sim", linewidth=2
+        )  # in encoder frame
         plt.plot(time, real_trajectories[:, i].cpu().numpy(), label="Real", c="tab:green", linestyle="--", linewidth=2)
         plt.plot(time, target_trajectories[:, i].cpu().numpy(), c="grey", label="Target", linestyle="--", alpha=0.5)
         plt.title(f"Joint {joint_order[i]}")  # Use joint names from config

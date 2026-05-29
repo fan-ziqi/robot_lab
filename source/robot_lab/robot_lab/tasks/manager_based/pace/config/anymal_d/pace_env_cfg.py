@@ -1,18 +1,23 @@
+# Copyright (c) 2024-2026 Ziqi Fan
+# SPDX-License-Identifier: Apache-2.0
+
 # © 2025 ETH Zurich, Robotic Systems Lab
 # Author: Filip Bjelonic
 # Licensed under the Apache License 2.0
 
+import torch
+
+from isaaclab.assets import ArticulationCfg
 from isaaclab.utils import configclass
 
 from isaaclab_assets.robots.anymal import ANYMAL_D_CFG
-from isaaclab.assets import ArticulationCfg
+
 from robot_lab.actuators import PaceDCMotorCfg
 from robot_lab.tasks.manager_based.pace.pace_sim2real_env_cfg import (
+    PaceCfg,
     PaceSim2realEnvCfg,
     PaceSim2realSceneCfg,
-    PaceCfg,
 )
-import torch
 
 ANYDRIVE_PACE_ACTUATOR_CFG = PaceDCMotorCfg(
     joint_names_expr=[".*HAA", ".*HFE", ".*KFE"],
@@ -34,6 +39,7 @@ ANYDRIVE_PACE_ACTUATOR_CFG = PaceDCMotorCfg(
 @configclass
 class AnymalDPaceCfg(PaceCfg):
     """Pace configuration for Anymal-D robot."""
+
     robot_name: str = "anymal_d_sim"
     data_dir: str = "anymal_d_sim/chirp_data.pt"  # located in <project_root>/data/anymal_d_sim/chirp_data.pt
     bounds_params: torch.Tensor = torch.zeros((49, 2))  # 12 + 12 + 12 + 12 + 1 = 49 parameters to optimize
@@ -66,6 +72,7 @@ class AnymalDPaceCfg(PaceCfg):
 @configclass
 class ANYmalDPaceSceneCfg(PaceSim2realSceneCfg):
     """Configuration for Anymal-D robot in Pace Sim2Real environment."""
+
     robot: ArticulationCfg = ANYMAL_D_CFG.replace(
         prim_path="{ENV_REGEX_NS}/Robot",
         init_state=ArticulationCfg.InitialStateCfg(pos=(0.0, 0.0, 1.0)),
@@ -75,7 +82,6 @@ class ANYmalDPaceSceneCfg(PaceSim2realSceneCfg):
 
 @configclass
 class AnymalDPaceEnvCfg(PaceSim2realEnvCfg):
-
     scene: ANYmalDPaceSceneCfg = ANYmalDPaceSceneCfg()
     sim2real: PaceCfg = AnymalDPaceCfg()
 

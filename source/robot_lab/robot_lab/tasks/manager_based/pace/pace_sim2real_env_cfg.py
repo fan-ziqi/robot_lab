@@ -1,18 +1,24 @@
+# Copyright (c) 2024-2026 Ziqi Fan
+# SPDX-License-Identifier: Apache-2.0
+
 # © 2025 ETH Zurich, Robotic Systems Lab
 # Author: Filip Bjelonic
 # Licensed under the Apache License 2.0
 
 # import math
 from dataclasses import MISSING
+
 import torch
 
 import isaaclab.sim as sim_utils
 from isaaclab.assets import ArticulationCfg, AssetBaseCfg
 from isaaclab.envs import ManagerBasedRLEnvCfg
+
 # from isaaclab.managers import EventTermCfg as EventTerm
 from isaaclab.managers import ObservationGroupCfg as ObsGroup
 from isaaclab.managers import ObservationTermCfg as ObsTerm
 from isaaclab.managers import RewardTermCfg as RewTerm
+
 # from isaaclab.managers import SceneEntityCfg
 from isaaclab.managers import TerminationTermCfg as DoneTerm
 from isaaclab.scene import InteractiveSceneCfg
@@ -21,7 +27,6 @@ from isaaclab.utils.assets import ISAAC_NUCLEUS_DIR
 
 from . import mdp
 
-
 ##
 # Scene definition
 ##
@@ -29,7 +34,6 @@ from . import mdp
 
 @configclass
 class PaceSim2realSceneCfg(InteractiveSceneCfg):
-
     # ground plane
     ground = AssetBaseCfg(
         prim_path="/World/ground",
@@ -59,7 +63,10 @@ class PaceSim2realSceneCfg(InteractiveSceneCfg):
 @configclass
 class ActionsCfg:
     """Action specifications for the MDP."""
-    joint_pos = mdp.JointPositionActionCfg(asset_name="robot", joint_names=[".*"], scale=1.0, use_default_offset=False)  # actions = absolute joint position targets
+
+    joint_pos = mdp.JointPositionActionCfg(
+        asset_name="robot", joint_names=[".*"], scale=1.0, use_default_offset=False
+    )  # actions = absolute joint position targets
 
 
 @configclass
@@ -69,6 +76,7 @@ class ObservationsCfg:
     @configclass
     class PolicyCfg(ObsGroup):
         """Observations for policy group."""
+
         joint_pos = ObsTerm(func=mdp.joint_pos_rel)
         joint_vel = ObsTerm(func=mdp.joint_vel_rel)
         actions = ObsTerm(func=mdp.last_action)
@@ -84,34 +92,41 @@ class ObservationsCfg:
 @configclass
 class RewardsCfg:
     """Reward terms for the MDP."""
+
     dof_pos_limits = RewTerm(func=mdp.joint_pos_limits, weight=0.0)
 
 
 @configclass
 class TerminationsCfg:
     """Termination terms for the MDP."""
+
     time_out = DoneTerm(func=mdp.time_out, time_out=False)
 
 
 @configclass
 class CMAESOptimizerCfg:
     """CMA-ES optimizer configuration."""
+
     max_iteration: int = 200
     epsilon: float = 1e-2
     sigma: float = 0.5
     save_interval: int = 10
-    save_optimization_process: bool = False  # consume more disk space if True, saves optimization process after finishing
+    save_optimization_process: bool = (
+        False  # consume more disk space if True, saves optimization process after finishing
+    )
 
 
 @configclass
 class PaceCfg:
     """Overall configuration for Pace Sim2Real task."""
+
     cmaes: CMAESOptimizerCfg = CMAESOptimizerCfg()
 
     robot_name: str = MISSING
     data_dir: str = MISSING
     joint_order: list = MISSING
     bounds_params: torch.Tensor = MISSING
+
 
 ##
 # Environment configuration
@@ -145,4 +160,3 @@ class PaceSim2realEnvCfg(ManagerBasedRLEnvCfg):
         self.sim.render_interval = 4  # render at 100Hz
 
         self.scene.robot.spawn.articulation_props.fix_root_link = True
-

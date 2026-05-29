@@ -1,3 +1,6 @@
+# Copyright (c) 2024-2026 Ziqi Fan
+# SPDX-License-Identifier: Apache-2.0
+
 # © 2025 ETH Zurich, Robotic Systems Lab
 # Author: Filip Bjelonic
 # Licensed under the Apache License 2.0
@@ -26,22 +29,19 @@ simulation_app = app_launcher.app
 """Rest everything follows."""
 
 import gymnasium as gym
+import robot_lab.tasks  # noqa: F401
 import torch
+from robot_lab.tasks.manager_based.pace.optim import CMAESOptimizer
+from robot_lab.utils.paths import project_root
 
 import isaaclab_tasks  # noqa: F401
 from isaaclab_tasks.utils import parse_env_cfg
-
-import robot_lab.tasks  # noqa: F401
-from robot_lab.utils.paths import project_root
-from robot_lab.tasks.manager_based.pace.optim import CMAESOptimizer
 
 
 def main():
     """Zero actions agent with Isaac Lab environment."""
     # parse configuration
-    env_cfg = parse_env_cfg(
-        args_cli.task, device=args_cli.device, num_envs=args_cli.num_envs
-    )
+    env_cfg = parse_env_cfg(args_cli.task, device=args_cli.device, num_envs=args_cli.num_envs)
     # create environment
     env = gym.make(args_cli.task, cfg=env_cfg)
 
@@ -53,7 +53,9 @@ def main():
     bounds_params = env_cfg.sim2real.bounds_params.to(env.unwrapped.device)
     articulation = env.unwrapped.scene["robot"]
     joint_order = env_cfg.sim2real.joint_order
-    sim_joint_ids = torch.tensor([articulation.joint_names.index(name) for name in joint_order], device=env.unwrapped.device)
+    sim_joint_ids = torch.tensor(
+        [articulation.joint_names.index(name) for name in joint_order], device=env.unwrapped.device
+    )
 
     data_file = project_root() / "data" / env_cfg.sim2real.data_dir
     log_dir = project_root() / "logs" / "pace" / env_cfg.sim2real.robot_name
@@ -91,14 +93,20 @@ def main():
         # run everything in inference mode
         with torch.inference_mode():
             # compute zero actions
-            opt.tell(env.unwrapped.scene.articulations["robot"].data.joint_pos[:, sim_joint_ids], measured_dof_pos[counter, :].unsqueeze(0).repeat(env.unwrapped.num_envs, 1))
+            opt.tell(
+                env.unwrapped.scene.articulations["robot"].data.joint_pos[:, sim_joint_ids],
+                measured_dof_pos[counter, :].unsqueeze(0).repeat(env.unwrapped.num_envs, 1),
+            )
             actions = torch.zeros(env.action_space.shape, device=env.unwrapped.device)
             actions[:, sim_joint_ids] = target_dof_pos[counter, :].unsqueeze(0).repeat(env.unwrapped.num_envs, 1)
             # apply actions
             env.step(actions)
             counter += 1
             if counter % 400 == 0:
-                print(f"[INFO]: Step {counter * sim_dt:.1f} / {time_data[-1]:.1f} seconds ({counter / time_steps * 100:.1f} %)")
+                print(
+                    f"[INFO]: Step {counter * sim_dt:.1f} / {time_data[-1]:.1f} seconds"
+                    f" ({counter / time_steps * 100:.1f} %)"
+                )
             if counter >= time_steps:
                 print("[INFO]: Reached the end of the trajectory, exiting.")
                 counter = 0
