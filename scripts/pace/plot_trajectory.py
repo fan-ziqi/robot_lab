@@ -106,7 +106,7 @@ if plot_score:
     # plt.ylim(0, None)
     plt.grid()
     plt.show()
-# APPEND_PLOT
+
 if plot_trajectory:
     for i in range(len(joint_order)):
         plt.figure(figsize=(8, 4.5))

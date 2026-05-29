@@ -67,7 +67,7 @@ def main():
 
     time_steps = time_data.shape[0]
     sim_dt = env.unwrapped.sim.cfg.dt
-    # APPEND_FIT
+
     opt = CMAESOptimizer(
         bounds=bounds_params,
         population_size=env.unwrapped.num_envs,

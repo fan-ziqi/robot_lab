@@ -106,7 +106,7 @@ def main():
         [1.0, 1.0, 1.0, -1.0, 1.0, 1.0, 1.0, -1.0, -1.0, -1.0, -1.0, -1.0],
         device=env.unwrapped.device
     )
-    # APPEND_PLACEHOLDER
+
     trajectory_bias = torch.tensor(
         [0.0, 0.4, 0.8] * 4,
         device=env.unwrapped.device
