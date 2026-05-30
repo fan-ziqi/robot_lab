@@ -9,29 +9,50 @@
 import math
 from dataclasses import MISSING
 
-import isaaclab.sim as sim_utils
-from isaaclab.assets import ArticulationCfg, AssetBaseCfg
-from isaaclab.envs import ManagerBasedRLEnvCfg
-from isaaclab.managers import CurriculumTermCfg as CurrTerm
-from isaaclab.managers import EventTermCfg as EventTerm
-from isaaclab.managers import ObservationGroupCfg as ObsGroup
-from isaaclab.managers import ObservationTermCfg as ObsTerm
-from isaaclab.managers import RewardTermCfg as RewTerm
-from isaaclab.managers import SceneEntityCfg
-from isaaclab.managers import TerminationTermCfg as DoneTerm
-from isaaclab.scene import InteractiveSceneCfg
-from isaaclab.sensors import ContactSensorCfg, RayCasterCfg, patterns
-from isaaclab.terrains import TerrainImporterCfg
-from isaaclab.utils import configclass
-from isaaclab.utils.assets import ISAAC_NUCLEUS_DIR, ISAACLAB_NUCLEUS_DIR
-from isaaclab.utils.noise import AdditiveUniformNoiseCfg as Unoise
+# Framework-agnostic manager / env / scene cfg types (resolved by detected backend).
+from robot_lab.framework import EnvCfg as ManagerBasedRLEnvCfg
+from robot_lab.framework import CurriculumTermCfg as CurrTerm
+from robot_lab.framework import EventTermCfg as EventTerm
+from robot_lab.framework import ObservationGroupCfg as ObsGroup
+from robot_lab.framework import ObservationTermCfg as ObsTerm
+from robot_lab.framework import RewardTermCfg as RewTerm
+from robot_lab.framework import SceneEntityCfg
+from robot_lab.framework import TerminationTermCfg as DoneTerm
+from robot_lab.framework import SceneCfg as InteractiveSceneCfg
+
+# IL-specific runtime types used directly inside cfg field bodies. Wrap in
+# try/except so the module is importable under the mjlab venv; per-robot
+# subclasses are responsible for replacing the IL-only fields with
+# mjlab-compatible cfg trees (see framework asset/scene helpers).
+try:
+    import isaaclab.sim as sim_utils
+    from isaaclab.assets import ArticulationCfg, AssetBaseCfg
+    from isaaclab.sensors import ContactSensorCfg, RayCasterCfg, patterns
+    from isaaclab.terrains import TerrainImporterCfg
+    from isaaclab.terrains.config.rough import ROUGH_TERRAINS_CFG
+    from isaaclab.utils.assets import ISAAC_NUCLEUS_DIR, ISAACLAB_NUCLEUS_DIR
+except ImportError:  # mjlab venv: IL deps unavailable
+    sim_utils = None  # type: ignore
+    ArticulationCfg = AssetBaseCfg = None  # type: ignore
+    ContactSensorCfg = RayCasterCfg = patterns = None  # type: ignore
+    TerrainImporterCfg = ROUGH_TERRAINS_CFG = None  # type: ignore
+    ISAAC_NUCLEUS_DIR = ISAACLAB_NUCLEUS_DIR = ""  # type: ignore
+
+# `configclass` is IL-only (see spec section 12). Fall back to a no-op identity
+# decorator when running under mjlab so class definitions still evaluate.
+try:
+    from isaaclab.utils import configclass
+except ImportError:
+    def configclass(cls):  # mjlab no-op fallback
+        return cls
+
+# Noise cfg differs between backends; use whichever import succeeds.
+try:
+    from isaaclab.utils.noise import AdditiveUniformNoiseCfg as Unoise
+except ImportError:
+    from mjlab.utils.noise import UniformNoiseCfg as Unoise
 
 import robot_lab.tasks.manager_based.locomotion.velocity.mdp as mdp
-
-##
-# Pre-defined configs
-##
-from isaaclab.terrains.config.rough import ROUGH_TERRAINS_CFG  # isort: skip
 
 
 ##
@@ -43,55 +64,61 @@ from isaaclab.terrains.config.rough import ROUGH_TERRAINS_CFG  # isort: skip
 class MySceneCfg(InteractiveSceneCfg):
     """Configuration for the terrain scene with a legged robot."""
 
-    # ground terrain
-    terrain = TerrainImporterCfg(
-        prim_path="/World/ground",
-        terrain_type="generator",
-        terrain_generator=ROUGH_TERRAINS_CFG,
-        max_init_terrain_level=5,
-        collision_group=-1,
-        physics_material=sim_utils.RigidBodyMaterialCfg(
-            friction_combine_mode="multiply",
-            restitution_combine_mode="multiply",
-            static_friction=1.0,
-            dynamic_friction=1.0,
-            restitution=1.0,
-        ),
-        visual_material=sim_utils.MdlFileCfg(
-            mdl_path=f"{ISAACLAB_NUCLEUS_DIR}/Materials/TilesMarbleSpiderWhiteBrickBondHoned/TilesMarbleSpiderWhiteBrickBondHoned.mdl",
-            project_uvw=True,
-            texture_scale=(0.25, 0.25),
-        ),
-        debug_vis=False,
-    )
-    # robots
-    robot: ArticulationCfg = MISSING
-    # sensors
-    height_scanner = RayCasterCfg(
-        prim_path="{ENV_REGEX_NS}/Robot/base",
-        offset=RayCasterCfg.OffsetCfg(pos=(0.0, 0.0, 20.0)),
-        ray_alignment="yaw",
-        pattern_cfg=patterns.GridPatternCfg(resolution=0.1, size=[1.6, 1.0]),
-        debug_vis=False,
-        mesh_prim_paths=["/World/ground"],
-    )
-    height_scanner_base = RayCasterCfg(
-        prim_path="{ENV_REGEX_NS}/Robot/base",
-        offset=RayCasterCfg.OffsetCfg(pos=(0.0, 0.0, 20.0)),
-        ray_alignment="yaw",
-        pattern_cfg=patterns.GridPatternCfg(resolution=0.05, size=(0.1, 0.1)),
-        debug_vis=False,
-        mesh_prim_paths=["/World/ground"],
-    )
-    contact_forces = ContactSensorCfg(prim_path="{ENV_REGEX_NS}/Robot/.*", history_length=3, track_air_time=True)
-    # lights
-    sky_light = AssetBaseCfg(
-        prim_path="/World/skyLight",
-        spawn=sim_utils.DomeLightCfg(
-            intensity=750.0,
-            texture_file=f"{ISAAC_NUCLEUS_DIR}/Materials/Textures/Skies/PolyHaven/kloofendal_43d_clear_puresky_4k.hdr",
-        ),
-    )
+    # robots (annotation-only; per-robot subclasses fill this in via __post_init__)
+    robot = MISSING
+    # IL-specific defaults: terrain, ray-cast height scanners, contact sensor,
+    # sky light. On mjlab these names are None; per-robot subclasses must
+    # populate framework-equivalent fields in their own class bodies.
+    if TerrainImporterCfg is not None:
+        # ground terrain
+        terrain = TerrainImporterCfg(
+            prim_path="/World/ground",
+            terrain_type="generator",
+            terrain_generator=ROUGH_TERRAINS_CFG,
+            max_init_terrain_level=5,
+            collision_group=-1,
+            physics_material=sim_utils.RigidBodyMaterialCfg(
+                friction_combine_mode="multiply",
+                restitution_combine_mode="multiply",
+                static_friction=1.0,
+                dynamic_friction=1.0,
+                restitution=1.0,
+            ),
+            visual_material=sim_utils.MdlFileCfg(
+                mdl_path=f"{ISAACLAB_NUCLEUS_DIR}/Materials/TilesMarbleSpiderWhiteBrickBondHoned/TilesMarbleSpiderWhiteBrickBondHoned.mdl",
+                project_uvw=True,
+                texture_scale=(0.25, 0.25),
+            ),
+            debug_vis=False,
+        )
+        # sensors
+        height_scanner = RayCasterCfg(
+            prim_path="{ENV_REGEX_NS}/Robot/base",
+            offset=RayCasterCfg.OffsetCfg(pos=(0.0, 0.0, 20.0)),
+            ray_alignment="yaw",
+            pattern_cfg=patterns.GridPatternCfg(resolution=0.1, size=[1.6, 1.0]),
+            debug_vis=False,
+            mesh_prim_paths=["/World/ground"],
+        )
+        height_scanner_base = RayCasterCfg(
+            prim_path="{ENV_REGEX_NS}/Robot/base",
+            offset=RayCasterCfg.OffsetCfg(pos=(0.0, 0.0, 20.0)),
+            ray_alignment="yaw",
+            pattern_cfg=patterns.GridPatternCfg(resolution=0.05, size=(0.1, 0.1)),
+            debug_vis=False,
+            mesh_prim_paths=["/World/ground"],
+        )
+        contact_forces = ContactSensorCfg(
+            prim_path="{ENV_REGEX_NS}/Robot/.*", history_length=3, track_air_time=True
+        )
+        # lights
+        sky_light = AssetBaseCfg(
+            prim_path="/World/skyLight",
+            spawn=sim_utils.DomeLightCfg(
+                intensity=750.0,
+                texture_file=f"{ISAAC_NUCLEUS_DIR}/Materials/Textures/Skies/PolyHaven/kloofendal_43d_clear_puresky_4k.hdr",
+            ),
+        )
 
 
 ##
@@ -103,27 +130,35 @@ class MySceneCfg(InteractiveSceneCfg):
 class CommandsCfg:
     """Command specifications for the MDP."""
 
-    base_velocity = mdp.UniformThresholdVelocityCommandCfg(
-        asset_name="robot",
-        resampling_time_range=(10.0, 10.0),
-        rel_standing_envs=0.02,
-        rel_heading_envs=1.0,
-        heading_command=True,
-        heading_control_stiffness=0.5,
-        debug_vis=True,
-        ranges=mdp.UniformThresholdVelocityCommandCfg.Ranges(
-            lin_vel_x=(-1.0, 1.0), lin_vel_y=(-1.0, 1.0), ang_vel_z=(-1.0, 1.0), heading=(-math.pi, math.pi)
-        ),
-    )
+    # `UniformThresholdVelocityCommandCfg` is IL-only (it subclasses
+    # ``mdp.UniformVelocityCommandCfg``, which mjlab does not expose). Per-robot
+    # mjlab subclasses must replace this field with an mjlab-compatible cfg.
+    if hasattr(mdp, "UniformThresholdVelocityCommandCfg"):
+        base_velocity = mdp.UniformThresholdVelocityCommandCfg(
+            asset_name="robot",
+            resampling_time_range=(10.0, 10.0),
+            rel_standing_envs=0.02,
+            rel_heading_envs=1.0,
+            heading_command=True,
+            heading_control_stiffness=0.5,
+            debug_vis=True,
+            ranges=mdp.UniformThresholdVelocityCommandCfg.Ranges(
+                lin_vel_x=(-1.0, 1.0), lin_vel_y=(-1.0, 1.0), ang_vel_z=(-1.0, 1.0), heading=(-math.pi, math.pi)
+            ),
+        )
 
 
 @configclass
 class ActionsCfg:
     """Action specifications for the MDP."""
 
-    joint_pos = mdp.JointPositionActionCfg(
-        asset_name="robot", joint_names=[".*"], scale=0.5, use_default_offset=True, clip=None, preserve_order=True
-    )
+    # `JointPositionActionCfg` lives in different modules across backends and
+    # is currently exposed only on the IsaacLab side. Mjlab subclasses must
+    # populate this field directly.
+    if hasattr(mdp, "JointPositionActionCfg"):
+        joint_pos = mdp.JointPositionActionCfg(
+            asset_name="robot", joint_names=[".*"], scale=0.5, use_default_offset=True, clip=None, preserve_order=True
+        )
 
 
 @configclass
@@ -366,7 +401,7 @@ class EventCfg:
     randomize_push_robot = EventTerm(
         func=mdp.push_by_setting_velocity,
         mode="interval",
-        interval_range_s=(10.0, 15.0),
+        interval_range_s=(5.0, 10.0),
         params={"velocity_range": {"x": (-0.5, 0.5), "y": (-0.5, 0.5)}},
     )
 
@@ -377,6 +412,7 @@ class RewardsCfg:
 
     # General
     is_terminated = RewTerm(func=mdp.is_terminated, weight=0.0)
+    is_alive = RewTerm(func=mdp.is_alive, weight=0.0)
 
     # Root penalties
     lin_vel_z_l2 = RewTerm(func=mdp.lin_vel_z_l2, weight=0.0)
@@ -627,6 +663,18 @@ class RewardsCfg:
             "std": math.sqrt(0.25),
             "asset_cfg": SceneEntityCfg("robot", body_names=""),
             "stance_width": float,
+        },
+    )
+
+    feet_gait_biped = RewTerm(
+        func=mdp.feet_gait_biped,
+        weight=0.0,
+        params={
+            "period": 0.8,
+            "offset": [0.0, 0.5],
+            "threshold": 0.55,
+            "command_name": "base_velocity",
+            "sensor_cfg": SceneEntityCfg("contact_forces", body_names=""),
         },
     )
 

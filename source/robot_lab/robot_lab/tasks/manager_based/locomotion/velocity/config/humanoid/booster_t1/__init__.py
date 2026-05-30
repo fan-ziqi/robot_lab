@@ -1,28 +1,30 @@
 # Copyright (c) 2024-2026 Ziqi Fan
 # SPDX-License-Identifier: Apache-2.0
 
-import gymnasium as gym
+from robot_lab.framework import register_task
 
 from . import agents
 
-gym.register(
-    id="RobotLab-Isaac-Velocity-Flat-Booster-T1-v0",
-    entry_point="isaaclab.envs:ManagerBasedRLEnv",
-    disable_env_checker=True,
-    kwargs={
-        "env_cfg_entry_point": f"{__name__}.flat_env_cfg:BoosterT1FlatEnvCfg",
+##
+# Register tasks for the active framework.
+##
+
+register_task(
+    task_id="RobotLab-Velocity-Flat-Booster-T1-v0",
+    env_cfg=f"{__name__}.flat_env_cfg:BoosterT1FlatEnvCfg",
+    agent_cfg_entries={
         "rsl_rl_cfg_entry_point": f"{agents.__name__}.rsl_rl_ppo_cfg:BoosterT1FlatPPORunnerCfg",
         "cusrl_cfg_entry_point": f"{agents.__name__}.cusrl_ppo_cfg:BoosterT1FlatTrainerCfg",
     },
+    framework_required="isaaclab",
 )
 
-gym.register(
-    id="RobotLab-Isaac-Velocity-Rough-Booster-T1-v0",
-    entry_point="isaaclab.envs:ManagerBasedRLEnv",
-    disable_env_checker=True,
-    kwargs={
-        "env_cfg_entry_point": f"{__name__}.rough_env_cfg:BoosterT1RoughEnvCfg",
+register_task(
+    task_id="RobotLab-Velocity-Rough-Booster-T1-v0",
+    env_cfg=f"{__name__}.rough_env_cfg:BoosterT1RoughEnvCfg",
+    agent_cfg_entries={
         "rsl_rl_cfg_entry_point": f"{agents.__name__}.rsl_rl_ppo_cfg:BoosterT1RoughPPORunnerCfg",
         "cusrl_cfg_entry_point": f"{agents.__name__}.cusrl_ppo_cfg:BoosterT1RoughTrainerCfg",
     },
+    framework_required="isaaclab",
 )

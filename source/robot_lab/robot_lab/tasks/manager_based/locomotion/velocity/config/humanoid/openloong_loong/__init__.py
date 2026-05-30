@@ -1,32 +1,30 @@
 # Copyright (c) 2024-2026 Ziqi Fan
 # SPDX-License-Identifier: Apache-2.0
 
-import gymnasium as gym
+from robot_lab.framework import register_task
 
 from . import agents
 
 ##
-# Register Gym environments.
+# Register tasks for the active framework.
 ##
 
-gym.register(
-    id="RobotLab-Isaac-Velocity-Rough-Openloong-Loong-v0",
-    entry_point="isaaclab.envs:ManagerBasedRLEnv",
-    disable_env_checker=True,
-    kwargs={
-        "env_cfg_entry_point": f"{__name__}.rough_env_cfg:OpenloongLoongRoughEnvCfg",
+register_task(
+    task_id="RobotLab-Velocity-Rough-Openloong-Loong-v0",
+    env_cfg=f"{__name__}.rough_env_cfg:OpenloongLoongRoughEnvCfg",
+    agent_cfg_entries={
         "rsl_rl_cfg_entry_point": f"{agents.__name__}.rsl_rl_ppo_cfg:OpenloongLoongRoughPPORunnerCfg",
         "cusrl_cfg_entry_point": f"{agents.__name__}.cusrl_ppo_cfg:OpenloongLoongRoughTrainerCfg",
     },
+    framework_required="isaaclab",
 )
 
-gym.register(
-    id="RobotLab-Isaac-Velocity-Flat-Openloong-Loong-v0",
-    entry_point="isaaclab.envs:ManagerBasedRLEnv",
-    disable_env_checker=True,
-    kwargs={
-        "env_cfg_entry_point": f"{__name__}.flat_env_cfg:OpenloongLoongFlatEnvCfg",
+register_task(
+    task_id="RobotLab-Velocity-Flat-Openloong-Loong-v0",
+    env_cfg=f"{__name__}.flat_env_cfg:OpenloongLoongFlatEnvCfg",
+    agent_cfg_entries={
         "rsl_rl_cfg_entry_point": f"{agents.__name__}.rsl_rl_ppo_cfg:OpenloongLoongFlatPPORunnerCfg",
         "cusrl_cfg_entry_point": f"{agents.__name__}.cusrl_ppo_cfg:OpenloongLoongFlatTrainerCfg",
     },
+    framework_required="isaaclab",
 )

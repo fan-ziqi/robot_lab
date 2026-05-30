@@ -7,16 +7,22 @@ from typing import TYPE_CHECKING
 
 import torch
 
-import isaaclab.utils.math as math_utils
-from isaaclab.assets import Articulation, RigidObject
-from isaaclab.envs import mdp
-from isaaclab.managers import ManagerTermBase, SceneEntityCfg
-from isaaclab.managers import RewardTermCfg as RewTerm
-from isaaclab.sensors import ContactSensor, RayCaster
-from isaaclab.utils.math import quat_apply_inverse, yaw_quat
+# Math utilities: prefer isaaclab when available, fall back to mjlab's lab_api shim.
+try:
+    import isaaclab.utils.math as math_utils
+    from isaaclab.utils.math import quat_apply_inverse, yaw_quat
+except ImportError:  # pragma: no cover - exercised under mjlab venv
+    from mjlab.utils.lab_api import math as math_utils
+    from mjlab.utils.lab_api.math import quat_apply_inverse, yaw_quat
+
+from robot_lab.framework import ManagerTermBase, SceneEntityCfg
+from robot_lab.framework import RewardTermCfg as RewTerm
+from robot_lab.framework import mdp
 
 if TYPE_CHECKING:
+    from isaaclab.assets import Articulation, RigidObject
     from isaaclab.envs import ManagerBasedRLEnv
+    from isaaclab.sensors import ContactSensor, RayCaster
 
 
 def track_lin_vel_xy_exp(
@@ -583,6 +589,35 @@ def feet_slide(
         env.num_envs, -1
     )
     reward = torch.sum(foot_leteral_vel * contacts, dim=1)
+    reward *= torch.clamp(-env.scene["robot"].data.projected_gravity_b[:, 2], 0, 0.7) / 0.7
+    return reward
+
+
+def feet_gait_biped(
+    env: ManagerBasedRLEnv,
+    period: float,
+    offset: list[float],
+    sensor_cfg: SceneEntityCfg,
+    threshold: float,
+    command_name: str,
+) -> torch.Tensor:
+    contact_sensor: ContactSensor = env.scene.sensors[sensor_cfg.name]
+    is_contact = contact_sensor.data.current_contact_time[:, sensor_cfg.body_ids] > 0
+
+    global_phase = ((env.episode_length_buf * env.step_dt) % period / period).unsqueeze(1)
+    phases = []
+    for offset_ in offset:
+        phase = (global_phase + offset_) % 1.0
+        phases.append(phase)
+    leg_phase = torch.cat(phases, dim=-1)
+
+    reward = torch.zeros(env.num_envs, dtype=torch.float, device=env.device)
+    for i in range(len(sensor_cfg.body_ids)):
+        is_stance = leg_phase[:, i] < threshold
+        reward += ~(is_stance ^ is_contact[:, i])
+
+    # no reward for zero command
+    reward *= torch.norm(env.command_manager.get_command(command_name), dim=1) > 0.1
     reward *= torch.clamp(-env.scene["robot"].data.projected_gravity_b[:, 2], 0, 0.7) / 0.7
     return reward
 

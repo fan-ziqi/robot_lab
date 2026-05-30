@@ -1,32 +1,30 @@
 # Copyright (c) 2024-2026 Ziqi Fan
 # SPDX-License-Identifier: Apache-2.0
 
-import gymnasium as gym
+from robot_lab.framework import register_task
 
 from . import agents
 
 ##
-# Register Gym environments.
+# Register tasks for the active framework.
 ##
 
-gym.register(
-    id="RobotLab-Isaac-Velocity-Flat-Deeprobotics-Lite3-v0",
-    entry_point="isaaclab.envs:ManagerBasedRLEnv",
-    disable_env_checker=True,
-    kwargs={
-        "env_cfg_entry_point": f"{__name__}.flat_env_cfg:DeeproboticsLite3FlatEnvCfg",
+register_task(
+    task_id="RobotLab-Velocity-Flat-Deeprobotics-Lite3-v0",
+    env_cfg=f"{__name__}.flat_env_cfg:DeeproboticsLite3FlatEnvCfg",
+    agent_cfg_entries={
         "rsl_rl_cfg_entry_point": f"{agents.__name__}.rsl_rl_ppo_cfg:DeeproboticsLite3FlatPPORunnerCfg",
         "cusrl_cfg_entry_point": f"{agents.__name__}.cusrl_ppo_cfg:DeeproboticsLite3FlatTrainerCfg",
     },
+    framework_required="isaaclab",
 )
 
-gym.register(
-    id="RobotLab-Isaac-Velocity-Rough-Deeprobotics-Lite3-v0",
-    entry_point="isaaclab.envs:ManagerBasedRLEnv",
-    disable_env_checker=True,
-    kwargs={
-        "env_cfg_entry_point": f"{__name__}.rough_env_cfg:DeeproboticsLite3RoughEnvCfg",
+register_task(
+    task_id="RobotLab-Velocity-Rough-Deeprobotics-Lite3-v0",
+    env_cfg=f"{__name__}.rough_env_cfg:DeeproboticsLite3RoughEnvCfg",
+    agent_cfg_entries={
         "rsl_rl_cfg_entry_point": f"{agents.__name__}.rsl_rl_ppo_cfg:DeeproboticsLite3RoughPPORunnerCfg",
         "cusrl_cfg_entry_point": f"{agents.__name__}.cusrl_ppo_cfg:DeeproboticsLite3RoughTrainerCfg",
     },
+    framework_required="isaaclab",
 )

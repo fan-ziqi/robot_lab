@@ -7,13 +7,18 @@ from typing import TYPE_CHECKING, Literal
 
 import torch
 
-import isaaclab.utils.math as math_utils
-from isaaclab.assets import Articulation, RigidObject
-from isaaclab.managers import SceneEntityCfg
+# Math utilities: prefer isaaclab when available, fall back to mjlab's lab_api shim.
+try:
+    import isaaclab.utils.math as math_utils
+except ImportError:  # pragma: no cover - exercised under mjlab venv
+    from mjlab.utils.lab_api import math as math_utils
+
+from robot_lab.framework import SceneEntityCfg
 
 from .utils import is_env_assigned_to_terrain
 
 if TYPE_CHECKING:
+    from isaaclab.assets import Articulation, RigidObject
     from isaaclab.envs import ManagerBasedEnv
 
 

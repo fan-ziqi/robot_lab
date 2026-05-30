@@ -7,10 +7,10 @@ from typing import TYPE_CHECKING
 
 import torch
 
-from isaaclab.assets import Articulation
-from isaaclab.managers import SceneEntityCfg
+from robot_lab.framework import SceneEntityCfg
 
 if TYPE_CHECKING:
+    from isaaclab.assets import Articulation
     from isaaclab.envs import ManagerBasedEnv, ManagerBasedRLEnv
 
 

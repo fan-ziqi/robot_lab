@@ -1,115 +1,127 @@
 # Copyright (c) 2024-2026 Ziqi Fan
 # SPDX-License-Identifier: Apache-2.0
 
-
-import isaaclab.sim as sim_utils
-from isaaclab.actuators import ImplicitActuatorCfg
-from isaaclab.assets.articulation import ArticulationCfg
-
-from robot_lab.assets import ISAACLAB_ASSETS_DATA_DIR
-
 ##
 # Configuration
+#
+# Imported defensively so this module also loads under the mjlab venv,
+# where ``isaaclab`` is not installed. IL tasks importing the constants
+# below are unaffected -- the assignments still execute under IL.
 ##
 
+try:
+    import isaaclab.sim as sim_utils
+    from isaaclab.actuators import ImplicitActuatorCfg
+    from isaaclab.assets.articulation import ArticulationCfg
 
-ATOM01_CFG = ArticulationCfg(
-    spawn=sim_utils.UrdfFileCfg(
-        fix_base=False,
-        merge_fixed_joints=True,
-        replace_cylinders_with_capsules=False,
-        asset_path=f"{ISAACLAB_ASSETS_DATA_DIR}/Robots/roboparty/atom01_description/urdf/atom01.urdf",
-        activate_contact_sensors=True,
-        rigid_props=sim_utils.RigidBodyPropertiesCfg(
-            disable_gravity=False,
-            retain_accelerations=False,
-            linear_damping=0.0,
-            angular_damping=0.0,
-            max_linear_velocity=1000.0,
-            max_angular_velocity=1000.0,
-            max_depenetration_velocity=1.0,
+    from robot_lab.assets import ISAACLAB_ASSETS_DATA_DIR
+
+    ##
+    # Configuration
+    ##
+
+
+    ATOM01_CFG = ArticulationCfg(
+        spawn=sim_utils.UrdfFileCfg(
+            fix_base=False,
+            merge_fixed_joints=True,
+            replace_cylinders_with_capsules=False,
+            asset_path=f"{ISAACLAB_ASSETS_DATA_DIR}/Robots/roboparty/atom01_description/urdf/atom01.urdf",
+            activate_contact_sensors=True,
+            rigid_props=sim_utils.RigidBodyPropertiesCfg(
+                disable_gravity=False,
+                retain_accelerations=False,
+                linear_damping=0.0,
+                angular_damping=0.0,
+                max_linear_velocity=1000.0,
+                max_angular_velocity=1000.0,
+                max_depenetration_velocity=1.0,
+            ),
+            articulation_props=sim_utils.ArticulationRootPropertiesCfg(
+                enabled_self_collisions=True, solver_position_iteration_count=8, solver_velocity_iteration_count=4
+            ),
+            joint_drive=sim_utils.UrdfConverterCfg.JointDriveCfg(
+                gains=sim_utils.UrdfConverterCfg.JointDriveCfg.PDGainsCfg(stiffness=0, damping=0)
+            ),
         ),
-        articulation_props=sim_utils.ArticulationRootPropertiesCfg(
-            enabled_self_collisions=True, solver_position_iteration_count=8, solver_velocity_iteration_count=4
+        init_state=ArticulationCfg.InitialStateCfg(
+            pos=(0.0, 0.0, 0.7),
+            joint_pos={
+                "left_thigh_pitch_joint": -0.2,
+                "left_knee_joint": 0.4,
+                "left_ankle_pitch_joint": -0.2,
+                "left_arm_pitch_joint": 0.1,
+                "left_arm_roll_joint": 0.07,
+                "left_elbow_pitch_joint": 1.0,
+                "right_thigh_pitch_joint": -0.2,
+                "right_knee_joint": 0.4,
+                "right_ankle_pitch_joint": -0.2,
+                "right_arm_pitch_joint": 0.1,
+                "right_arm_roll_joint": -0.07,
+                "right_elbow_pitch_joint": 1.0,
+            },
+            joint_vel={".*": 0.0},
         ),
-        joint_drive=sim_utils.UrdfConverterCfg.JointDriveCfg(
-            gains=sim_utils.UrdfConverterCfg.JointDriveCfg.PDGainsCfg(stiffness=0, damping=0)
-        ),
-    ),
-    init_state=ArticulationCfg.InitialStateCfg(
-        pos=(0.0, 0.0, 0.7),
-        joint_pos={
-            "left_thigh_pitch_joint": -0.2,
-            "left_knee_joint": 0.4,
-            "left_ankle_pitch_joint": -0.2,
-            "left_arm_pitch_joint": 0.1,
-            "left_arm_roll_joint": 0.07,
-            "left_elbow_pitch_joint": 1.0,
-            "right_thigh_pitch_joint": -0.2,
-            "right_knee_joint": 0.4,
-            "right_ankle_pitch_joint": -0.2,
-            "right_arm_pitch_joint": 0.1,
-            "right_arm_roll_joint": -0.07,
-            "right_elbow_pitch_joint": 1.0,
+        soft_joint_pos_limit_factor=0.90,
+        actuators={
+            "legs": ImplicitActuatorCfg(
+                joint_names_expr=[
+                    ".*_thigh_yaw_joint",
+                    ".*_thigh_roll_joint",
+                    ".*_thigh_pitch_joint",
+                    ".*_knee_joint",
+                    ".*torso.*",
+                ],
+                stiffness={
+                    ".*_thigh_yaw_joint": 100.0,
+                    ".*_thigh_roll_joint": 100.0,
+                    ".*_thigh_pitch_joint": 100.0,
+                    ".*_knee_joint": 150.0,
+                    ".*torso.*": 150.0,
+                },
+                damping={
+                    ".*_thigh_yaw_joint": 3.0,
+                    ".*_thigh_roll_joint": 3.0,
+                    ".*_thigh_pitch_joint": 3.0,
+                    ".*_knee_joint": 5.0,
+                    ".*torso.*": 5.0,
+                },
+                armature=0.01,
+            ),
+            "feet": ImplicitActuatorCfg(
+                joint_names_expr=[".*_ankle_pitch_joint", ".*_ankle_roll_joint"],
+                stiffness=40.0,
+                damping=1.5,
+                armature=0.01,
+            ),
+            "shoulders": ImplicitActuatorCfg(
+                joint_names_expr=[
+                    ".*_arm_pitch_joint",
+                    ".*_arm_roll_joint",
+                    ".*_arm_yaw_joint",
+                ],
+                stiffness=60.0,
+                damping=2.0,
+                armature=0.01,
+            ),
+            "arms": ImplicitActuatorCfg(
+                joint_names_expr=[
+                    ".*_elbow_pitch_joint",
+                    ".*_elbow_yaw_joint",
+                ],
+                stiffness={
+                    ".*_elbow_pitch_joint": 40.0,
+                    ".*_elbow_yaw_joint": 20.0,
+                },
+                damping={
+                    ".*_elbow_pitch_joint": 1.5,
+                    ".*_elbow_yaw_joint": 1.0,
+                },
+                armature=0.01,
+            ),
         },
-        joint_vel={".*": 0.0},
-    ),
-    soft_joint_pos_limit_factor=0.90,
-    actuators={
-        "legs": ImplicitActuatorCfg(
-            joint_names_expr=[
-                ".*_thigh_yaw_joint",
-                ".*_thigh_roll_joint",
-                ".*_thigh_pitch_joint",
-                ".*_knee_joint",
-                ".*torso.*",
-            ],
-            stiffness={
-                ".*_thigh_yaw_joint": 100.0,
-                ".*_thigh_roll_joint": 100.0,
-                ".*_thigh_pitch_joint": 100.0,
-                ".*_knee_joint": 150.0,
-                ".*torso.*": 150.0,
-            },
-            damping={
-                ".*_thigh_yaw_joint": 3.0,
-                ".*_thigh_roll_joint": 3.0,
-                ".*_thigh_pitch_joint": 3.0,
-                ".*_knee_joint": 5.0,
-                ".*torso.*": 5.0,
-            },
-            armature=0.01,
-        ),
-        "feet": ImplicitActuatorCfg(
-            joint_names_expr=[".*_ankle_pitch_joint", ".*_ankle_roll_joint"],
-            stiffness=40.0,
-            damping=1.5,
-            armature=0.01,
-        ),
-        "shoulders": ImplicitActuatorCfg(
-            joint_names_expr=[
-                ".*_arm_pitch_joint",
-                ".*_arm_roll_joint",
-                ".*_arm_yaw_joint",
-            ],
-            stiffness=60.0,
-            damping=2.0,
-            armature=0.01,
-        ),
-        "arms": ImplicitActuatorCfg(
-            joint_names_expr=[
-                ".*_elbow_pitch_joint",
-                ".*_elbow_yaw_joint",
-            ],
-            stiffness={
-                ".*_elbow_pitch_joint": 40.0,
-                ".*_elbow_yaw_joint": 20.0,
-            },
-            damping={
-                ".*_elbow_pitch_joint": 1.5,
-                ".*_elbow_yaw_joint": 1.0,
-            },
-            armature=0.01,
-        ),
-    },
-)
+    )
+except ImportError:  # pragma: no cover - exercised under mjlab venv
+    # IsaacLab is not installed (likely the mjlab backend). Tasks that
+    # import these constants only ever run under IL.
+    ATOM01_CFG = None  # type: ignore
