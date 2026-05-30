@@ -46,37 +46,49 @@ The table below lists all available environments:
 >
 > Discuss in [Github Discussion](https://github.com/fan-ziqi/robot_lab/discussions) or [Discord](http://www.robotsfan.com/dc_robot_lab).
 
+## Frameworks
+
+robot_lab tasks run on either **IsaacLab** or **mjlab**. Select the backend
+at runtime via the dispatcher:
+
+```bash
+python scripts/train.py --framework isaaclab --rl rsl_rl --task RobotLab-Velocity-Rough-Unitree-A1-v0
+python scripts/train.py --framework mjlab    --rl rsl_rl --task RobotLab-Velocity-Rough-Unitree-A1-v0
+```
+
+Each backend has its own venv, provisioned by `./setup_env.sh`. The
+dispatcher auto-`exec`s under the right interpreter — no `source ... activate`
+needed. Tasks tagged `framework_required="isaaclab"` are silently skipped
+on the mjlab backend (and vice versa); running them with the wrong
+`--framework` produces a clear "task not registered" error.
+
+Existing IsaacLab users should read
+[`docs/migration-from-subclass.md`](docs/migration-from-subclass.md)
+for the (small) set of changes they need to make.
+
 ## Version Dependency
 
-| robot_lab Version | Isaac Lab Version             | Isaac Sim Version         |
-|------------------ | ----------------------------- | ------------------------- |
-| `main` branch     | `main` branch                 | Isaac Sim 4.5 / 5.0 / 5.1 |
-| `v2.3.2`          | `v2.3.2`                      | Isaac Sim 4.5 / 5.0 / 5.1 |
-| `v2.2.2`          | `v2.2.1`                      | Isaac Sim 4.5 / 5.0       |
-| `v2.1.1`          | `v2.1.1`                      | Isaac Sim 4.5             |
-| `v1.1`            | `v1.4.1`                      | Isaac Sim 4.2             |
+| robot_lab Version | Isaac Lab Version             | Isaac Sim Version         | mjlab Version |
+|------------------ | ----------------------------- | ------------------------- | ------------- |
+| `main` branch     | `main` branch                 | Isaac Sim 4.5 / 5.0 / 5.1 | `>=1.4,<2`    |
+| `v2.3.2`          | `v2.3.2`                      | Isaac Sim 4.5 / 5.0 / 5.1 | n/a           |
+| `v2.2.2`          | `v2.2.1`                      | Isaac Sim 4.5 / 5.0       | n/a           |
+| `v2.1.1`          | `v2.1.1`                      | Isaac Sim 4.5             | n/a           |
+| `v1.1`            | `v1.4.1`                      | Isaac Sim 4.2             | n/a           |
 
 ## Installation
 
-- Install Isaac Lab by following the [installation guide](https://isaac-sim.github.io/IsaacLab/main/source/setup/installation/index.html). We recommend using the conda installation as it simplifies calling Python scripts from the terminal.
+Pick one (or both, in separate venvs):
 
-- Clone this repository separately from the Isaac Lab installation (i.e. outside the `IsaacLab` directory):
+```bash
+./setup_env.sh isaaclab    # Python 3.11, IsaacSim+IsaacLab via PyPI
+./setup_env.sh mjlab       # Python 3.12, mjlab via PyPI
+```
 
-  ```bash
-  git clone https://github.com/fan-ziqi/robot_lab.git
-  ```
-
-- Using a python interpreter that has Isaac Lab installed, install the library
-
-  ```bash
-  python -m pip install -e source/robot_lab
-  ```
-
-- Verify that the extension is correctly installed by running the following command to print all the available environments in the extension:
-
-  ```bash
-  python scripts/tools/list_envs.py
-  ```
+The two venvs live at `.venvs/{isaaclab,mjlab}/` and are managed by uv. You do
+not need to `source ... activate` — the dispatcher (`scripts/train.py`,
+`scripts/play.py`) auto-exec's under the right interpreter when you pass
+`--framework`.
 
 <details>
 

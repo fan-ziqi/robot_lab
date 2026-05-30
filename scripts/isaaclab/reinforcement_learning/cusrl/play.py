@@ -123,13 +123,13 @@ def main(env_cfg: ManagerBasedRLEnvCfg | DirectRLEnvCfg | DirectMARLEnvCfg, agen
         )
 
     if args_cli.checkpoint is None:
-        args_cli.checkpoint = os.path.join("logs", "cusrl", agent_cfg.experiment_name)
+        args_cli.checkpoint = os.path.join("logs", "isaaclab", agent_cfg.experiment_name)
     trial = cusrl.Trial(args_cli.checkpoint)
     if trial is not None:
         log_dir = trial.home
     else:
         # specify directory for logging videos
-        log_dir = os.path.join("logs", "cusrl", agent_cfg.experiment_name)
+        log_dir = os.path.join("logs", "isaaclab", agent_cfg.experiment_name)
         log_dir = os.path.abspath(log_dir)
 
     # create isaac environment
