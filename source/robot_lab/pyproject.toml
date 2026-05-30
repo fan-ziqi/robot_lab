@@ -1,3 +1,79 @@
 [build-system]
-requires = ["setuptools<82.0.0", "wheel", "toml"]
+requires = ["setuptools>=61", "wheel"]
 build-backend = "setuptools.build_meta"
+
+[project]
+name = "robot_lab"
+version = "2.3.2"  # keep aligned with config/extension.toml or read from VERSION
+description = "RL Extension Library for Robots, supporting IsaacLab and mjlab."
+# Inline because setuptools rejects readme paths walking outside the package source dir.
+readme = { text = "RL extension library for robots, supporting IsaacLab and mjlab. See https://github.com/fan-ziqi/robot_lab for details.", content-type = "text/markdown" }
+requires-python = ">=3.10"
+license = { text = "Apache-2.0" }
+authors = [{ name = "Ziqi Fan" }]
+maintainers = [{ name = "Ziqi Fan" }]
+keywords = ["extension", "robot_lab", "isaaclab", "mjlab"]
+classifiers = [
+  "Natural Language :: English",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Isaac Sim :: 4.5.0",
+  "Isaac Sim :: 5.0.0",
+  "Isaac Sim :: 5.1.0",
+]
+dependencies = [
+  # base
+  "psutil",
+  "colorama",
+  "xacrodoc",
+  "toml>=0.10,<1",
+  # amp
+  "numpy",
+  "pandas",
+  "pinocchio",
+  # rl
+  "cusrl[all]",
+  # internal
+  "InquirerPy",
+  "rich",
+]
+
+[project.urls]
+Repository = "https://github.com/fan-ziqi/robot_lab.git"
+
+[project.optional-dependencies]
+# Pulls isaacsim transitively from the nvidia index (configured below).
+# rsl-rl-lib is NOT listed here -- isaaclab[isaacsim,all] already pulls
+# isaaclab_rl[rsl-rl] which depends on rsl-rl-lib. Listing it again
+# risks version drift.
+isaaclab = [
+  "isaaclab[isaacsim,all]==2.3.2.post1",
+]
+mjlab = [
+  "mjlab>=1.4,<2",
+]
+
+# Required: setuptools' flat-layout auto-discovery refuses to proceed when the
+# source dir contains multiple top-level entries (we have robot_lab/, config/,
+# and data/ as siblings). Limiting discovery to the package itself fixes that.
+[tool.setuptools.packages.find]
+include = ["robot_lab*"]
+
+[tool.uv]
+# IsaacSim 5.1.x is published with pre-release markers (5.1.0.dev0/5.1.1.dev0).
+# Allow uv to resolve them when the [isaaclab] extra is requested.
+prerelease = "allow"
+# isaacsim-core depends on pywin32==306 unconditionally (no platform marker).
+# Override so the resolver only tries to install pywin32 on Windows.
+override-dependencies = [
+  "pywin32 ; sys_platform == 'win32'",
+]
+
+[tool.uv.sources]
+isaacsim = [{ index = "nvidia" }]
+
+[[tool.uv.index]]
+name = "nvidia"
+url = "https://pypi.nvidia.com"
+explicit = true
