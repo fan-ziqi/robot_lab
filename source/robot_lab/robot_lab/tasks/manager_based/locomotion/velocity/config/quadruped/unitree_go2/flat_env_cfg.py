@@ -12,6 +12,8 @@ class UnitreeGo2FlatEnvCfg(UnitreeGo2RoughEnvCfg):
         # post init of parent
         super().__post_init__()
 
+        # Twice the measured 64-constraint peak; contacts also gain headroom.
+
         # override rewards
         self.rewards.base_height_l2.params["sensor_cfg"] = None
         # change terrain to flat

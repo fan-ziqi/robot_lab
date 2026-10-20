@@ -10,8 +10,7 @@ from robot_lab.assets import ISAACLAB_ASSETS_DATA_DIR
 DEEPROBOTICS_LITE3_CFG = ArticulationCfg(
     spawn=sim_utils.UrdfFileCfg(
         fix_base=False,
-        merge_fixed_joints=True,
-        replace_cylinders_with_capsules=False,
+        merge_fixed_joints=False,
         asset_path=f"{ISAACLAB_ASSETS_DATA_DIR}/Robots/deeprobotics/lite3_description/urdf/lite3.urdf",
         activate_contact_sensors=True,
         rigid_props=sim_utils.RigidBodyPropertiesCfg(
@@ -43,18 +42,20 @@ DEEPROBOTICS_LITE3_CFG = ArticulationCfg(
     actuators={
         "Hip": DCMotorCfg(
             joint_names_expr=[".*_Hip[X,Y]_joint"],
-            effort_limit=24.0,
+            joint_effort_limit=1.0e9,  # Preserve the Isaac Lab 2.x explicit-actuator solver clamp.
+            actuator_effort_limit=24.0,
             saturation_effort=24.0,
-            velocity_limit=26.2,
+            actuator_velocity_limit=26.2,
             stiffness=30.0,
             damping=0.5,
             friction=0.0,
         ),
         "Knee": DCMotorCfg(
             joint_names_expr=[".*_Knee_joint"],
-            effort_limit=36.0,
+            joint_effort_limit=1.0e9,  # Preserve the Isaac Lab 2.x explicit-actuator solver clamp.
+            actuator_effort_limit=36.0,
             saturation_effort=36.0,
-            velocity_limit=17.3,
+            actuator_velocity_limit=17.3,
             stiffness=30.0,
             damping=0.5,
             friction=0.0,
@@ -65,8 +66,7 @@ DEEPROBOTICS_LITE3_CFG = ArticulationCfg(
 DEEPROBOTICS_M20_CFG = ArticulationCfg(
     spawn=sim_utils.UrdfFileCfg(
         fix_base=False,
-        merge_fixed_joints=True,
-        replace_cylinders_with_capsules=False,
+        merge_fixed_joints=False,
         asset_path=f"{ISAACLAB_ASSETS_DATA_DIR}/Robots/deeprobotics/m20_description/urdf/m20.urdf",
         activate_contact_sensors=True,
         rigid_props=sim_utils.RigidBodyPropertiesCfg(
@@ -101,18 +101,20 @@ DEEPROBOTICS_M20_CFG = ArticulationCfg(
     actuators={
         "joint": DCMotorCfg(
             joint_names_expr=[".*hipx_joint", ".*hipy_joint", ".*knee_joint"],
-            effort_limit=76.4,
+            joint_effort_limit=1.0e9,  # Preserve the Isaac Lab 2.x explicit-actuator solver clamp.
+            actuator_effort_limit=76.4,
             saturation_effort=76.4,
-            velocity_limit=22.4,
+            actuator_velocity_limit=22.4,
             stiffness=80.0,
             damping=2.0,
             friction=0.0,
         ),
         "wheel": DCMotorCfg(
             joint_names_expr=[".*_wheel_joint"],
-            effort_limit=21.6,
+            joint_effort_limit=1.0e9,  # Preserve the Isaac Lab 2.x explicit-actuator solver clamp.
+            actuator_effort_limit=21.6,
             saturation_effort=21.6,
-            velocity_limit=79.3,
+            actuator_velocity_limit=79.3,
             stiffness=0.0,
             damping=0.6,
             friction=0.0,

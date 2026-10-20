@@ -27,3 +27,16 @@ class AnymalDFlatEnvCfg(AnymalDRoughEnvCfg):
         # If the weight of rewards is 0, set rewards to None
         if self.__class__.__name__ == "AnymalDFlatEnvCfg":
             self.disable_zero_weight_rewards()
+
+
+@configclass
+class AnymalDFlatEnvCfg_PLAY(AnymalDFlatEnvCfg):
+    """Playback configuration for the existing AnyMal D Play registration."""
+
+    def __post_init__(self):
+        super().__post_init__()
+        self.scene.num_envs = 50
+        self.observations.policy.enable_corruption = False
+        self.events.randomize_apply_external_force_torque = None
+        self.events.push_robot = None
+        self.disable_zero_weight_rewards()

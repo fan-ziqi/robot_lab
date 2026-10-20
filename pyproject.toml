@@ -5,7 +5,7 @@
 
 [tool.ruff]
 line-length = 120
-target-version = "py310"
+target-version = "py312"
 
 # Exclude directories
 extend-exclude = [
@@ -113,7 +113,7 @@ exclude = [
 ]
 
 typeCheckingMode = "basic"
-pythonVersion = "3.11"
+pythonVersion = "3.12"
 pythonPlatform = "Linux"
 enableTypeIgnoreComments = true
 

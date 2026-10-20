@@ -17,7 +17,7 @@ import torch
 from tensordict import TensorDict
 
 if TYPE_CHECKING:
-    from omni.isaac.lab.envs import ManagerBasedRLEnv
+    from isaaclab.envs import ManagerBasedRLEnv
 
 # specify the functions that are available for import
 __all__ = ["compute_symmetric_states"]

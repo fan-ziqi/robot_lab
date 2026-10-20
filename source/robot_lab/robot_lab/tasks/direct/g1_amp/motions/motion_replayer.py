@@ -32,15 +32,19 @@ from isaaclab.app import AppLauncher
 
 # Command line arguments
 parser = argparse.ArgumentParser()
+parser.add_argument("--headless", action="store_true", help="Run without a visualizer unless --viz is explicit.")
 AppLauncher.add_app_launcher_args(parser)
 parser.add_argument("--motion", type=str, default="g1_dance.npz")
 args_cli = parser.parse_args()
+if args_cli.headless and not args_cli.visualizer:
+    args_cli.visualizer = ["none"]
 
 # Launch Isaac Sim
 app_launcher = AppLauncher(args_cli)
 simulation_app = app_launcher.app
 
 import torch
+from isaaclab_physx.physics import PhysxCfg
 from motion_loader import MotionLoader
 
 import isaaclab.sim as sim_utils
@@ -76,7 +80,7 @@ sim_cfg = sim_utils.SimulationCfg(
     render_interval=1,  # Render every physics step
     enable_scene_query_support=True,
     use_fabric=True,
-    physx=sim_utils.PhysxCfg(
+    physics=PhysxCfg(
         solver_type=1,  # TGS solver
         min_position_iteration_count=8,  # Increase solver iterations
         max_position_iteration_count=8,
@@ -138,9 +142,18 @@ try:
             root_state = torch.cat([root_pos, root_rot, root_vel, root_ang_vel], dim=-1)
 
             # Write to simulation
-            robot.write_root_link_pose_to_sim(root_state[:, :7], torch.tensor([0], device=args_cli.device))
-            robot.write_root_com_velocity_to_sim(root_state[:, 7:], torch.tensor([0], device=args_cli.device))
-            robot.write_joint_state_to_sim(joint_pos, joint_vel, None, torch.tensor([0], device=args_cli.device))
+            robot.write_root_link_pose_to_sim_index(
+                root_pose=root_state[:, :7], env_ids=torch.tensor([0], device=args_cli.device)
+            )
+            robot.write_root_com_velocity_to_sim_index(
+                root_velocity=root_state[:, 7:], env_ids=torch.tensor([0], device=args_cli.device)
+            )
+            robot.write_joint_state_to_sim_index(
+                position=joint_pos,
+                velocity=joint_vel,
+                joint_ids=None,
+                env_ids=torch.tensor([0], device=args_cli.device),
+            )
 
             # Step simulation (strict dt synchronization)
             scene.update(dt=sim.get_physics_dt())

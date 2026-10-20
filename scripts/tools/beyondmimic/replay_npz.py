@@ -23,9 +23,12 @@ parser = argparse.ArgumentParser(description="Replay converted motions.")
 parser.add_argument("--file", "-f", type=str, required=True)
 
 # append AppLauncher cli args
+parser.add_argument("--headless", action="store_true", help="Run without a visualizer unless --viz is explicit.")
 AppLauncher.add_app_launcher_args(parser)
 # parse the arguments
 args_cli = parser.parse_args()
+if args_cli.headless and not args_cli.visualizer:
+    args_cli.visualizer = ["none"]
 
 # launch omniverse app
 app_launcher = AppLauncher(args_cli)
@@ -36,6 +39,7 @@ simulation_app = app_launcher.app
 ##
 # Pre-defined configs
 ##
+from isaaclab_physx.physics import PhysxCfg
 from robot_lab.assets.unitree import UNITREE_G1_29DOF_CFG
 from robot_lab.tasks.manager_based.beyondmimic.mdp import MotionLoader
 
@@ -84,14 +88,17 @@ def run_simulator(sim: sim_utils.SimulationContext, scene: InteractiveScene):
         reset_ids = time_steps >= motion.time_step_total
         time_steps[reset_ids] = 0
 
-        root_states = robot.data.default_root_state.clone()
+        root_states = robot.data.default_root_state.torch.clone()
         root_states[:, :3] = motion.body_pos_w[time_steps][:, 0] + scene.env_origins[:, None, :]
         root_states[:, 3:7] = motion.body_quat_w[time_steps][:, 0]
         root_states[:, 7:10] = motion.body_lin_vel_w[time_steps][:, 0]
         root_states[:, 10:] = motion.body_ang_vel_w[time_steps][:, 0]
 
-        robot.write_root_state_to_sim(root_states)
-        robot.write_joint_state_to_sim(motion.joint_pos[time_steps], motion.joint_vel[time_steps])
+        robot.write_root_link_pose_to_sim_index(root_pose=(root_states)[:, :7])
+        robot.write_root_com_velocity_to_sim_index(root_velocity=(root_states)[:, 7:])
+        robot.write_joint_state_to_sim_index(
+            position=motion.joint_pos[time_steps], velocity=motion.joint_vel[time_steps]
+        )
         scene.write_data_to_sim()
         sim.render()  # We don't want physic (sim.step())
         scene.update(sim_dt)
@@ -101,7 +108,7 @@ def run_simulator(sim: sim_utils.SimulationContext, scene: InteractiveScene):
 
 
 def main():
-    sim_cfg = sim_utils.SimulationCfg(device=args_cli.device)
+    sim_cfg = sim_utils.SimulationCfg(device=args_cli.device, physics=PhysxCfg())
     sim_cfg.dt = 0.02
     sim = SimulationContext(sim_cfg)
 

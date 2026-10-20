@@ -16,7 +16,7 @@ The data (accessed by key) is described in the following table, where:
 | `dof_positions` | float32 | (N, D) | Skeleton DOF positions |
 | `dof_velocities` | float32 | (N, D) | Skeleton DOF velocities |
 | `body_positions` | float32 | (N, B, 3) | Skeleton body positions |
-| `body_rotations` | float32 | (N, B, 4) | Skeleton body rotations (as `wxyz` quaternion) |
+| `body_rotations` | float32 | (N, B, 4) | Skeleton body rotations (order declared by `quaternion_order`; untagged legacy files use `wxyz`) |
 | `body_linear_velocities` | float32 | (N, B, 3) | Skeleton body linear velocities |
 | `body_angular_velocities` | float32 | (N, B, 3) | Skeleton body angular velocities |
 
@@ -31,3 +31,5 @@ python motion_viewer.py --file MOTION_FILE_NAME.npz
 ```
 
 See `python motion_viewer.py --help` for available arguments.
+
+New converters write `quaternion_order="xyzw"`. The loader accepts `xyzw` or `wxyz`, defaults untagged legacy archives to `wxyz`, and converts once to runtime XYZW. Existing archives are not rewritten.

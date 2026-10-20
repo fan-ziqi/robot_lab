@@ -1,8 +1,8 @@
 # robot_lab
 
 [![IsaacSim](https://img.shields.io/badge/IsaacSim-5.1.0-silver.svg)](https://docs.omniverse.nvidia.com/isaacsim/latest/overview.html)
-[![Isaac Lab](https://img.shields.io/badge/IsaacLab-2.3.2-silver)](https://isaac-sim.github.io/IsaacLab)
-[![Python](https://img.shields.io/badge/python-3.11-blue.svg)](https://docs.python.org/3/whatsnew/3.11.html)
+[![Isaac Lab](https://img.shields.io/badge/IsaacLab-3.0.0-silver)](https://isaac-sim.github.io/IsaacLab)
+[![Python](https://img.shields.io/badge/python-3.12-blue.svg)](https://docs.python.org/3/whatsnew/3.12.html)
 [![Linux platform](https://img.shields.io/badge/platform-linux--64-orange.svg)](https://releases.ubuntu.com/22.04/)
 [![Windows platform](https://img.shields.io/badge/platform-windows--64-orange.svg)](https://www.microsoft.com/en-us/)
 [![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white)](https://pre-commit.com/)
@@ -16,7 +16,7 @@ The table below lists all available environments:
 
 | Category   | Robot Model         | Environment Name (<ENV_NAME>)                                      | Screenshot |
 |------------|---------------------|------------------------------------------------------------|------------|
-| **Quadruped** | [Anymal D](https://www.anybotics.com/robotics/anymal) | RobotLab-Isaac-Velocity-Rough-Anymal-D-v0 | <img src="./docs/imgs/anymal_d.png" alt="anymal_d" width="75"> |
+| **Quadruped** | [Anymal D](https://www.anybotics.com/robotics/anymal) | Isaac-Velocity-Flat-Anymal-D-v0 | <img src="./docs/imgs/anymal_d.png" alt="anymal_d" width="75"> |
 |            | [Unitree Go2](https://www.unitree.com/go2) | RobotLab-Isaac-Velocity-Rough-Unitree-Go2-v0 | <img src="./docs/imgs/unitree_go2.png" alt="unitree_go2" width="75"> |
 |            | [Unitree B2](https://www.unitree.com/b2) | RobotLab-Isaac-Velocity-Rough-Unitree-B2-v0 | <img src="./docs/imgs/unitree_b2.png" alt="unitree_b2" width="75"> |
 |            | [Unitree A1](https://www.unitree.com/a1) | RobotLab-Isaac-Velocity-Rough-Unitree-A1-v0 | <img src="./docs/imgs/unitree_a1.png" alt="unitree_a1" width="75"> |
@@ -50,7 +50,7 @@ The table below lists all available environments:
 
 | robot_lab Version | Isaac Lab Version             | Isaac Sim Version         |
 |------------------ | ----------------------------- | ------------------------- |
-| `main` branch     | `main` branch                 | Isaac Sim 4.5 / 5.0 / 5.1 |
+| `main` branch     | `v3.0.0`                      | Isaac Sim 6.1             |
 | `v2.3.2`          | `v2.3.2`                      | Isaac Sim 4.5 / 5.0 / 5.1 |
 | `v2.2.2`          | `v2.2.1`                      | Isaac Sim 4.5 / 5.0       |
 | `v2.1.1`          | `v2.1.1`                      | Isaac Sim 4.5             |
@@ -58,7 +58,7 @@ The table below lists all available environments:
 
 ## Installation
 
-- Install Isaac Lab by following the [installation guide](https://isaac-sim.github.io/IsaacLab/main/source/setup/installation/index.html). We recommend using the conda installation as it simplifies calling Python scripts from the terminal.
+- Install Isaac Lab 3.0 by following the [installation guide](https://isaac-sim.github.io/IsaacLab/main/source/setup/installation/index.html). Isaac Lab 3.0 requires Python 3.12. For Isaac Lab 2.x, use the `v2.3.2` tag of this repository.
 
 - Clone this repository separately from the Isaac Lab installation (i.e. outside the `IsaacLab` directory):
 
@@ -70,6 +70,8 @@ The table below lists all available environments:
 
   ```bash
   python -m pip install -e source/robot_lab
+  # or, for uv-managed Isaac Lab environments
+  uv pip install -e source/robot_lab
   ```
 
 - Verify that the extension is correctly installed by running the following command to print all the available environments in the extension:
@@ -77,6 +79,9 @@ The table below lists all available environments:
   ```bash
   python scripts/tools/list_envs.py
   ```
+
+> [!NOTE]
+> The RSL-RL and skrl scripts use the unified Isaac Lab 3.0 entry points: resume training or select a checkpoint for playback with `--checkpoint /path/to/model.pt`, and use `--viz kit` to open the viewer (`--headless --viz kit --video` records videos). `skrl` and `cusrl` are optional and only need to be installed for their respective scripts.
 
 <details>
 
@@ -282,27 +287,27 @@ Others (**Experimental**)
 
   ```bash
   # Train
-  python scripts/reinforcement_learning/rsl_rl/train.py --task=RobotLab-Isaac-Velocity-Rough-Anymal-D-v0 --headless --agent=rsl_rl_with_symmetry_cfg_entry_point --run_name=ppo_with_symmetry_data_augmentation agent.algorithm.symmetry_cfg.use_data_augmentation=true
+  python scripts/reinforcement_learning/rsl_rl/train.py --task=Isaac-Velocity-Flat-Anymal-D-v0 --headless --agent=rsl_rl_with_symmetry_cfg_entry_point --run_name=ppo_with_symmetry_data_augmentation agent.algorithm.symmetry_cfg.use_data_augmentation=true
 
   # Play
-  python scripts/reinforcement_learning/rsl_rl/play.py --task=RobotLab-Isaac-Velocity-Rough-Anymal-D-v0 --agent=rsl_rl_with_symmetry_cfg_entry_point --run_name=ppo_with_symmetry_data_augmentation agent.algorithm.symmetry_cfg.use_data_augmentation=true
+  python scripts/reinforcement_learning/rsl_rl/play.py --task=Isaac-Velocity-Flat-Anymal-D-v0 --agent=rsl_rl_with_symmetry_cfg_entry_point --run_name=ppo_with_symmetry_data_augmentation agent.algorithm.symmetry_cfg.use_data_augmentation=true
   ```
 
 - Training and distilling Anymal D
 
   ```bash
   # Train the teacher agent
-  python scripts/reinforcement_learning/rsl_rl/train.py --task=RobotLab-Isaac-Velocity-Flat-Anymal-D-v0 --headless
+  python scripts/reinforcement_learning/rsl_rl/train.py --task=Isaac-Velocity-Flat-Anymal-D-v0 --headless
 
   # Distill the teacher agent into a student agent
-  python scripts/reinforcement_learning/rsl_rl/train.py --task=RobotLab-Isaac-Velocity-Flat-Anymal-D-v0 --headless --agent=rsl_rl_distillation_cfg_entry_point --load_run teacher_run_folder_name
+  python scripts/reinforcement_learning/rsl_rl/train.py --task=Isaac-Velocity-Flat-Anymal-D-v0 --headless --agent=rsl_rl_distillation_cfg_entry_point --checkpoint /path/to/teacher/model.pt
 
   # Play the student agent
-  python scripts/reinforcement_learning/rsl_rl/play.py --task=RobotLab-Isaac-Velocity-Flat-Anymal-D-v0 --num_envs 64 --agent rsl_rl_distillation_cfg_entry_point
+  python scripts/reinforcement_learning/rsl_rl/play.py --task=Isaac-Velocity-Flat-Anymal-D-v0 --num_envs 64 --agent rsl_rl_distillation_cfg_entry_point
   ```
 
 > [!NOTE]
-> If you want to control a **SINGLE ROBOT** with the keyboard during playback, add `--keyboard` at the end of the play script.
+> The legacy `rsl_rl/play_cs.py` and CusRL playback retain `--keyboard`; the standard 3.0 RSL-RL/skrl wrappers use upstream playback arguments. Interactive keyboard playback has not been validated in this migration.
 >
 > ```
 > Key bindings:
@@ -318,8 +323,8 @@ Others (**Experimental**)
 * You can change `Rough` to `Flat` in the above configs.
 * Record video of a trained agent (requires installing `ffmpeg`), add `--video --video_length 200`
 * Play/Train with 32 environments, add `--num_envs 32`
-* Play on specific folder or checkpoint, add `--load_run run_folder_name --checkpoint /PATH/TO/model.pt`
-* Resume training from folder or checkpoint, add `--resume --load_run run_folder_name --checkpoint /PATH/TO/model.pt`
+* Play on specific folder or checkpoint, add `--checkpoint /PATH/TO/model.pt`
+* Resume training from folder or checkpoint, add `--checkpoint /PATH/TO/model.pt`
 * To train with multiple GPUs, use the following command, where --nproc_per_node represents the number of available GPUs:
     ```bash
     python -m torch.distributed.run --nnodes=1 --nproc_per_node=2 scripts/reinforcement_learning/rsl_rl/train.py --task=<TASK_NAME> --headless --distributed
