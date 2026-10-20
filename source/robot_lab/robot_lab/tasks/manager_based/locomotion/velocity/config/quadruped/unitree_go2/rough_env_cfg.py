@@ -1,11 +1,9 @@
 # Copyright (c) 2024-2026 Ziqi Fan
 # SPDX-License-Identifier: Apache-2.0
 
-from isaaclab.utils import configclass
+from isaaclab.utils import configclass, replace
 
 from robot_lab.tasks.manager_based.locomotion.velocity.velocity_env_cfg import LocomotionVelocityRoughEnvCfg
-
-from .newton_cfg import configure_go2_newton
 
 ##
 # Pre-defined configs
@@ -33,8 +31,8 @@ class UnitreeGo2RoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         # post init of parent
         super().__post_init__()
 
-        # ------------------------------Sence------------------------------
-        self.scene.robot = UNITREE_GO2_CFG.replace(prim_path="{ENV_REGEX_NS}/Robot")
+        # ------------------------------Scene------------------------------
+        self.scene.robot = replace(UNITREE_GO2_CFG, prim_path="{ENV_REGEX_NS}/Robot")
         self.scene.height_scanner.prim_path = "{ENV_REGEX_NS}/Robot/Geometry/base"
         self.scene.height_scanner_base.prim_path = "{ENV_REGEX_NS}/Robot/Geometry/base"
 
@@ -169,6 +167,3 @@ class UnitreeGo2RoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         # self.commands.base_velocity.ranges.lin_vel_x = (-1.0, 1.0)
         # self.commands.base_velocity.ranges.lin_vel_y = (-0.5, 0.5)
         # self.commands.base_velocity.ranges.ang_vel_z = (-1.0, 1.0)
-
-        # Opt in only after the legacy task has been completely initialized.
-        configure_go2_newton(self)

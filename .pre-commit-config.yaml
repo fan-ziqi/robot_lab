@@ -1,6 +1,7 @@
 # Copyright (c) 2024-2026 Ziqi Fan
 # SPDX-License-Identifier: Apache-2.0
 
+# Hook revisions follow Isaac Lab v3.0.0.
 repos:
   - repo: https://github.com/astral-sh/ruff-pre-commit
     rev: v0.14.10
@@ -32,18 +33,12 @@ repos:
     hooks:
       - id: codespell
         additional_dependencies:
-        - tomli
-        args: [-L lamda]
-  # FIXME: Figure out why this is getting stuck under VPN.
-  # - repo: https://github.com/RobertCraigie/pyright-python
-  #   rev: v1.1.315
-  #   hooks:
-  #   - id: pyright
+          - tomli
   - repo: https://github.com/Lucas-C/pre-commit-hooks
     rev: v1.5.5
     hooks:
       - id: insert-license
-        files: \.(py|ya?ml)$
+        files: \.(pyi?|ya?ml)$
         args:
           # - --remove-header    # Remove existing license headers. Useful when updating license.
           - --license-filepath
@@ -56,4 +51,13 @@ repos:
       - id: rst-directive-colons
       - id: rst-inline-touching-normal
 
-exclude: ^(source/robot_lab/robot_lab/third_party/|source/robot_lab/data/|.vscode/|.github/)
+exclude: |
+  (?x)^(
+    source/robot_lab/robot_lab/third_party/
+    |source/robot_lab/robot_lab/assets/data/
+    |\.vscode/
+    |\.github/
+    |_isaac_sim[^/]*(/|$)
+    |logs/
+    |outputs/
+  )

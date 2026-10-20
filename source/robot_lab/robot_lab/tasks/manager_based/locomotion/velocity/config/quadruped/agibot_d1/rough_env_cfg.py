@@ -1,7 +1,7 @@
 # Copyright (c) 2024-2026 Ziqi Fan
 # SPDX-License-Identifier: Apache-2.0
 
-from isaaclab.utils import configclass
+from isaaclab.utils import configclass, replace
 
 from robot_lab.tasks.manager_based.locomotion.velocity.velocity_env_cfg import LocomotionVelocityRoughEnvCfg
 
@@ -29,8 +29,8 @@ class AgibotD1RoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         # post init of parent
         super().__post_init__()
 
-        # ------------------------------Sence------------------------------
-        self.scene.robot = AGIBOT_D1_CFG.replace(prim_path="{ENV_REGEX_NS}/Robot")
+        # ------------------------------Scene------------------------------
+        self.scene.robot = replace(AGIBOT_D1_CFG, prim_path="{ENV_REGEX_NS}/Robot")
         self.scene.height_scanner.prim_path = "{ENV_REGEX_NS}/Robot/Geometry/BASE_LINK"
         self.scene.height_scanner.spawn = None
         self.scene.height_scanner_base.prim_path = "{ENV_REGEX_NS}/Robot/Geometry/BASE_LINK"
@@ -160,7 +160,3 @@ class AgibotD1RoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         # ------------------------------Commands------------------------------
 
         # Only this independently validated class opts into Newton.
-        if type(self) is AgibotD1RoughEnvCfg:
-            from robot_lab.tasks.manager_based.locomotion.velocity.newton_support import configure_newton_from_profile
-
-            configure_newton_from_profile(self, "agibot_d1", njmax=256, nconmax=128)

@@ -3,11 +3,14 @@
 
 """Configuration for magiclab robots."""
 
+from isaaclab_newton.sim.schemas import NewtonArticulationCfg
+from isaaclab_physx.sim.schemas import PhysxArticulationCfg, PhysxRigidBodyCfg
+
 import isaaclab.sim as sim_utils
 from isaaclab.actuators import DCMotorCfg, ImplicitActuatorCfg
 from isaaclab.assets.articulation import ArticulationCfg
 
-from robot_lab.assets import ISAACLAB_ASSETS_DATA_DIR
+from robot_lab.assets import ROBOT_LAB_ASSETS_DIR
 
 ##
 # Configuration
@@ -16,10 +19,11 @@ from robot_lab.assets import ISAACLAB_ASSETS_DATA_DIR
 MAGICLAB_BOT_GEN1_CFG = ArticulationCfg(
     spawn=sim_utils.UrdfFileCfg(
         fix_base=False,
-        merge_fixed_joints=False,
-        asset_path=f"{ISAACLAB_ASSETS_DATA_DIR}/Robots/magiclab/magicbot-Gen1/urdf/MAGICBOT.urdf",
+        # Merge massless camera frames into their rigid parent.
+        merge_fixed_joints=True,
+        asset_path=f"{ROBOT_LAB_ASSETS_DIR}/Robots/magiclab/magicbot-Gen1/urdf/MAGICBOT.urdf",
         activate_contact_sensors=True,
-        rigid_props=sim_utils.RigidBodyPropertiesCfg(
+        rigid_props=PhysxRigidBodyCfg(
             disable_gravity=False,
             retain_accelerations=False,
             linear_damping=0.0,
@@ -28,9 +32,12 @@ MAGICLAB_BOT_GEN1_CFG = ArticulationCfg(
             max_angular_velocity=3.0,
             max_depenetration_velocity=10.0,
         ),
-        articulation_props=sim_utils.ArticulationRootPropertiesCfg(
-            enabled_self_collisions=False, solver_position_iteration_count=4, solver_velocity_iteration_count=0
-        ),
+        articulation_props=[
+            PhysxArticulationCfg(
+                enabled_self_collisions=False, solver_position_iteration_count=4, solver_velocity_iteration_count=0
+            ),
+            NewtonArticulationCfg(self_collision_enabled=False),
+        ],
         joint_drive=sim_utils.UrdfConverterCfg.JointDriveCfg(
             gains=sim_utils.UrdfConverterCfg.JointDriveCfg.PDGainsCfg(stiffness=0, damping=0)
         ),
@@ -103,9 +110,9 @@ MAGICLAB_BOT_Z1_CFG = ArticulationCfg(
     spawn=sim_utils.UrdfFileCfg(
         fix_base=False,
         merge_fixed_joints=False,
-        asset_path=f"{ISAACLAB_ASSETS_DATA_DIR}/Robots/magiclab/magicbot-Z1/urdf/MagicBotZ1.urdf",
+        asset_path=f"{ROBOT_LAB_ASSETS_DIR}/Robots/magiclab/magicbot-Z1/urdf/MagicBotZ1.urdf",
         activate_contact_sensors=True,
-        rigid_props=sim_utils.RigidBodyPropertiesCfg(
+        rigid_props=PhysxRigidBodyCfg(
             disable_gravity=False,
             retain_accelerations=False,
             linear_damping=0.0,
@@ -114,9 +121,12 @@ MAGICLAB_BOT_Z1_CFG = ArticulationCfg(
             max_angular_velocity=3.0,
             max_depenetration_velocity=10.0,
         ),
-        articulation_props=sim_utils.ArticulationRootPropertiesCfg(
-            enabled_self_collisions=False, solver_position_iteration_count=4, solver_velocity_iteration_count=0
-        ),
+        articulation_props=[
+            PhysxArticulationCfg(
+                enabled_self_collisions=False, solver_position_iteration_count=4, solver_velocity_iteration_count=0
+            ),
+            NewtonArticulationCfg(self_collision_enabled=False),
+        ],
         joint_drive=sim_utils.UrdfConverterCfg.JointDriveCfg(
             gains=sim_utils.UrdfConverterCfg.JointDriveCfg.PDGainsCfg(stiffness=0, damping=0)
         ),
@@ -189,9 +199,9 @@ MAGICDOG_CFG = ArticulationCfg(
     spawn=sim_utils.UrdfFileCfg(
         fix_base=False,
         merge_fixed_joints=False,
-        asset_path=f"{ISAACLAB_ASSETS_DATA_DIR}/Robots/magiclab/magicdog/urdf/magicdog.urdf",
+        asset_path=f"{ROBOT_LAB_ASSETS_DIR}/Robots/magiclab/magicdog/urdf/magicdog.urdf",
         activate_contact_sensors=True,
-        rigid_props=sim_utils.RigidBodyPropertiesCfg(
+        rigid_props=PhysxRigidBodyCfg(
             disable_gravity=False,
             retain_accelerations=False,
             linear_damping=0.0,
@@ -200,9 +210,12 @@ MAGICDOG_CFG = ArticulationCfg(
             max_angular_velocity=1000.0,
             max_depenetration_velocity=1.0,
         ),
-        articulation_props=sim_utils.ArticulationRootPropertiesCfg(
-            enabled_self_collisions=False, solver_position_iteration_count=4, solver_velocity_iteration_count=0
-        ),
+        articulation_props=[
+            PhysxArticulationCfg(
+                enabled_self_collisions=False, solver_position_iteration_count=4, solver_velocity_iteration_count=0
+            ),
+            NewtonArticulationCfg(self_collision_enabled=False),
+        ],
         joint_drive=sim_utils.UrdfConverterCfg.JointDriveCfg(
             gains=sim_utils.UrdfConverterCfg.JointDriveCfg.PDGainsCfg(stiffness=0, damping=0)
         ),
@@ -238,9 +251,9 @@ MAGICDOG_W_CFG = ArticulationCfg(
     spawn=sim_utils.UrdfFileCfg(
         fix_base=False,
         merge_fixed_joints=False,
-        asset_path=f"{ISAACLAB_ASSETS_DATA_DIR}/Robots/magiclab/magicdog_w/urdf/magicdog_w.urdf",
+        asset_path=f"{ROBOT_LAB_ASSETS_DIR}/Robots/magiclab/magicdog_w/urdf/magicdog_w.urdf",
         activate_contact_sensors=True,
-        rigid_props=sim_utils.RigidBodyPropertiesCfg(
+        rigid_props=PhysxRigidBodyCfg(
             disable_gravity=False,
             retain_accelerations=False,
             linear_damping=0.0,
@@ -249,9 +262,12 @@ MAGICDOG_W_CFG = ArticulationCfg(
             max_angular_velocity=1000.0,
             max_depenetration_velocity=1.0,
         ),
-        articulation_props=sim_utils.ArticulationRootPropertiesCfg(
-            enabled_self_collisions=False, solver_position_iteration_count=4, solver_velocity_iteration_count=0
-        ),
+        articulation_props=[
+            PhysxArticulationCfg(
+                enabled_self_collisions=False, solver_position_iteration_count=4, solver_velocity_iteration_count=0
+            ),
+            NewtonArticulationCfg(self_collision_enabled=False),
+        ],
         joint_drive=sim_utils.UrdfConverterCfg.JointDriveCfg(
             gains=sim_utils.UrdfConverterCfg.JointDriveCfg.PDGainsCfg(stiffness=0, damping=0)
         ),

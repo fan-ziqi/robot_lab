@@ -33,3 +33,23 @@ python motion_viewer.py --file MOTION_FILE_NAME.npz
 See `python motion_viewer.py --help` for available arguments.
 
 New converters write `quaternion_order="xyzw"`. The loader accepts `xyzw` or `wxyz`, defaults untagged legacy archives to `wxyz`, and converts once to runtime XYZW. Existing archives are not rewritten.
+
+## Convert a retargeted CSV for AMP
+
+From the repository root:
+
+```bash
+uv run --extra motion python source/robot_lab/robot_lab/tasks/direct/g1_amp/motions/csv2npz.py --file /path/to/motion.csv --urdf /path/to/g1.urdf --mesh-dir /path/to/meshes --output /path/to/motion.npz --fps 30
+```
+
+The CSV contains root xyz, root quaternion xyzw and the 29 joint positions, in that order.
+Use `--start-frame` and `--end-frame` to select a range. The output declares XYZW rotations
+and stores body angular velocities in world coordinates.
+
+Replay an AMP archive in Isaac Sim:
+
+```bash
+uv run --extra isaacsim python source/robot_lab/robot_lab/tasks/direct/g1_amp/motions/motion_replayer.py --motion /path/to/motion.npz --viz kit
+```
+
+Use `--viz none --max_steps 100` for a bounded replay.

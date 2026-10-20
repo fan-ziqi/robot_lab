@@ -3,7 +3,7 @@
 
 from isaaclab.managers import RewardTermCfg as RewTerm
 from isaaclab.managers import SceneEntityCfg
-from isaaclab.utils import configclass
+from isaaclab.utils import configclass, replace
 
 import robot_lab.tasks.manager_based.locomotion.velocity.mdp as mdp
 from robot_lab.tasks.manager_based.locomotion.velocity.velocity_env_cfg import (
@@ -73,8 +73,8 @@ class UnitreeB2WRoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         # post init of parent
         super().__post_init__()
 
-        # ------------------------------Sence------------------------------
-        self.scene.robot = UNITREE_B2W_CFG.replace(prim_path="{ENV_REGEX_NS}/Robot")
+        # ------------------------------Scene------------------------------
+        self.scene.robot = replace(UNITREE_B2W_CFG, prim_path="{ENV_REGEX_NS}/Robot")
         self.scene.height_scanner.prim_path = "{ENV_REGEX_NS}/Robot/Geometry/base_link"
         self.scene.height_scanner.spawn = None
         self.scene.height_scanner_base.prim_path = "{ENV_REGEX_NS}/Robot/Geometry/base_link"
@@ -231,11 +231,6 @@ class UnitreeB2WRoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         # self.curriculum.command_levels_ang_vel.params["range_multiplier"] = (0.2, 1.0)
         self.curriculum.command_levels_lin_vel = None
         self.curriculum.command_levels_ang_vel = None
-
-        if type(self) is UnitreeB2WRoughEnvCfg:
-            from robot_lab.tasks.manager_based.locomotion.velocity.newton_support import configure_newton_from_profile
-
-            configure_newton_from_profile(self, "unitree_b2w", njmax=1024, nconmax=256)
 
         # ------------------------------Commands------------------------------
         # self.commands.base_velocity.ranges.lin_vel_x = (-2.0, 2.0)

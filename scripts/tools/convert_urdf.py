@@ -31,7 +31,7 @@ optional arguments:
   --joint_target_type       The type of control to use for the joint drive. (default: "position")
 
 The standard launcher arguments are also accepted. In particular, ``--viz`` previews the converted
-asset: ``--viz kit`` opens it in the Isaac Sim viewport, while ``--viz rerun`` (or ``rerun`` /
+asset: ``--viz kit`` opens it in the Isaac Sim viewport, while ``--viz newton_gl`` (or ``rerun`` /
 ``viser``) opens it kitlessly. Run with ``--help`` for the full list.
 
 """
@@ -96,7 +96,7 @@ args_cli.require_kit = not standalone_importers_available()
 
 # ``launch_simulation`` receives a bare ``PhysicsCfg()`` placeholder, so name the backend the
 # runtime provides; without it the preview builds a simulation with no physics manager.
-args_cli.physics = "isaacsim_physx"
+args_cli.physics = "isaacsim_physx" if args_cli.require_kit else "newton_mjwarp"
 
 import os  # noqa: E402
 

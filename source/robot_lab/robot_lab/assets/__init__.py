@@ -1,29 +1,12 @@
 # Copyright (c) 2024-2026 Ziqi Fan
 # SPDX-License-Identifier: Apache-2.0
 
-# Copyright (c) 2022-2026, The Isaac Lab Project Developers (https://github.com/isaac-sim/IsaacLab/blob/main/CONTRIBUTORS.md).
-# All rights reserved.
-#
-# SPDX-License-Identifier: BSD-3-Clause
+"""Paths and configurations for project-owned assets."""
 
-"""Package containing asset and sensor configurations."""
+from pathlib import Path
 
-import os
-import toml
+ROBOT_LAB_ASSETS_DIR = Path(__file__).resolve().parent / "data"
+"""Path to project-owned asset data, in an editable checkout or an installed wheel."""
 
-##
-# Configuration for different assets.
-##
-
-# Conveniences to other module directories via relative paths
-ISAACLAB_ASSETS_EXT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../"))
-"""Path to the extension source directory."""
-
-ISAACLAB_ASSETS_DATA_DIR = os.path.join(ISAACLAB_ASSETS_EXT_DIR, "data")
-"""Path to the extension data directory."""
-
-ISAACLAB_ASSETS_METADATA = toml.load(os.path.join(ISAACLAB_ASSETS_EXT_DIR, "config", "extension.toml"))
-"""Extension metadata dictionary parsed from the extension.toml file."""
-
-# Configure the module-level variables
-__version__ = ISAACLAB_ASSETS_METADATA["package"]["version"]
+# Compatibility for asset configurations written against robot_lab 2.x.
+ISAACLAB_ASSETS_DATA_DIR = str(ROBOT_LAB_ASSETS_DIR)

@@ -1,7 +1,7 @@
 # Copyright (c) 2024-2026 Ziqi Fan
 # SPDX-License-Identifier: Apache-2.0
 
-from isaaclab.utils import configclass
+from isaaclab.utils import configclass, replace
 
 import robot_lab.tasks.manager_based.locomotion.velocity.mdp as mdp
 from robot_lab.tasks.manager_based.locomotion.velocity.velocity_env_cfg import LocomotionVelocityRoughEnvCfg
@@ -39,8 +39,8 @@ class MagicLabBotGen1RoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         # post init of parent
         super().__post_init__()
 
-        # ------------------------------Sence------------------------------
-        self.scene.robot = MAGICLAB_BOT_GEN1_CFG.replace(prim_path="{ENV_REGEX_NS}/Robot")
+        # ------------------------------Scene------------------------------
+        self.scene.robot = replace(MAGICLAB_BOT_GEN1_CFG, prim_path="{ENV_REGEX_NS}/Robot")
         self.scene.height_scanner.prim_path = "{ENV_REGEX_NS}/Robot/Geometry/pelvis"
         self.scene.height_scanner.spawn = None
         self.scene.height_scanner_base.prim_path = "{ENV_REGEX_NS}/Robot/Geometry/pelvis"

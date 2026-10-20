@@ -148,14 +148,15 @@ class MotionLoader:
         neg_mask = cos_half_theta < 0
         q1 = q1.clone()
         q1[neg_mask] = -q1[neg_mask]
-        cos_half_theta = torch.abs(cos_half_theta)
+        cos_half_theta = torch.abs(cos_half_theta).clamp(max=1.0)
         cos_half_theta = torch.unsqueeze(cos_half_theta, dim=-1)
 
         half_theta = torch.acos(cos_half_theta)
         sin_half_theta = torch.sqrt(1.0 - cos_half_theta * cos_half_theta)
 
-        ratio_a = torch.sin((1 - blend) * half_theta) / sin_half_theta
-        ratio_b = torch.sin(blend * half_theta) / sin_half_theta
+        denominator = sin_half_theta.clamp_min(torch.finfo(q0.dtype).eps)
+        ratio_a = torch.sin((1 - blend) * half_theta) / denominator
+        ratio_b = torch.sin(blend * half_theta) / denominator
 
         new_q_x = ratio_a * q0[..., qx : qx + 1] + ratio_b * q1[..., qx : qx + 1]
         new_q_y = ratio_a * q0[..., qy : qy + 1] + ratio_b * q1[..., qy : qy + 1]
@@ -163,9 +164,9 @@ class MotionLoader:
         new_q_w = ratio_a * q0[..., qw : qw + 1] + ratio_b * q1[..., qw : qw + 1]
 
         new_q = torch.cat([new_q_x, new_q_y, new_q_z, new_q_w], dim=len(new_q_w.shape) - 1)
-        new_q = torch.where(torch.abs(sin_half_theta) < 0.001, 0.5 * q0 + 0.5 * q1, new_q)
+        new_q = torch.where(torch.abs(sin_half_theta) < 0.001, (1 - blend) * q0 + blend * q1, new_q)
         new_q = torch.where(torch.abs(cos_half_theta) >= 1, q0, new_q)
-        return new_q
+        return torch.nn.functional.normalize(new_q, dim=-1)
 
     def _compute_frame_blend(self, times: np.ndarray) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
         """Compute the indexes of the first and second values, as well as the blending time
@@ -178,10 +179,11 @@ class MotionLoader:
         Returns:
             First value indexes, Second value indexes, and blending time between 0 (first value) and 1 (second value).
         """
-        phase = np.clip(times / self.duration, 0.0, 1.0)
-        index_0 = (phase * (self.num_frames - 1)).round(decimals=0).astype(int)
+        times = np.clip(times, 0.0, self.duration)
+        frame = times / self.dt
+        index_0 = np.floor(frame).astype(int)
         index_1 = np.minimum(index_0 + 1, self.num_frames - 1)
-        blend = ((times - index_0 * self.dt) / self.dt).round(decimals=5)
+        blend = frame - index_0
         return index_0, index_1, blend
 
     def sample_times(self, num_samples: int, duration: float | None = None) -> np.ndarray:
@@ -289,7 +291,7 @@ class MotionLoader:
         orig_dt = self.dt
         orig_times = np.arange(orig_num_frames) * orig_dt
         target_num_frames = int(self.duration / target_dt) + 1
-        target_times = np.linspace(0, self.duration, target_num_frames)
+        target_times = np.arange(target_num_frames) * target_dt
 
         def interp_tensor(data, kind="linear"):
             data_np = data.cpu().numpy()

@@ -1,7 +1,7 @@
 # Copyright (c) 2024-2026 Ziqi Fan
 # SPDX-License-Identifier: Apache-2.0
 
-from isaaclab.utils import configclass
+from isaaclab.utils import configclass, replace
 
 from robot_lab.tasks.manager_based.locomotion.velocity.velocity_env_cfg import LocomotionVelocityRoughEnvCfg
 
@@ -22,8 +22,8 @@ class AnymalDRoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         # Keep the learned actuator network on its Lab execution path; it has no PD gains.
         self.sim.use_newton_actuators = False
 
-        # ------------------------------Sence------------------------------
-        self.scene.robot = ANYMAL_D_CFG.replace(prim_path="{ENV_REGEX_NS}/Robot")
+        # ------------------------------Scene------------------------------
+        self.scene.robot = replace(ANYMAL_D_CFG, prim_path="{ENV_REGEX_NS}/Robot")
         self.scene.height_scanner.prim_path = "{ENV_REGEX_NS}/Robot/base"
         self.scene.height_scanner.spawn = None
         self.scene.height_scanner_base.prim_path = "{ENV_REGEX_NS}/Robot/base"

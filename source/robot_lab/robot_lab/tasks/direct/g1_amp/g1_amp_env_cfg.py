@@ -20,7 +20,7 @@ from isaaclab.assets import ArticulationCfg, AssetBaseCfg
 from isaaclab.envs import DirectRLEnvCfg
 from isaaclab.scene import InteractiveSceneCfg
 from isaaclab.sim import SimulationCfg
-from isaaclab.utils import configclass
+from isaaclab.utils import configclass, replace
 
 from robot_lab.assets.unitree import UNITREE_G1_29DOF_CFG
 
@@ -31,7 +31,7 @@ MOTIONS_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "motions"
 class G1AmpSceneCfg(InteractiveSceneCfg):
     """Declarative robot, ground and lighting for the G1 AMP scene."""
 
-    robot: ArticulationCfg = UNITREE_G1_29DOF_CFG.replace(prim_path="{ENV_REGEX_NS}/Robot")
+    robot: ArticulationCfg = replace(UNITREE_G1_29DOF_CFG, prim_path="{ENV_REGEX_NS}/Robot")
     ground = AssetBaseCfg(
         prim_path="/World/ground",
         collision_group=-1,

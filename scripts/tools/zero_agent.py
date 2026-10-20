@@ -3,15 +3,20 @@
 
 """Run the Isaac Lab 3.0 zero-action agent with robot_lab tasks registered."""
 
+import sys
 
-def main() -> int:
-    import sys
+import warp as wp
 
-    import robot_lab.tasks  # noqa: F401
+wp.config.enable_backward = False
 
-    from isaaclab_rl.entrypoints import run_zero_agent_cli
+from isaaclab_rl.entrypoints import run_zero_agent_cli  # noqa: E402
 
-    args = list(sys.argv[1:])
+import robot_lab.tasks  # noqa: F401  # isort: skip
+
+
+def main(argv: list[str] | None = None) -> int:
+    """Run an environment with a zero-action agent."""
+    args = list(sys.argv[1:] if argv is None else argv)
     if "--headless" in args:
         args.remove("--headless")
         if not any(arg in ("--viz", "--visualizer") or arg.startswith(("--viz=", "--visualizer=")) for arg in args):

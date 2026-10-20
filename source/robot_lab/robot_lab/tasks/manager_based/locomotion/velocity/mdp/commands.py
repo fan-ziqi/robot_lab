@@ -157,15 +157,11 @@ class DiscreteCommandController(CommandTerm):
         """Update metrics for the command controller."""
         pass
 
-    def _resample_command(self, env_ids: Sequence[int]):
-        """Resample commands for the given environments."""
-        sampled_indices = torch.randint(
-            len(self.available_commands), (len(env_ids),), dtype=torch.int32, device=self.device
-        )
-        sampled_commands = torch.tensor(
-            [self.available_commands[idx.item()] for idx in sampled_indices], dtype=torch.int32, device=self.device
-        )
-        self.command_buffer[env_ids] = sampled_commands
+    def _resample_command(self, env_ids: Sequence[int] | slice):
+        commands = torch.tensor(self.available_commands, dtype=torch.int32, device=self.device)
+        count = self.command_buffer[env_ids].shape[0]
+        indices = torch.randint(len(self.available_commands), (count,), device=self.device)
+        self.command_buffer[env_ids] = commands[indices]
 
     def _update_command(self):
         """Update and store the current commands."""

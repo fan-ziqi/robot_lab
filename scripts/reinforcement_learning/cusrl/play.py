@@ -3,17 +3,22 @@
 
 """Script to play a checkpoint if an RL agent from CusRL."""
 
-"""Launch Isaac Sim Simulator first."""
-
 import argparse
 import os
 import sys
+from dataclasses import replace
 
 import warp as wp
 
 wp.config.enable_backward = False
 
-from isaaclab.app import AppLauncher
+from isaaclab.app import add_launcher_args, launch_simulation
+
+from isaaclab_rl.entrypoints.common import apply_video_recording, pre_launch_video_config
+
+from isaaclab_tasks.utils import resolve_task_config, setup_preset_cli
+
+import robot_lab.tasks  # noqa: F401  # isort: skip
 
 
 # add argparse arguments
@@ -49,11 +54,11 @@ parser.add_argument(
 )
 parser.add_argument("--keyboard", action="store_true", default=False, help="Whether to use keyboard.")
 
-# append AppLauncher cli args
+# append simulation launcher cli args
 parser.add_argument("--headless", action="store_true", help="Run without a viewer (alias for --viz none).")
-AppLauncher.add_app_launcher_args(parser)
+add_launcher_args(parser)
 # parse the arguments
-args_cli, hydra_args = parser.parse_known_args()
+args_cli, hydra_args = setup_preset_cli(parser)
 if args_cli.headless and args_cli.visualizer is None:
     args_cli.visualizer = ["none"]
 # always enable cameras to record video
@@ -65,10 +70,6 @@ if args_cli.video:
 # clear out sys.argv for Hydra
 sys.argv = [sys.argv[0]] + hydra_args
 
-# launch omniverse app
-app_launcher = AppLauncher(args_cli)
-simulation_app = app_launcher.app
-
 """Rest everything follows."""
 
 import cusrl
@@ -76,20 +77,13 @@ import gymnasium as gym
 import torch
 from cusrl.environment.isaaclab import TrainerCfg
 
-from isaaclab.devices import Se2Keyboard, Se2KeyboardCfg
 from isaaclab.envs import (
-    DirectMARLEnv,
     DirectMARLEnvCfg,  # noqa: F401
     DirectRLEnvCfg,  # noqa: F401
     ManagerBasedRLEnvCfg,  # noqa: F401
-    VideoRecorderCfg,
     multi_agent_to_single_agent,
 )
 from isaaclab.managers import ObservationTermCfg as ObsTerm
-
-from isaaclab_tasks.utils import resolve_task_config
-
-import robot_lab.tasks  # noqa: F401  # isort: skip
 
 # local imports
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
@@ -97,7 +91,7 @@ from rl_utils import camera_follow
 
 
 class CameraFollowPlayerHook(cusrl.Player.Hook):
-    def step(self, step: int, transition: dict, metrics: dict):
+    def step(self, step: int, transition: dict):
         camera_follow(self.player.environment)
 
 
@@ -107,15 +101,19 @@ class PlaybackStepCounter(cusrl.Player.Hook):
     def __init__(self):
         self.completed_steps = 0
 
-    def step(self, step: int, transition: dict, metrics: dict):
+    def step(self, step: int, transition: dict):
         self.completed_steps += 1
 
 
 def main(env_cfg: ManagerBasedRLEnvCfg | DirectRLEnvCfg | DirectMARLEnvCfg, agent_cfg: TrainerCfg):
     """Play with CusRL-RL agent."""
+    from isaaclab.envs import DirectMARLEnv
+
     # set the environment seed
     # note: certain randomizations occur in the environment initialization so we set the seed here
     cusrl.set_global_seed(args_cli.seed)
+    if args_cli.seed is not None:
+        env_cfg.seed = args_cli.seed
 
     # modify environment configurations based on CLI args
     env_cfg.scene.num_envs = args_cli.num_envs if args_cli.num_envs is not None else 50
@@ -134,11 +132,13 @@ def main(env_cfg: ManagerBasedRLEnvCfg | DirectRLEnvCfg | DirectMARLEnvCfg, agen
     env_cfg.observations.policy.enable_corruption = False
     # remove random pushing
     env_cfg.events.randomize_apply_external_force_torque = None
-    env_cfg.events.push_robot = None
+    env_cfg.events.randomize_push_robot = None
     env_cfg.curriculum.command_levels_lin_vel = None
     env_cfg.curriculum.command_levels_ang_vel = None
 
     if args_cli.keyboard:
+        from isaaclab.devices import Se2Keyboard, Se2KeyboardCfg
+
         env_cfg.scene.num_envs = 1
         env_cfg.terminations.time_out = None
         env_cfg.commands.base_velocity.debug_vis = False
@@ -164,14 +164,7 @@ def main(env_cfg: ManagerBasedRLEnvCfg | DirectRLEnvCfg | DirectMARLEnvCfg, agen
 
     # Configure recording before the environment creates its recorder manager.
     if args_cli.video:
-        env_cfg.video_recorders = [
-            VideoRecorderCfg(
-                source="visualizer:kit",
-                output_dir=os.path.join(log_dir, "videos", "play"),
-                video_length=args_cli.video_length,
-                video_interval=0,
-            )
-        ]
+        apply_video_recording(env_cfg, log_dir, args_cli, subdir="play")
 
     # create isaac environment
     env = gym.make(args_cli.task, cfg=env_cfg)
@@ -183,7 +176,7 @@ def main(env_cfg: ManagerBasedRLEnvCfg | DirectRLEnvCfg | DirectMARLEnvCfg, agen
     # create player from cusrl
     player = cusrl.Player(
         environment=cusrl.environment.IsaacLabEnvAdapter(env),
-        agent=agent_cfg.agent_factory.override(device=args_cli.device),
+        agent=replace(agent_cfg.agent_factory, device=env.unwrapped.device),
         checkpoint_path=trial,
         deterministic=not args_cli.stochastic,
         num_steps=args_cli.max_steps,
@@ -211,7 +204,8 @@ def main(env_cfg: ManagerBasedRLEnvCfg | DirectRLEnvCfg | DirectMARLEnvCfg, agen
 
 
 if __name__ == "__main__":
-    # run the main function
-    main(*resolve_task_config(args_cli.task, args_cli.agent, overrides=hydra_args))
-    # close sim app
-    simulation_app.close()
+    env_cfg, agent_cfg = resolve_task_config(args_cli.task, args_cli.agent, overrides=hydra_args, play_mode=True)
+    args_cli.require_kit = args_cli.keyboard
+    pre_launch_video_config(env_cfg, args_cli)
+    with launch_simulation(env_cfg, args_cli):
+        main(env_cfg, agent_cfg)

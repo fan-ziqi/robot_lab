@@ -4,164 +4,82 @@
 # Copyright (c) 2025 Linden
 # SPDX-License-Identifier: BSD 3-Clause
 
-"""
-Motion Replayer for G1 Humanoid Robot
-
-This script replays motion data for the G1 humanoid robot in Isaac Sim.
-
-Usage:
-    python motion_replayer.py [options]
-
-Options:
-    --motion MOTION_FILE    Motion data file to replay (default: G1_dance.npz)
-    --device DEVICE       Device to run simulation on (default: cuda:0)
-
-Example:
-    # Replay a motion file
-    python motion_replayer.py --motion G1_dance.npz
-"""
-
-import os
-import sys
-
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+"""Replay a G1 AMP motion archive using the Isaac Lab simulation launcher."""
 
 import argparse
-
-from isaaclab.app import AppLauncher
-
-# Command line arguments
-parser = argparse.ArgumentParser()
-parser.add_argument("--headless", action="store_true", help="Run without a visualizer unless --viz is explicit.")
-AppLauncher.add_app_launcher_args(parser)
-parser.add_argument("--motion", type=str, default="g1_dance.npz")
-args_cli = parser.parse_args()
-if args_cli.headless and not args_cli.visualizer:
-    args_cli.visualizer = ["none"]
-
-# Launch Isaac Sim
-app_launcher = AppLauncher(args_cli)
-simulation_app = app_launcher.app
+from pathlib import Path
 
 import torch
-from isaaclab_physx.physics import PhysxCfg
-from motion_loader import MotionLoader
+import warp as wp
 
-import isaaclab.sim as sim_utils
-from isaaclab.scene import InteractiveScene, InteractiveSceneCfg
+wp.config.enable_backward = False
+
+from isaaclab_physx.physics import PhysxCfg
+
+from isaaclab.app import add_launcher_args, launch_simulation
+from isaaclab.assets import AssetBaseCfg
+from isaaclab.scene import InteractiveSceneCfg
+from isaaclab.sim import DomeLightCfg, GroundPlaneCfg, SimulationCfg
+from isaaclab.utils import configclass, replace
 
 from robot_lab.assets.unitree import UNITREE_G1_29DOF_CFG
-
-# Load motion data and get dt
-motion = MotionLoader(args_cli.motion, device=args_cli.device)
-motion.resample(0.005, kind="linear")
-num_frames = motion.num_frames
-print(f"motion.dt: {motion.dt}")
-print(f"motion.num_frames: {motion.num_frames}")
-
-# Find the index for the root body, typically 'pelvis'
-try:
-    print(f"Searching for 'pelvis' in the following list of body names: {motion.body_names}")
-    root_idx = motion.body_names.index("pelvis")
-    print(f"Found root body 'pelvis' at index: {root_idx}")
-except (ValueError, AttributeError):
-    print("\nError: Could not find 'pelvis' in the motion file's body_names.")
-    print("The motion replayer requires 'pelvis' to be defined as the root body.")
-    simulation_app.close()
-    sys.exit(1)
-
-# Configure simulation with dt matching motion.dt
+from robot_lab.tasks.direct.g1_amp.motions.motion_loader import MotionLoader
 
 
-sim_cfg = sim_utils.SimulationCfg(
-    dt=motion.dt,
-    device=args_cli.device,
-    gravity=(0.0, 0.0, -9.81),  # Explicitly set gravity
-    render_interval=1,  # Render every physics step
-    enable_scene_query_support=True,
-    use_fabric=True,
-    physics=PhysxCfg(
-        solver_type=1,  # TGS solver
-        min_position_iteration_count=8,  # Increase solver iterations
-        max_position_iteration_count=8,
-        min_velocity_iteration_count=4,  # Add velocity iterations
-        max_velocity_iteration_count=4,
-        enable_ccd=True,  # Enable continuous collision detection
-        enable_stabilization=True,  # Enable additional stabilization
-        bounce_threshold_velocity=0.2,  # Lower threshold for more stable contacts
-        friction_offset_threshold=0.04,  # Increase friction threshold
-        friction_correlation_distance=0.025,  # Increase correlation distance
-    ),
-)
-sim = sim_utils.SimulationContext(sim_cfg)
-sim.set_camera_view([3.0, 3.0, 3.0], [0.0, 0.0, 0.0])
+@configclass
+class MotionReplaySceneCfg(InteractiveSceneCfg):
+    """Robot, ground and lighting for motion playback."""
 
-# Configure scene
-scene_cfg = InteractiveSceneCfg(num_envs=1, env_spacing=2.0)
-scene_cfg.robot = UNITREE_G1_29DOF_CFG.replace(prim_path="/World/Robot")
-scene = InteractiveScene(scene_cfg)
+    robot = replace(UNITREE_G1_29DOF_CFG, prim_path="{ENV_REGEX_NS}/Robot")
+    ground = AssetBaseCfg(
+        prim_path="/World/ground",
+        init_state=AssetBaseCfg.InitialStateCfg(pos=(0.0, 0.0, -0.5)),
+        spawn=GroundPlaneCfg(color=(0.0, 0.0, 0.0)),
+    )
+    light = AssetBaseCfg(prim_path="/World/Light", spawn=DomeLightCfg(intensity=2000.0))
 
-# Add DomeLight for illumination
-light_cfg = sim_utils.DomeLightCfg(intensity=2000.0, color=(0.75, 0.75, 0.75))
-light_cfg.func("/World/Light", light_cfg)
 
-# Add black ground plane at -0.5m
-ground_cfg = sim_utils.GroundPlaneCfg(color=(0.0, 0.0, -0.5))
-# ground_cfg.func("/World/ground", ground_cfg)
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--motion", default=str(Path(__file__).with_name("g1_dance1_subject2_30.npz")))
+    parser.add_argument(
+        "--max_steps", type=int, default=0, help="Stop after this many frames; zero replays indefinitely."
+    )
+    add_launcher_args(parser)
+    args = parser.parse_args()
+    motion = MotionLoader(args.motion, device=args.device)
+    motion.resample(0.005)
+    root_id = motion.get_body_index(["pelvis"])[0]
+    sim_cfg = SimulationCfg(dt=motion.dt, device=args.device, physics=PhysxCfg())
+    with launch_simulation(sim_cfg, args):
+        import isaaclab.sim as sim_utils
+        from isaaclab.scene import InteractiveScene
 
-ground_cfg.func(
-    "/World/ground",
-    ground_cfg,
-    translation=(0.0, 0.0, -0.5),  # 这里是 (x, y, z)
-)
-# Reset simulation
-sim.reset()
-scene.reset()
-
-robot = scene["robot"]
-# Align joint order from motion file to robot's joint order
-motion_dof_indices = motion.get_dof_index(robot.joint_names)
-
-print("\nStarting G1 motion replay loop...")
-print("Tip: Close window or press Ctrl+C to exit")
-
-try:
-    # Continue motion replay loop
-    while simulation_app.is_running():
-        for i in range(num_frames):
-            if not simulation_app.is_running():
-                break
-
-            # Get current frame's joint and root states (aligned order!)
-            joint_pos = motion.dof_positions[i, motion_dof_indices].unsqueeze(0)
-            joint_vel = motion.dof_velocities[i, motion_dof_indices].unsqueeze(0)
-            root_pos = motion.body_positions[i, root_idx].unsqueeze(0)
-            root_rot = motion.body_rotations[i, root_idx].unsqueeze(0)
-            root_vel = motion.body_linear_velocities[i, root_idx].unsqueeze(0)
-            root_ang_vel = motion.body_angular_velocities[i, root_idx].unsqueeze(0)
-            root_state = torch.cat([root_pos, root_rot, root_vel, root_ang_vel], dim=-1)
-
-            # Write to simulation
-            robot.write_root_link_pose_to_sim_index(
-                root_pose=root_state[:, :7], env_ids=torch.tensor([0], device=args_cli.device)
+        sim = sim_utils.SimulationContext(sim_cfg)
+        sim.set_camera_view([3.0, 3.0, 3.0], [0.0, 0.0, 0.0])
+        scene = InteractiveScene(MotionReplaySceneCfg(num_envs=1, env_spacing=2.0))
+        sim.reset()
+        scene.reset()
+        robot = scene["robot"]
+        joint_ids = motion.get_dof_index(robot.joint_names)
+        step = 0
+        while sim.is_running() and (args.max_steps == 0 or step < args.max_steps):
+            frame = step % motion.num_frames
+            root_pose = torch.cat((motion.body_positions[frame, root_id], motion.body_rotations[frame, root_id]))
+            root_velocity = torch.cat(
+                (motion.body_linear_velocities[frame, root_id], motion.body_angular_velocities[frame, root_id])
             )
-            robot.write_root_com_velocity_to_sim_index(
-                root_velocity=root_state[:, 7:], env_ids=torch.tensor([0], device=args_cli.device)
-            )
+            robot.write_root_link_pose_to_sim_index(root_pose=root_pose.unsqueeze(0))
+            robot.write_root_link_velocity_to_sim_index(root_velocity=root_velocity.unsqueeze(0))
             robot.write_joint_state_to_sim_index(
-                position=joint_pos,
-                velocity=joint_vel,
-                joint_ids=None,
-                env_ids=torch.tensor([0], device=args_cli.device),
+                position=motion.dof_positions[frame, joint_ids].unsqueeze(0),
+                velocity=motion.dof_velocities[frame, joint_ids].unsqueeze(0),
             )
-
-            # Step simulation (strict dt synchronization)
-            scene.update(dt=sim.get_physics_dt())
             scene.write_data_to_sim()
-            sim.step(render=True)
+            sim.render()
+            scene.update(sim_cfg.dt)
+            step += 1
 
-except KeyboardInterrupt:
-    print("\nProgram interrupted by user")
 
-finally:
-    simulation_app.close()
+if __name__ == "__main__":
+    main()

@@ -1,7 +1,7 @@
 # Copyright (c) 2024-2026 Ziqi Fan
 # SPDX-License-Identifier: Apache-2.0
 
-from isaaclab.utils import configclass
+from isaaclab.utils import configclass, replace
 
 import isaaclab_tasks.core.velocity.mdp as mdp
 
@@ -23,7 +23,7 @@ class RobotEraXbotRoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         super().__post_init__()
 
         # -------------------------------Scene-------------------------------
-        self.scene.robot = ROBOTERA_XBOT_CFG.replace(prim_path="{ENV_REGEX_NS}/Robot")
+        self.scene.robot = replace(ROBOTERA_XBOT_CFG, prim_path="{ENV_REGEX_NS}/Robot")
         self.scene.height_scanner.prim_path = "{ENV_REGEX_NS}/Robot/Geometry/base"
         self.scene.height_scanner.spawn = None
         self.scene.height_scanner_base.prim_path = "{ENV_REGEX_NS}/Robot/Geometry/base"

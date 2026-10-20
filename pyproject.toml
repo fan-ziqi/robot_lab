@@ -3,6 +3,95 @@
 #
 # SPDX-License-Identifier: BSD-3-Clause
 
+[build-system]
+requires = ["uv_build>=0.12.6,<0.13"]
+build-backend = "uv_build"
+
+[project]
+name = "robot_lab"
+version = "3.0.0"
+description = "Robot learning environments extending Isaac Lab."
+readme = "README.md"
+license = { file = "LICENSE" }
+authors = [
+    { name = "Ziqi Fan" },
+]
+requires-python = ">=3.12,<3.13"
+dependencies = [
+    "isaaclab-dev",
+]
+
+[project.entry-points."isaaclab.tasks"]
+robot_lab = "robot_lab.tasks"
+
+[project.optional-dependencies]
+importers = ["isaaclab-dev[importers]"]
+isaacsim = ["isaaclab-dev[isaacsim]"]
+ov = ["isaaclab-dev[ov]"]
+ovphysx = ["isaaclab-dev[ovphysx]"]
+ovrtx = ["isaaclab-dev[ovrtx]"]
+rerun = ["isaaclab-dev[rerun]"]
+rsl-rl = ["isaaclab-dev[rsl-rl]"]
+skrl = ["isaaclab-dev[skrl]"]
+video = ["isaaclab-dev[video]"]
+viser = ["isaaclab-dev[viser]"]
+wandb = ["isaaclab-dev[wandb]"]
+cusrl = ["cusrl[all]>=1.2.2,<2.0"]
+motion = ["pandas", "pin", "xacrodoc"]
+
+[dependency-groups]
+dev = ["codespell==2.4.1", "pre-commit>=4.2", "pytest>=8.3", "ruff==0.14.10"]
+
+[tool.uv]
+index-strategy = "unsafe-best-match"
+prerelease = "allow"
+environments = [
+    "sys_platform == 'linux' and platform_machine == 'x86_64'",
+    "sys_platform == 'linux' and platform_machine == 'aarch64'",
+    "sys_platform == 'win32' and platform_machine == 'AMD64'",
+]
+override-dependencies = [
+    "numpy>=2",
+    "mujoco~=3.12.0",
+    "mujoco-warp~=3.12.0",
+    "newton[sim]==1.6.1",
+    "newton-usd-schemas>=0.5.0",
+    "usd-exchange==3.0.1",
+    "usd-optimize~=1.3.1",
+    "torch==2.11.0",
+    "torchvision==0.26.0",
+    "fsspec>=2026.6.0",
+    "packaging>=20,<27",
+    "urllib3>=2.8.0",
+]
+
+[tool.uv.sources]
+"isaaclab" = { path = "../IsaacLab/source/isaaclab", editable = true }
+"isaaclab-assets" = { path = "../IsaacLab/source/isaaclab_assets", editable = true }
+"isaaclab-contrib" = { path = "../IsaacLab/source/isaaclab_contrib", editable = true }
+"isaaclab-dev" = { path = "../IsaacLab", editable = true }
+"isaaclab-experimental" = { path = "../IsaacLab/source/isaaclab_experimental", editable = true }
+"isaaclab-mimic" = { path = "../IsaacLab/source/isaaclab_mimic", editable = true }
+"isaaclab-newton" = { path = "../IsaacLab/source/isaaclab_newton", editable = true }
+"isaaclab-ov" = { path = "../IsaacLab/source/isaaclab_ov", editable = true }
+"isaaclab-physx" = { path = "../IsaacLab/source/isaaclab_physx", editable = true }
+"isaaclab-ppisp" = { path = "../IsaacLab/source/isaaclab_ppisp", editable = true }
+"isaaclab-rl" = { path = "../IsaacLab/source/isaaclab_rl", editable = true }
+"isaaclab-tasks" = { path = "../IsaacLab/source/isaaclab_tasks", editable = true }
+"isaaclab-tasks-experimental" = { path = "../IsaacLab/source/isaaclab_tasks_experimental", editable = true }
+"isaaclab-teleop" = { path = "../IsaacLab/source/isaaclab_teleop", editable = true }
+"isaaclab-visualizers" = { path = "../IsaacLab/source/isaaclab_visualizers", editable = true }
+"omniverseclient" = { index = "pypi-public" }
+"ovphysx" = { index = "pypi-public" }
+"ovrtx" = { index = "pypi-public" }
+"ovstage" = { index = "pypi-public" }
+"torch" = { index = "pytorch-cu130" }
+"torchvision" = { index = "pytorch-cu130" }
+
+[tool.uv.build-backend]
+module-name = "robot_lab"
+module-root = "source/robot_lab"
+
 [tool.ruff]
 line-length = 120
 target-version = "py312"
@@ -10,14 +99,18 @@ target-version = "py312"
 # Exclude directories
 extend-exclude = [
     "logs",
-    "_isaac_sim",
+    "outputs",
+    "_isaac_sim*",
     ".vscode",
-    "_*",
     ".git",
+    "_build",
+    "_repo",
+    "source/robot_lab/robot_lab/assets/data",
+    "source/robot_lab/robot_lab/third_party",
 ]
 
 [tool.ruff.lint]
-# Enable flake8 rules and other useful ones
+# Use Isaac Lab's lint rule set.
 select = [
     "E",      # pycodestyle errors
     "W",      # pycodestyle warnings
@@ -30,7 +123,7 @@ select = [
     "RET",    # flake8-return
 ]
 
-# Ignore specific rules (matching your flake8 config)
+# Keep the exceptions used by Isaac Lab.
 ignore = [
     "E402",   # Module level import not at top of file
     "D401",   # First line should be in imperative mood
@@ -46,7 +139,8 @@ ignore = [
 ]
 
 [tool.ruff.lint.per-file-ignores]
-"__init__.py" = ["F401"]  # Allow unused imports in __init__.py files
+"**/__init__.py" = ["F401", "F403"]  # Allow package re-exports.
+"**/__init__.pyi" = ["F401", "F403"]
 
 [tool.ruff.lint.mccabe]
 max-complexity = 30
@@ -55,6 +149,8 @@ max-complexity = 30
 convention = "google"
 
 [tool.ruff.lint.isort]
+
+known-first-party = ["robot_lab"]
 
 # Custom import sections with separate sections for each Isaac Lab extension
 section-order = [
@@ -112,13 +208,15 @@ exclude = [
     ".vscode",
 ]
 
+# Resolve the extension from this checkout without machine-specific paths.
+extraPaths = ["source/robot_lab"]
+
 typeCheckingMode = "basic"
 pythonVersion = "3.12"
 pythonPlatform = "Linux"
 enableTypeIgnoreComments = true
 
-# This is required as the CI pre-commit does not download the module (i.e. numpy, torch, prettytable)
-# Therefore, we have to ignore missing imports
+# CI pre-commit does not install runtime dependencies (numpy, torch, ...).
 reportMissingImports = "none"
 # This is required to ignore for type checks of modules with stubs missing.
 reportMissingModuleSource = "none" # -> most common: prettytable in mdp managers
@@ -128,15 +226,26 @@ reportOptionalMemberAccess = "warning" # -> raises 8 errors
 reportPrivateUsage = "warning"
 
 
-[tool.codespell]
-skip = '*.usd,*.usda,*.usdz,*.svg,*.png,_isaac_sim*,*.bib,*.css,*/_build'
-quiet-level = 0
-# the world list should always have words in lower case
-ignore-words-list = "haa,slq,collapsable,buss,reacher,thirdparty"
-
-
 [tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra"
 
-markers = [
-    "isaacsim_ci: mark test to run in isaacsim ci",
-]
+[tool.codespell]
+skip = '*.usd,*.usda,*.usdc,*.usdz,*.svg,*.png,*.json,*.onnx,*.pt,*.mp4,*.data,*.bib,*.css,uv.lock,_isaac_sim*,*/_build,logs,outputs,source/robot_lab/robot_lab/assets/data,source/robot_lab/robot_lab/third_party'
+quiet-level = 0
+# The word list should always have words in lower case.
+ignore-words-list = "haa,slq,collapsable,buss,reacher,thirdparty,lamda"
+
+[[tool.uv.index]]
+url = "https://pypi.nvidia.com"
+explicit = false
+
+[[tool.uv.index]]
+name = "pypi-public"
+url = "https://pypi.org/simple"
+explicit = true
+
+[[tool.uv.index]]
+name = "pytorch-cu130"
+url = "https://download.pytorch.org/whl/cu130"
+explicit = true

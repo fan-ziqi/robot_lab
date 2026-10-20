@@ -44,7 +44,7 @@ memory:
   memory_size: -1  # automatically determined (same as agent:rollouts)
 
 
-# PPO agent configuration (field names are from PPO_DEFAULT_CONFIG)
+# PPO agent configuration (field names are from PPO_CFG)
 # https://skrl.readthedocs.io/en/latest/api/agents/ppo.html
 agent:
   class: PPO
@@ -52,13 +52,13 @@ agent:
   learning_epochs: 5
   mini_batches: 4
   discount_factor: 0.99
-  lambda: 0.95
+  gae_lambda: 0.95
   learning_rate: 1.0e-03
   learning_rate_scheduler: KLAdaptiveLR
   learning_rate_scheduler_kwargs:
     kl_threshold: 0.01
-  state_preprocessor: null
-  state_preprocessor_kwargs: null
+  observation_preprocessor: null
+  observation_preprocessor_kwargs: null
   value_preprocessor: null
   value_preprocessor_kwargs: null
   random_timesteps: 0
@@ -66,7 +66,6 @@ agent:
   grad_norm_clip: 1.0
   ratio_clip: 0.2
   value_clip: 0.2
-  clip_predicted_values: True
   entropy_loss_scale: 0.01
   value_loss_scale: 1.0
   kl_threshold: 0.0

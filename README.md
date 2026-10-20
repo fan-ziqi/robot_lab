@@ -1,6 +1,6 @@
 # robot_lab
 
-[![IsaacSim](https://img.shields.io/badge/IsaacSim-5.1.0-silver.svg)](https://docs.omniverse.nvidia.com/isaacsim/latest/overview.html)
+[![IsaacSim](https://img.shields.io/badge/IsaacSim-6.2%20(optional)-silver.svg)](https://docs.omniverse.nvidia.com/isaacsim/latest/overview.html)
 [![Isaac Lab](https://img.shields.io/badge/IsaacLab-3.0.0-silver)](https://isaac-sim.github.io/IsaacLab)
 [![Python](https://img.shields.io/badge/python-3.12-blue.svg)](https://docs.python.org/3/whatsnew/3.12.html)
 [![Linux platform](https://img.shields.io/badge/platform-linux--64-orange.svg)](https://releases.ubuntu.com/22.04/)
@@ -12,7 +12,7 @@
 
 **robot_lab** is a RL extension library for robots, based on IsaacLab. It allows you to develop in an isolated environment, outside of the core Isaac Lab repository.
 
-The table below lists all available environments:
+The table below lists representative environments. Use `isaaclab list_envs` for all task IDs and agent configurations:
 
 | Category   | Robot Model         | Environment Name (<ENV_NAME>)                                      | Screenshot |
 |------------|---------------------|------------------------------------------------------------|------------|
@@ -50,7 +50,7 @@ The table below lists all available environments:
 
 | robot_lab Version | Isaac Lab Version             | Isaac Sim Version         |
 |------------------ | ----------------------------- | ------------------------- |
-| `main` branch     | `v3.0.0`                      | Isaac Sim 6.1             |
+| `main` branch     | `v3.0.0`                      | Isaac Sim 6.2 (optional for Newton) |
 | `v2.3.2`          | `v2.3.2`                      | Isaac Sim 4.5 / 5.0 / 5.1 |
 | `v2.2.2`          | `v2.2.1`                      | Isaac Sim 4.5 / 5.0       |
 | `v2.1.1`          | `v2.1.1`                      | Isaac Sim 4.5             |
@@ -58,400 +58,210 @@ The table below lists all available environments:
 
 ## Installation
 
-- Install Isaac Lab 3.0 by following the [installation guide](https://isaac-sim.github.io/IsaacLab/main/source/setup/installation/index.html). Isaac Lab 3.0 requires Python 3.12. For Isaac Lab 2.x, use the `v2.3.2` tag of this repository.
+Use Python 3.12 and [uv](https://docs.astral.sh/uv/). This source project follows Isaac Lab's
+external-project template and expects an Isaac Lab **v3.0.0** checkout beside it:
 
-- Clone this repository separately from the Isaac Lab installation (i.e. outside the `IsaacLab` directory):
-
-  ```bash
-  git clone https://github.com/fan-ziqi/robot_lab.git
-  ```
-
-- Using a python interpreter that has Isaac Lab installed, install the library
-
-  ```bash
-  python -m pip install -e source/robot_lab
-  # or, for uv-managed Isaac Lab environments
-  uv pip install -e source/robot_lab
-  ```
-
-- Verify that the extension is correctly installed by running the following command to print all the available environments in the extension:
-
-  ```bash
-  python scripts/tools/list_envs.py
-  ```
-
-> [!NOTE]
-> The RSL-RL and skrl scripts use the unified Isaac Lab 3.0 entry points: resume training or select a checkpoint for playback with `--checkpoint /path/to/model.pt`, and use `--viz kit` to open the viewer (`--headless --viz kit --video` records videos). `skrl` and `cusrl` are optional and only need to be installed for their respective scripts.
-
-<details>
-
-<summary>Set up IDE (Optional, click to expand)</summary>
-
-To setup the IDE, please follow these instructions:
-
-- Run VSCode Tasks, by pressing `Ctrl+Shift+P`, selecting `Tasks: Run Task` and running the `setup_python_env` in the drop down menu. When running this task, you will be prompted to add the absolute path to your Isaac Sim installation.
-
-If everything executes correctly, it should create a file .python.env in the `.vscode` directory. The file contains the python paths to all the extensions provided by Isaac Sim and Omniverse. This helps in indexing all the python modules for intelligent suggestions while writing code.
-
-</details>
-
-<details>
-
-<summary>Setup as Omniverse Extension (Optional, click to expand)</summary>
-
-We provide an example UI extension that will load upon enabling your extension defined in `source/robot_lab/robot_lab/ui_extension_example.py`.
-
-To enable your extension, follow these steps:
-
-1. **Add the search path of your repository** to the extension manager:
-    - Navigate to the extension manager using `Window` -> `Extensions`.
-    - Click on the **Hamburger Icon** (☰), then go to `Settings`.
-    - In the `Extension Search Paths`, enter the absolute path to `robot_lab/source`
-    - If not already present, in the `Extension Search Paths`, enter the path that leads to Isaac Lab's extension directory directory (`IsaacLab/source`)
-    - Click on the **Hamburger Icon** (☰), then click `Refresh`.
-
-2. **Search and enable your extension**:
-    - Find your extension under the `Third Party` category.
-    - Toggle it to enable your extension.
-
-</details>
-
-## Docker setup
-
-<details>
-
-<summary>Click to expand</summary>
-
-### Building Isaac Lab Base Image
-
-Currently, we don't have the Docker for Isaac Lab publicly available. Hence, you'd need to build the docker image
-for Isaac Lab locally by following the steps [here](https://isaac-sim.github.io/IsaacLab/main/source/deployment/index.html).
-
-Once you have built the base Isaac Lab image, you can check it exists by doing:
-
-```bash
-docker images
-
-# Output should look something like:
-#
-# REPOSITORY                       TAG       IMAGE ID       CREATED          SIZE
-# isaac-lab-base                   latest    28be62af627e   32 minutes ago   18.9GB
+```text
+workspaces/
+├── IsaacLab/     # v3.0.0
+└── robot_lab/
 ```
 
-### Building robot_lab Image
+For a new workspace:
 
-Following above, you can build the docker container for this project. It is called `robot-lab`. However,
-you can modify this name inside the [`docker/docker-compose.yaml`](docker/docker-compose.yaml).
+```bash
+git clone --branch v3.0.0 --depth 1 https://github.com/isaac-sim/IsaacLab.git
+git clone https://github.com/fan-ziqi/robot_lab.git
+cd robot_lab
+uv sync --extra importers
+uv run --extra importers isaaclab list_envs --show_presets
+```
+
+If the checkouts already exist, verify the Isaac Lab version and run `uv sync --extra importers`
+from this repository. Relative source paths are declared in `pyproject.toml`; update them if the
+Isaac Lab directory moves. Commit `uv.lock` with dependency changes.
+
+For an existing, fully provisioned Isaac Lab environment, install only this extension:
+
+```bash
+uv pip install --no-deps -e .
+uv run --active --no-project isaaclab list_envs
+```
+
+### Newton without Isaac Sim
+
+Velocity tasks use Isaac Lab's `RoughPhysicsCfg` and default to Newton MJWarp. The `importers`
+extra provides URDF/MJCF conversion without installing the full Isaac Sim runtime or Kit.
+
+```bash
+uv run --extra importers isaaclab zero_agent --task RobotLab-Isaac-Velocity-Flat-Unitree-Go2-v0 --num_envs 4 --max_steps 100 --viz none physics=newton_mjwarp
+uv run --extra importers isaaclab train --rl_library rsl_rl --task RobotLab-Isaac-Velocity-Flat-Unitree-Go2-v0 --viz none physics=newton_mjwarp
+uv run --extra importers isaaclab play --rl_library rsl_rl --task RobotLab-Isaac-Velocity-Flat-Unitree-Go2-v0 --checkpoint latest --num_envs 4 --viz newton_gl physics=newton_mjwarp
+```
+
+The standalone importer retains the namespace `isaacsim.asset.importer`. It converts assets and
+registers USD schemas without `SimulationApp`. Project initialization imports it before the first
+USD stage is created when standalone importers are available.
+
+### Isaac Sim PhysX
+
+Use a separate environment for Isaac Sim. Its regular `isaacsim` package shadows the standalone
+importer namespace, so URDF import in that environment requires Kit.
+
+```bash
+UV_PROJECT_ENVIRONMENT=.venv-isaacsim uv sync --extra isaacsim
+UV_PROJECT_ENVIRONMENT=.venv-isaacsim uv run --extra isaacsim isaaclab zero_agent --task RobotLab-Isaac-Velocity-Flat-Unitree-Go2-v0 --num_envs 4 --max_steps 100 --viz none physics=isaacsim_physx
+UV_PROJECT_ENVIRONMENT=.venv-isaacsim uv run --extra isaacsim isaaclab train --rl_library rsl_rl --task RobotLab-Isaac-Velocity-Flat-Unitree-Go2-v0 --viz none physics=isaacsim_physx
+UV_PROJECT_ENVIRONMENT=.venv-isaacsim uv run --extra isaacsim isaaclab play --rl_library rsl_rl --task RobotLab-Isaac-Velocity-Flat-Unitree-Go2-v0 --checkpoint latest --num_envs 4 --viz kit physics=isaacsim_physx
+```
+
+When Newton runs in the full Isaac Sim environment, add `--viz kit` for URDF import. USD assets can
+run without Kit unless another selected component requires it. The AMP and BeyondMimic tasks
+currently configure Isaac Sim PhysX directly.
+
+## Train, play and record
+
+Use the upstream CLI and select the RL library with `--rl_library`. RSL-RL is included; install
+`--extra skrl` for tasks with a skrl agent configuration. Select a task and its available libraries
+with `isaaclab list_envs`.
+
+```bash
+# Zero or random actions
+uv run --extra importers isaaclab random_agent --task RobotLab-Isaac-Velocity-Flat-Unitree-Go2-v0 --num_envs 4 --max_steps 100 --viz none physics=newton_mjwarp
+
+# Choose a checkpoint explicitly, or use latest/best
+uv run --extra importers isaaclab play --rl_library rsl_rl --task RobotLab-Isaac-Velocity-Flat-Unitree-Go2-v0 --checkpoint /path/to/model.pt --viz newton_gl physics=newton_mjwarp
+
+# Resume training
+uv run --extra importers isaaclab train --rl_library rsl_rl --task RobotLab-Isaac-Velocity-Flat-Unitree-Go2-v0 --checkpoint /path/to/model.pt --viz none physics=newton_mjwarp
+
+# Record a bounded playback through the selected visualizer
+uv run --extra importers --extra video isaaclab play --rl_library rsl_rl --task RobotLab-Isaac-Velocity-Flat-Unitree-Go2-v0 --checkpoint latest --video --video_length 200 --viz newton_gl physics=newton_mjwarp
+
+# Multiple GPUs
+uv run --extra importers isaaclab train_multigpu --rl_library rsl_rl --task RobotLab-Isaac-Velocity-Flat-Unitree-Go2-v0 --num_gpus 2 --viz none physics=newton_mjwarp
+
+# Training logs
+uv run tensorboard --logdir logs
+```
+
+The scripts under `scripts/reinforcement_learning/train.py`, `play.py`, and the existing `rsl_rl`
+and `skrl` directories delegate to upstream entry points. The compatibility scripts still accept
+`--headless`; new commands use `--viz none`.
+
+### CusRL
+
+CusRL is a project integration and uses its own scripts. Select its extra together with the runtime:
+
+```bash
+uv run --extra importers --extra cusrl python scripts/reinforcement_learning/cusrl/train.py --task RobotLab-Isaac-Velocity-Flat-Unitree-Go2-v0 --viz none physics=newton_mjwarp
+uv run --extra importers --extra cusrl python scripts/reinforcement_learning/cusrl/play.py --task RobotLab-Isaac-Velocity-Flat-Unitree-Go2-v0 --checkpoint /path/to/model.pt --viz newton_gl physics=newton_mjwarp
+```
+
+### Motion tracking and AMP
+
+Acquire the motion data under its original license. Convert retargeted G1 CSV files for BeyondMimic
+with the repository tool, then set the resulting archive in the environment configuration:
+
+```bash
+UV_PROJECT_ENVIRONMENT=.venv-isaacsim uv run --extra isaacsim python scripts/tools/beyondmimic/csv_to_npz.py -f /path/to/motion.csv --input_fps 60 --viz none --exit_after_save
+UV_PROJECT_ENVIRONMENT=.venv-isaacsim uv run --extra isaacsim python scripts/tools/beyondmimic/replay_npz.py -f /path/to/motion.npz --viz kit
+UV_PROJECT_ENVIRONMENT=.venv-isaacsim uv run --extra isaacsim isaaclab train --rl_library rsl_rl --task RobotLab-Isaac-BeyondMimic-Flat-Unitree-G1-v0 --viz none env.commands.motion.motion_file=/path/to/motion.npz
+```
+
+For G1 AMP, use a motion archive containing joint names, body names, positions, rotations and
+velocities. See the [motion format and conversion tools](source/robot_lab/robot_lab/tasks/direct/g1_amp/motions/README.md).
+
+```bash
+UV_PROJECT_ENVIRONMENT=.venv-isaacsim uv run --extra isaacsim --extra skrl isaaclab train --rl_library skrl --task RobotLab-Isaac-G1-AMP-Dance-Direct-v0 --algorithm AMP --viz none
+UV_PROJECT_ENVIRONMENT=.venv-isaacsim uv run --extra isaacsim --extra skrl isaaclab play --rl_library skrl --task RobotLab-Isaac-G1-AMP-Dance-Direct-v0 --algorithm AMP --checkpoint latest --num_envs 4 --viz kit
+```
+
+### Symmetry, distillation and handstand
+
+ANYmal-D registers separate RSL-RL agent configurations for symmetry and distillation:
+
+```bash
+uv run --extra importers isaaclab train --rl_library rsl_rl --task Isaac-Velocity-Flat-Anymal-D-v0 --agent rsl_rl_with_symmetry_cfg_entry_point --viz none physics=newton_mjwarp agent.algorithm.symmetry_cfg.use_data_augmentation=true
+uv run --extra importers isaaclab train --rl_library rsl_rl --task Isaac-Velocity-Flat-Anymal-D-v0 --agent rsl_rl_distillation_cfg_entry_point --checkpoint /path/to/teacher/model.pt --viz none physics=newton_mjwarp
+uv run --extra importers isaaclab train --rl_library rsl_rl --task RobotLab-Isaac-Velocity-Flat-HandStand-Unitree-A1-v0 --viz none physics=newton_mjwarp
+```
+
+For playback in a custom scene, use `scripts/reinforcement_learning/rsl_rl/play_cs.py` with
+`--map /path/to/scene.usd`, the task, checkpoint and backend arguments.
+
+## Add a robot or task
+
+Tasks follow the Gymnasium API. Common velocity configuration and MDP terms belong to the task
+family; robot-specific scenes, registrations and agent configurations belong to `config`:
+
+```text
+source/robot_lab/robot_lab/
+├── assets/
+│   ├── data/Robots/               # Packaged project-owned URDFs, meshes and textures
+│   └── unitree.py                # Asset configuration
+└── tasks/manager_based/locomotion/velocity/
+    ├── velocity_env_cfg.py        # Shared task and upstream physics presets
+    ├── mdp/                      # Project-specific terms and upstream lazy exports
+    └── config/quadruped/unitree_a1/
+        ├── __init__.py           # Gymnasium registrations
+        ├── rough_env_cfg.py
+        ├── flat_env_cfg.py
+        └── agents/
+```
+
+Use `ROBOT_LAB_ASSETS_DIR` from `robot_lab.assets` for asset paths. It resolves correctly in an
+editable checkout and an installed wheel. Register new tasks in their package's `__init__.py` with
+module-path environment and agent entry points, following the existing registrations. The
+`isaaclab.tasks` package entry point discovers them without copying launchers.
+
+Use one mechanical asset for both backends and composable upstream schema configurations for
+backend-specific properties. Keep `run_asset_transformer=True` and `run_multi_physics_conversion=True`
+for URDF/MJCF import. Set solver capacities directly in the task's
+`self.sim.physics.newton_mjwarp.solver_cfg`. Follow the official
+[asset preparation guide](https://github.com/isaac-sim/IsaacLab/blob/v3.0.0/docs/source/how-to/prepare_asset_for_newton.rst)
+and [2.x to 3.0 migration guide](https://isaac-sim.github.io/IsaacLab/develop/source/isaaclab/migrating.html).
+
+Assets use each backend's native public joint/body ordering by default. For checkpoint transfer,
+configure `ArticulationCfg.joint_ordering` and `body_ordering` through the upstream ordering API.
+Checkpoints trained with the previous explicit ordering profiles or unmerged body layouts require
+their original conventions. A1 velocity tasks randomize physical trunk/link masses while preserving the foot bodies.
+G1 uses its physical pelvis as the root; velocity tasks merge fixed sensor frames.
+New BeyondMimic archives store joint/body names and resolve motion data by name. Reconvert legacy
+archives if their body layout differs, using an output FPS matching the task control rate.
+
+Validate initial states, contacts, observations, rewards and repeated resets in both backends before
+training. Smoke tests and short training do not establish policy convergence or transfer quality.
+
+## Development
+
+```bash
+uv run pytest
+uv run pre-commit run --all-files
+uv run --extra importers isaaclab --editor
+```
+
+The editor command selects the active interpreter and writes the local Pyright configuration. The
+`setup_python_env` VS Code task invokes it. Select that interpreter in VS Code or Cursor; see the
+upstream [editor setup](https://isaac-sim.github.io/IsaacLab/develop/source/isaaclab/installation.html).
+If ROS injects incompatible pytest plugins into the environment, run tests with
+`PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 uv run pytest`.
+
+The optional `robot_lab.ui_extension_example` module is a Kit UI example; task discovery and
+training do not load it.
+
+## Docker
+
+Build an Isaac Lab v3.0.0 base image using its Docker workflow, then set `ISAACLAB_BASE_IMAGE`
+in `docker/.env.base` to that image. The extension image installs this project into the base
+image's provisioned environment:
 
 ```bash
 cd docker
 docker compose --env-file .env.base --file docker-compose.yaml build robot-lab
-```
-
-You can verify the image is built successfully using the same command as earlier:
-
-```bash
-docker images
-
-# Output should look something like:
-#
-# REPOSITORY                       TAG       IMAGE ID       CREATED             SIZE
-# robot-lab                        latest    00b00b647e1b   2 minutes ago       18.9GB
-# isaac-lab-base                   latest    892938acb55c   About an hour ago   18.9GB
-```
-
-### Running the container
-
-After building, the usual next step is to start the containers associated with your services. You can do this with:
-
-```bash
-docker compose --env-file .env.base --file docker-compose.yaml up
-```
-
-This will start the services defined in your `docker-compose.yaml` file, including robot-lab.
-
-If you want to run it in detached mode (in the background), use:
-
-```bash
-docker compose --env-file .env.base --file docker-compose.yaml up -d
-```
-
-### Interacting with a running container
-
-If you want to run commands inside the running container, you can use the `exec` command:
-
-```bash
-docker exec --interactive --tty -e DISPLAY=${DISPLAY} robot-lab /bin/bash
-```
-
-### Shutting down the container
-
-When you are done or want to stop the running containers, you can bring down the services:
-
-```bash
-docker compose --env-file .env.base --file docker-compose.yaml down
-```
-
-This stops and removes the containers, but keeps the images.
-
-</details>
-
-## Try examples
-
-You can use the following commands to run all environments:
-
-RSL-RL:
-
-```bash
-# Train
-python scripts/reinforcement_learning/rsl_rl/train.py --task=<TASK_NAME> --headless
-
-# Play
-python scripts/reinforcement_learning/rsl_rl/play.py --task=<TASK_NAME>
-```
-
-CusRL (**Experimental**):
-
-```bash
-# Train
-python scripts/reinforcement_learning/cusrl/train.py --task=<TASK_NAME> --headless
-
-# Play
-python scripts/reinforcement_learning/cusrl/play.py --task=<TASK_NAME>
-```
-
-Running a task with dummy agents (These include dummy agents that output zero or random agents. They are useful to ensure that the environments are configured correctly):
-
-```bash
-# Zero-action agent
-python scripts/tools/zero_agent.py --task=<TASK_NAME>
-# Random-action agent
-python scripts/tools/random_agent.py --task=<TASK_NAME>
-```
-
-BeyondMimic for Unitree G1:
-
-- Gather the reference motion datasets (please follow the original licenses), we use the same convention as .csv of Unitree's dataset
-
-  - Unitree-retargeted LAFAN1 Dataset is available
-    on [HuggingFace](https://huggingface.co/datasets/lvhaidong/LAFAN1_Retargeting_Dataset)
-  - Sidekicks are from [KungfuBot](https://kungfu-bot.github.io/)
-  - Christiano Ronaldo celebration is from [ASAP](https://github.com/LeCAR-Lab/ASAP).
-  - Balance motions are from [HuB](https://hub-robot.github.io/)
-
-- Convert retargeted motions to include the maximum coordinates information (body pose, body velocity, and body acceleration) via forward kinematics
-
-  ```bash
-  python scripts/tools/beyondmimic/csv_to_npz.py -f path_to_input.csv --input_fps 60 --headless
-  ```
-
-- Replaying the motion in Isaac Sim:
-
-  ```bash
-  python scripts/tools/beyondmimic/replay_npz.py -f path_to_motion.npz
-  ```
-
-- Training and Evaluation
-
-  ```bash
-  # Train
-  python scripts/reinforcement_learning/rsl_rl/train.py --task=RobotLab-Isaac-BeyondMimic-Flat-Unitree-G1-v0 --headless
-
-  # Play
-  python scripts/reinforcement_learning/rsl_rl/play.py --task=RobotLab-Isaac-BeyondMimic-Flat-Unitree-G1-v0 --num_envs 2
-  ```
-
-Others (**Experimental**)
-
-- Train AMP Dance for Unitree G1
-
-  ```bash
-  # Train
-  python scripts/reinforcement_learning/skrl/train.py --task=RobotLab-Isaac-G1-AMP-Dance-Direct-v0 --algorithm AMP --headless
-
-  # Play
-  python scripts/reinforcement_learning/skrl/play.py --task=RobotLab-Isaac-G1-AMP-Dance-Direct-v0 --algorithm AMP --num_envs=32
-  ```
-
-- Train Handstand for Unitree A1
-
-  ```bash
-  # Train
-  python scripts/reinforcement_learning/rsl_rl/train.py --task=RobotLab-Isaac-Velocity-Flat-HandStand-Unitree-A1-v0 --headless
-
-  # Play
-  python scripts/reinforcement_learning/rsl_rl/play.py --task=RobotLab-Isaac-Velocity-Flat-HandStand-Unitree-A1-v0
-  ```
-
-- Train Anymal D with symmetry
-
-  ```bash
-  # Train
-  python scripts/reinforcement_learning/rsl_rl/train.py --task=Isaac-Velocity-Flat-Anymal-D-v0 --headless --agent=rsl_rl_with_symmetry_cfg_entry_point --run_name=ppo_with_symmetry_data_augmentation agent.algorithm.symmetry_cfg.use_data_augmentation=true
-
-  # Play
-  python scripts/reinforcement_learning/rsl_rl/play.py --task=Isaac-Velocity-Flat-Anymal-D-v0 --agent=rsl_rl_with_symmetry_cfg_entry_point --run_name=ppo_with_symmetry_data_augmentation agent.algorithm.symmetry_cfg.use_data_augmentation=true
-  ```
-
-- Training and distilling Anymal D
-
-  ```bash
-  # Train the teacher agent
-  python scripts/reinforcement_learning/rsl_rl/train.py --task=Isaac-Velocity-Flat-Anymal-D-v0 --headless
-
-  # Distill the teacher agent into a student agent
-  python scripts/reinforcement_learning/rsl_rl/train.py --task=Isaac-Velocity-Flat-Anymal-D-v0 --headless --agent=rsl_rl_distillation_cfg_entry_point --checkpoint /path/to/teacher/model.pt
-
-  # Play the student agent
-  python scripts/reinforcement_learning/rsl_rl/play.py --task=Isaac-Velocity-Flat-Anymal-D-v0 --num_envs 64 --agent rsl_rl_distillation_cfg_entry_point
-  ```
-
-> [!NOTE]
-> The legacy `rsl_rl/play_cs.py` and CusRL playback retain `--keyboard`; the standard 3.0 RSL-RL/skrl wrappers use upstream playback arguments. Interactive keyboard playback has not been validated in this migration.
->
-> ```
-> Key bindings:
-> ====================== ========================= ========================
-> Command                Key (+ve axis)            Key (-ve axis)
-> ====================== ========================= ========================
-> Move along x-axis      Numpad 8 / Arrow Up       Numpad 2 / Arrow Down
-> Move along y-axis      Numpad 4 / Arrow Right    Numpad 6 / Arrow Left
-> Rotate along z-axis    Numpad 7 / Z              Numpad 9 / X
-> ====================== ========================= ========================
-> ```
-
-* You can change `Rough` to `Flat` in the above configs.
-* Record video of a trained agent (requires installing `ffmpeg`), add `--video --video_length 200`
-* Play/Train with 32 environments, add `--num_envs 32`
-* Play on specific folder or checkpoint, add `--checkpoint /PATH/TO/model.pt`
-* Resume training from folder or checkpoint, add `--checkpoint /PATH/TO/model.pt`
-* To train with multiple GPUs, use the following command, where --nproc_per_node represents the number of available GPUs:
-    ```bash
-    python -m torch.distributed.run --nnodes=1 --nproc_per_node=2 scripts/reinforcement_learning/rsl_rl/train.py --task=<TASK_NAME> --headless --distributed
-    ```
-* To scale up training beyond multiple GPUs on a single machine, it is also possible to train across multiple nodes. To train across multiple nodes/machines, it is required to launch an individual process on each node.
-
-    For the master node, use the following command, where --nproc_per_node represents the number of available GPUs, and --nnodes represents the number of nodes:
-    ```bash
-    python -m torch.distributed.run --nproc_per_node=2 --nnodes=2 --node_rank=0 --rdzv_id=123 --rdzv_backend=c10d --rdzv_endpoint=localhost:5555 scripts/reinforcement_learning/rsl_rl/train.py --task=<TASK_NAME> --headless --distributed
-    ```
-    Note that the port (`5555`) can be replaced with any other available port.
-    For non-master nodes, use the following command, replacing `--node_rank` with the index of each machine:
-    ```bash
-    python -m torch.distributed.run --nproc_per_node=2 --nnodes=2 --node_rank=1 --rdzv_id=123 --rdzv_backend=c10d --rdzv_endpoint=ip_of_master_machine:5555 scripts/reinforcement_learning/rsl_rl/train.py --task=<TASK_NAME> --headless --distributed
-    ```
-
-## Add your own robot
-
-Using the core framework developed as part of Isaac Lab, we provide various learning environments for robotics research.
-These environments follow the `gym.Env` API from OpenAI Gym version `0.21.0`. The environments are registered using
-the Gym registry.
-
-Each environment's name is composed of `Isaac-<Task>-<Robot>-v<X>`, where `<Task>` indicates the skill to learn
-in the environment, `<Robot>` indicates the embodiment of the acting agent, and `<X>` represents the version of
-the environment (which can be used to suggest different observation or action spaces).
-
-The environments are configured using either Python classes (wrapped using `configclass` decorator) or through
-YAML files. The template structure of the environment is always put at the same level as the environment file
-itself. However, its various instances are included in directories within the environment directory itself.
-This looks like as follows:
-
-```tree
-source/robot_lab/assets/
-├── __init__.py
-└── unitree.py  # <- this is where we define robot assets
-
-source/robot_lab/tasks/manager_based/locomotion/
-├── __init__.py
-└── velocity
-    ├── config
-    │   └── unitree_a1
-    │       ├── agent  # <- this is where we store the learning agent configurations
-    │       ├── __init__.py  # <- this is where we register the environment and configurations to gym registry
-    │       ├── flat_env_cfg.py
-    │       └── rough_env_cfg.py
-    ├── __init__.py
-    └── velocity_env_cfg.py  # <- this is the base task configuration
-```
-
-The environments are then registered in the `source/robot_lab/tasks/manager_based/locomotion/velocity/config/unitree_a1/__init__.py`:
-
-```python
-gym.register(
-    id="RobotLab-Isaac-Velocity-Flat-Unitree-A1-v0",
-    entry_point="isaaclab.envs:ManagerBasedRLEnv",
-    disable_env_checker=True,
-    kwargs={
-        "env_cfg_entry_point": f"{__name__}.flat_env_cfg:UnitreeA1FlatEnvCfg",
-        "rsl_rl_cfg_entry_point": f"{agents.__name__}.rsl_rl_ppo_cfg:UnitreeA1FlatPPORunnerCfg",
-        "cusrl_cfg_entry_point": f"{agents.__name__}.cusrl_ppo_cfg:UnitreeA1FlatTrainerCfg",
-    },
-)
-
-gym.register(
-    id="RobotLab-Isaac-Velocity-Rough-Unitree-A1-v0",
-    entry_point="isaaclab.envs:ManagerBasedRLEnv",
-    disable_env_checker=True,
-    kwargs={
-        "env_cfg_entry_point": f"{__name__}.rough_env_cfg:UnitreeA1RoughEnvCfg",
-        "rsl_rl_cfg_entry_point": f"{agents.__name__}.rsl_rl_ppo_cfg:UnitreeA1RoughPPORunnerCfg",
-        "cusrl_cfg_entry_point": f"{agents.__name__}.cusrl_ppo_cfg:UnitreeA1RoughTrainerCfg",
-    },
-)
-```
-
-## Tensorboard
-
-To view tensorboard, run:
-
-```bash
-tensorboard --logdir=logs
-```
-
-## Code formatting
-
-A pre-commit template is given to automatically format the code.
-
-To install pre-commit:
-
-```bash
-pip install pre-commit
-```
-
-Then you can run pre-commit with:
-
-```bash
-pre-commit run --all-files
-```
-
-## Troubleshooting
-
-### Pylance Missing Indexing of Extensions
-
-In some VsCode versions, the indexing of part of the extensions is missing. In this case, add the path to your extension in `.vscode/settings.json` under the key `"python.analysis.extraPaths"`.
-
-**Note: Replace `<path-to-isaac-lab>` with your own IsaacLab path.**
-
-```json
-{
-    "python.languageServer": "Pylance",
-    "python.analysis.extraPaths": [
-        "${workspaceFolder}/source/robot_lab",
-        "/<path-to-isaac-lab>/source/isaaclab",
-        "/<path-to-isaac-lab>/source/isaaclab_assets",
-        "/<path-to-isaac-lab>/source/isaaclab_mimic",
-        "/<path-to-isaac-lab>/source/isaaclab_rl",
-        "/<path-to-isaac-lab>/source/isaaclab_tasks",
-    ]
-}
-```
-
-### Clean USD Caches
-
-Temporary USD files are generated in `/tmp/IsaacLab/usd_{date}_{time}_{random}` during simulation runs. These files can consume significant disk space and can be cleaned by:
-
-```bash
-rm -rf /tmp/IsaacLab/usd_*
+docker compose --env-file .env.base --file docker-compose.yaml run --rm robot-lab
+# Inside the container, use the existing environment:
+uv run --active --no-project isaaclab list_envs
 ```
 
 ## Citation

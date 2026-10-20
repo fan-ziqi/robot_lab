@@ -1,81 +1,28 @@
 {
-    "files.associations": {
-        "*.tpp": "cpp",
-        "*.kit": "toml",
-        "*.rst": "restructuredtext"
-    },
-    "editor.rulers": [120],
-
-    // files to be ignored by the linter
-    "files.watcherExclude": {
-        "**/.git/objects/**": true,
-        "**/.git/subtree-cache/**": true,
-        "**/node_modules/**": true,
-        "**/_isaac_sim/**": true,
-        "**/_compiler/**": true
-    },
-    // Configuration for spelling checker
-    "spellright.language": [
-        "en-US-10-1."
-    ],
-    "spellright.documentTypes": [
-        "markdown",
-        "latex",
-        "plaintext",
-        "cpp",
-        "asciidoc",
-        "python",
-        "restructuredtext"
-    ],
-    "cSpell.words": [
-        "literalinclude",
-        "linenos",
-        "instanceable",
-        "isaacSim",
-        "jacobians",
-        "pointcloud",
-        "ridgeback",
-        "rllib",
-        "robomimic",
-        "teleoperation",
-        "xform",
-        "numpy",
-        "tensordict",
-        "flatcache",
-        "physx",
-        "dpad",
-        "gamepad",
-        "linspace",
-        "upsampled",
-        "downsampled",
-        "arange",
-        "discretization",
-        "trimesh",
-        "uninstanceable"
-    ],
-    // This enables python language server. Seems to work slightly better than jedi:
-    "python.languageServer": "Pylance",
-    // We use "black" as a formatter:
-    "black-formatter.args": ["--line-length", "120", "--unstable"],
-    // Use ruff as a linter
-    "ruff.configuration": "${workspaceFolder}/pyproject.toml",
-    // Use docstring generator
-    "autoDocstring.docstringFormat": "google",
-    "autoDocstring.guessTypes": true,
-    // Python environment path
-    // note: the default interpreter is overridden when user selects a workspace interpreter
-    //     in the status bar. For example, the virtual environment python interpreter
-    "python.defaultInterpreterPath": "",
-    // ROS distribution
-    "ros.distro": "noetic",
-    // Language specific settings
-    "[python]": {
-        "editor.tabSize": 4
-    },
-    "[restructuredtext]": {
-        "editor.tabSize": 2
-    },
-    // Python extra paths
-    // Note: this is filled up when vscode is set up for the first time
-    "python.analysis.extraPaths": []
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Python: Current File",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${file}",
+            "console": "integratedTerminal"
+        },
+        {
+            "name": "Isaac Lab: Train Go2",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "isaaclab",
+            "args": ["train", "--rl_library", "rsl_rl", "--task", "RobotLab-Isaac-Velocity-Flat-Unitree-Go2-v0", "--num_envs", "64", "--viz", "none", "physics=newton_mjwarp"],
+            "console": "integratedTerminal"
+        },
+        {
+            "name": "Isaac Lab: Play Go2",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "isaaclab",
+            "args": ["play", "--rl_library", "rsl_rl", "--task", "RobotLab-Isaac-Velocity-Flat-Unitree-Go2-v0", "--num_envs", "4", "--checkpoint", "latest", "--viz", "newton_gl", "physics=newton_mjwarp"],
+            "console": "integratedTerminal"
+        }
+    ]
 }

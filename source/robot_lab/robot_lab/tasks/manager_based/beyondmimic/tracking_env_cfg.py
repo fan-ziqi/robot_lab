@@ -25,6 +25,7 @@ from isaaclab.terrains import TerrainImporterCfg
 # Pre-defined configs
 ##
 from isaaclab.utils import configclass
+from isaaclab.utils.assets import NVIDIA_NUCLEUS_DIR
 from isaaclab.utils.noise import UniformNoiseCfg as Unoise
 
 import robot_lab.tasks.manager_based.beyondmimic.mdp as mdp
@@ -59,7 +60,7 @@ class MySceneCfg(InteractiveSceneCfg):
             dynamic_friction=1.0,
         ),
         visual_material=sim_utils.MdlFileCfg(
-            mdl_path="{NVIDIA_NUCLEUS_DIR}/Materials/Base/Architecture/Shingles_01.mdl",
+            mdl_path=f"{NVIDIA_NUCLEUS_DIR}/Materials/Base/Architecture/Shingles_01.mdl",
             project_uvw=True,
         ),
     )

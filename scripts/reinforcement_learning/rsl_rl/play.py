@@ -9,15 +9,17 @@ Run with --help for current CLI flags. Use --checkpoint for resume/play and
 
 import sys
 
+import warp as wp
+
+wp.config.enable_backward = False
+
+from isaaclab_rl.entrypoints import run_play_cli  # noqa: E402
+
+import robot_lab.tasks  # noqa: F401  # isort: skip
+
 
 def main(argv: list[str] | None = None) -> int:
-    import warp as wp
-
-    wp.config.enable_backward = False
-    import robot_lab.tasks  # noqa: F401
-
-    from isaaclab_rl.entrypoints import run_play_cli
-
+    """Play a trained RSL-RL agent."""
     args = list(sys.argv[1:] if argv is None else argv)
     # The installed 3.0 launcher uses --viz none; accept the task's headless spelling.
     if "--headless" in args:
