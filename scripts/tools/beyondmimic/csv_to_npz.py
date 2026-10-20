@@ -9,13 +9,15 @@
     python csv_to_npz.py -f path_to_input.csv --input_fps 60
 """
 
-"""Launch Isaac Sim Simulator first."""
+from __future__ import annotations
 
 import argparse
+from pathlib import Path
+from typing import TYPE_CHECKING
 
 import numpy as np
 
-from isaaclab.app import AppLauncher
+from isaaclab.app import add_launcher_args, launch_simulation
 
 # add argparse arguments
 parser = argparse.ArgumentParser(description="Replay motion from csv file and output to npz file.")
@@ -37,41 +39,38 @@ parser.add_argument(
     "--exit_after_save", action="store_true", help="Exit after writing the first complete motion cycle."
 )
 
-# append AppLauncher cli args
+# append simulation launcher cli args
 parser.add_argument("--headless", action="store_true", help="Run without a visualizer unless --viz is explicit.")
-AppLauncher.add_app_launcher_args(parser)
+add_launcher_args(parser)
 # parse the arguments
 args_cli = parser.parse_args()
 if args_cli.headless and not args_cli.visualizer:
     args_cli.visualizer = ["none"]
+if args_cli.input_fps <= 0 or args_cli.output_fps <= 0:
+    parser.error("input_fps and output_fps must be positive")
 if not args_cli.output_name:
-    # generate at the same location as input file
-    args_cli.output_name = (
-        "/".join(args_cli.input_file.split("/")[:-1]) + "/" + args_cli.input_file.split("/")[-1].replace(".csv", ".npz")
-    )
+    args_cli.output_name = str(Path(args_cli.input_file).with_suffix(".npz"))
 
-
-# launch omniverse app
-app_launcher = AppLauncher(args_cli)
-simulation_app = app_launcher.app
 
 """Rest everything follows."""
 
 import torch
 from isaaclab_physx.physics import PhysxCfg
 
+import isaaclab.sim as sim_utils
+from isaaclab.assets import ArticulationCfg, AssetBaseCfg
+from isaaclab.scene import InteractiveSceneCfg
+from isaaclab.utils import configclass
+from isaaclab.utils.assets import ISAAC_NUCLEUS_DIR
+from isaaclab.utils.math import axis_angle_from_quat, quat_conjugate, quat_mul, quat_slerp
+
 ##
 # Pre-defined configs
 ##
 from robot_lab.assets.unitree import UNITREE_G1_29DOF_CFG
 
-import isaaclab.sim as sim_utils
-from isaaclab.assets import ArticulationCfg, AssetBaseCfg
-from isaaclab.scene import InteractiveScene, InteractiveSceneCfg
-from isaaclab.sim import SimulationContext
-from isaaclab.utils import configclass
-from isaaclab.utils.assets import ISAAC_NUCLEUS_DIR
-from isaaclab.utils.math import axis_angle_from_quat, quat_conjugate, quat_mul, quat_slerp
+if TYPE_CHECKING:
+    from isaaclab.scene import InteractiveScene
 
 
 @configclass
@@ -280,6 +279,8 @@ def run_simulator(sim: sim_utils.SimulationContext, scene: InteractiveScene):
     log = {
         "fps": [args_cli.output_fps],
         "quaternion_order": "xyzw",
+        "joint_names": robot.joint_names,
+        "body_names": robot.body_names,
         "joint_pos": [],
         "joint_vel": [],
         "body_pos_w": [],
@@ -291,7 +292,7 @@ def run_simulator(sim: sim_utils.SimulationContext, scene: InteractiveScene):
     # --------------------------------------------------------------------------
 
     # Simulation loop
-    while simulation_app.is_running():
+    while sim.is_running():
         (
             (
                 motion_base_pos,
@@ -305,14 +306,13 @@ def run_simulator(sim: sim_utils.SimulationContext, scene: InteractiveScene):
         ) = motion.get_next_state()
 
         # set root state
-        root_states = robot.data.default_root_state.torch.clone()
-        root_states[:, :3] = motion_base_pos
-        root_states[:, :2] += scene.env_origins[:, :2]
-        root_states[:, 3:7] = motion_base_rot
-        root_states[:, 7:10] = motion_base_lin_vel
-        root_states[:, 10:] = motion_base_ang_vel
-        robot.write_root_link_pose_to_sim_index(root_pose=(root_states)[:, :7])
-        robot.write_root_com_velocity_to_sim_index(root_velocity=(root_states)[:, 7:])
+        root_pose = robot.data.default_root_pose.torch.clone()
+        root_pose[:, :3] = motion_base_pos
+        root_pose[:, :2] += scene.env_origins[:, :2]
+        root_pose[:, 3:7] = motion_base_rot
+        root_velocity = torch.cat((motion_base_lin_vel, motion_base_ang_vel), dim=-1)
+        robot.write_root_link_pose_to_sim_index(root_pose=root_pose)
+        robot.write_root_link_velocity_to_sim_index(root_velocity=root_velocity)
 
         # set joint state
         joint_pos = robot.data.default_joint_pos.torch.clone()
@@ -323,7 +323,7 @@ def run_simulator(sim: sim_utils.SimulationContext, scene: InteractiveScene):
         sim.render()  # We don't want physic (sim.step())
         scene.update(sim.get_physics_dt())
 
-        pos_lookat = root_states[0, :3].cpu().numpy()
+        pos_lookat = root_pose[0, :3].cpu().numpy()
         sim.set_camera_view(pos_lookat + np.array([2.0, 2.0, 0.5]), pos_lookat)
 
         if not file_saved:
@@ -354,23 +354,22 @@ def run_simulator(sim: sim_utils.SimulationContext, scene: InteractiveScene):
 
 def main():
     """Main function."""
-    # Load kit helper
     sim_cfg = sim_utils.SimulationCfg(device=args_cli.device, physics=PhysxCfg())
     sim_cfg.dt = 1.0 / args_cli.output_fps
-    sim = SimulationContext(sim_cfg)
-    # Design scene
-    scene_cfg = ReplayMotionsSceneCfg(num_envs=1, env_spacing=2.0)
-    scene = InteractiveScene(scene_cfg)
-    # Play the simulator
-    sim.reset()
-    # Now we are ready!
-    print("[INFO]: Setup complete...")
-    # Run the simulator
-    run_simulator(sim, scene)
+    with launch_simulation(sim_cfg, args_cli):
+        from isaaclab.scene import InteractiveScene
+        from isaaclab.sim import SimulationContext
+
+        sim = SimulationContext(sim_cfg)
+        # Design scene
+        scene_cfg = ReplayMotionsSceneCfg(num_envs=1, env_spacing=2.0)
+        scene = InteractiveScene(scene_cfg)
+        # Play the simulator
+        sim.reset()
+        print("[INFO]: Setup complete...")
+        run_simulator(sim, scene)
 
 
 if __name__ == "__main__":
     # run the main function
     main()
-    # close sim app
-    simulation_app.close()

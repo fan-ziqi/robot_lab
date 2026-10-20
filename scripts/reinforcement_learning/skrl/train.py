@@ -9,15 +9,17 @@ Run with --help for current CLI flags. Use --checkpoint for resume/play and
 
 import sys
 
+import warp as wp
+
+wp.config.enable_backward = False
+
+from isaaclab_rl.entrypoints import run_train_cli  # noqa: E402
+
+import robot_lab.tasks  # noqa: F401  # isort: skip
+
 
 def main(argv: list[str] | None = None) -> int:
-    import warp as wp
-
-    wp.config.enable_backward = False
-    import robot_lab.tasks  # noqa: F401
-
-    from isaaclab_rl.entrypoints import run_train_cli
-
+    """Train an agent with skrl."""
     args = list(sys.argv[1:] if argv is None else argv)
     # The installed 3.0 launcher uses --viz none; accept the task's headless spelling.
     if "--headless" in args:
@@ -28,4 +30,6 @@ def main(argv: list[str] | None = None) -> int:
 
 
 if __name__ == "__main__":
-    raise SystemExit(main())
+    from torch.distributed.elastic.multiprocessing.errors import record
+
+    raise SystemExit(record(main)())

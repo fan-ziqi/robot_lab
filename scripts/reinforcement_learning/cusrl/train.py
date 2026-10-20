@@ -3,8 +3,6 @@
 
 """Script to train RL agent with CusRL."""
 
-"""Launch Isaac Sim Simulator first."""
-
 import argparse
 import os
 import sys
@@ -13,7 +11,13 @@ import warp as wp
 
 wp.config.enable_backward = False
 
-from isaaclab.app import AppLauncher
+from isaaclab.app import add_launcher_args, launch_simulation
+
+from isaaclab_rl.entrypoints.common import apply_video_recording, pre_launch_video_config
+
+from isaaclab_tasks.utils import resolve_task_config, setup_preset_cli
+
+import robot_lab.tasks  # noqa: F401  # isort: skip
 
 # local imports
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
@@ -47,10 +51,10 @@ parser.add_argument(
 parser.add_argument("--autocast", nargs="?", const=True, help="Datatype for automatic mixed precision.")
 parser.add_argument("--compile", action="store_true", help="Whether to use `torch.compile` for optimization.")
 
-# append AppLauncher cli args
+# append simulation launcher cli args
 parser.add_argument("--headless", action="store_true", help="Run without a viewer (alias for --viz none).")
-AppLauncher.add_app_launcher_args(parser)
-args_cli, hydra_args = parser.parse_known_args()
+add_launcher_args(parser)
+args_cli, hydra_args = setup_preset_cli(parser)
 if args_cli.headless and args_cli.visualizer is None:
     args_cli.visualizer = ["none"]
 
@@ -68,12 +72,9 @@ if os.environ.get("LOCAL_RANK") is not None:
     args_cli.distributed = True
     args_cli.device = f"cuda:{os.environ['LOCAL_RANK']}"
 
-# launch omniverse app
-app_launcher = AppLauncher(args_cli)
-simulation_app = app_launcher.app
-
 """Rest everything follows."""
 
+from dataclasses import replace
 from datetime import datetime
 
 import cusrl
@@ -82,17 +83,11 @@ import torch
 from cusrl.environment.isaaclab import TrainerCfg
 
 from isaaclab.envs import (
-    DirectMARLEnv,
     DirectMARLEnvCfg,  # noqa: F401
     DirectRLEnvCfg,  # noqa: F401
     ManagerBasedRLEnvCfg,  # noqa: F401
-    VideoRecorderCfg,
     multi_agent_to_single_agent,
 )
-
-from isaaclab_tasks.utils import resolve_task_config
-
-import robot_lab.tasks  # noqa: F401  # isort: skip
 
 torch.backends.cuda.matmul.allow_tf32 = True
 torch.backends.cudnn.allow_tf32 = True
@@ -102,6 +97,8 @@ torch.backends.cudnn.benchmark = False
 
 def main(env_cfg: ManagerBasedRLEnvCfg | DirectRLEnvCfg | DirectMARLEnvCfg, agent_cfg: TrainerCfg):
     """Train with CusRL agent."""
+    from isaaclab.envs import DirectMARLEnv
+
     env_cfg.scene.num_envs = args_cli.num_envs if args_cli.num_envs is not None else env_cfg.scene.num_envs
     agent_cfg.max_iterations = (
         args_cli.max_iterations if args_cli.max_iterations is not None else agent_cfg.max_iterations
@@ -112,6 +109,8 @@ def main(env_cfg: ManagerBasedRLEnvCfg | DirectRLEnvCfg | DirectMARLEnvCfg, agen
     # set the environment seed
     # note: certain randomizations occur in the environment initialization so we set the seed here
     env_cfg.sim.device = args_cli.device if args_cli.device is not None else env_cfg.sim.device
+    if args_cli.seed is not None:
+        env_cfg.seed = args_cli.seed
     cusrl.set_global_seed(args_cli.seed)
     env_cfg.scene.num_envs = int(env_cfg.scene.num_envs / cusrl.utils.distributed.world_size())
 
@@ -127,14 +126,7 @@ def main(env_cfg: ManagerBasedRLEnvCfg | DirectRLEnvCfg | DirectMARLEnvCfg, agen
 
     # Configure recording before the environment creates its recorder manager.
     if args_cli.video and cusrl.utils.is_main_process():
-        env_cfg.video_recorders = [
-            VideoRecorderCfg(
-                source="visualizer:kit",
-                output_dir=os.path.join(log_dir, "videos", "train"),
-                video_length=args_cli.video_length,
-                video_interval=args_cli.video_interval,
-            )
-        ]
+        apply_video_recording(env_cfg, log_dir, args_cli, subdir="train")
 
     # create isaac environment
     env = gym.make(args_cli.task, cfg=env_cfg)
@@ -146,12 +138,12 @@ def main(env_cfg: ManagerBasedRLEnvCfg | DirectRLEnvCfg | DirectMARLEnvCfg, agen
     # create trainer from cusrl
     trainer = cusrl.Trainer(
         environment=cusrl.environment.IsaacLabEnvAdapter(env),
-        agent_factory=agent_cfg.agent_factory.override(
-            device=args_cli.device, autocast=args_cli.autocast, compile=args_cli.compile
+        agent_factory=replace(
+            agent_cfg.agent_factory, device=env.unwrapped.device, autocast=args_cli.autocast, compile=args_cli.compile
         ),
         logger_factory=cusrl.make_logger_factory(args_cli.logger, log_dir, name=None),
         num_iterations=agent_cfg.max_iterations,
-        save_interval=agent_cfg.save_interval,
+        checkpoint_interval=agent_cfg.save_interval,
         checkpoint_path=args_cli.checkpoint,
     )
 
@@ -163,7 +155,7 @@ def main(env_cfg: ManagerBasedRLEnvCfg | DirectRLEnvCfg | DirectMARLEnvCfg, agen
 
 
 if __name__ == "__main__":
-    # run the main function
-    main(*resolve_task_config(args_cli.task, args_cli.agent, overrides=hydra_args))
-    # close sim app
-    simulation_app.close()
+    env_cfg, agent_cfg = resolve_task_config(args_cli.task, args_cli.agent, overrides=hydra_args)
+    pre_launch_video_config(env_cfg, args_cli)
+    with launch_simulation(env_cfg, args_cli):
+        main(env_cfg, agent_cfg)

@@ -8,7 +8,7 @@ from cusrl.environment.isaaclab import TrainerCfg
 
 
 @dataclass
-class FTAIGR1T2RoughTrainerCfg(TrainerCfg):
+class FFTAIGR1T2RoughTrainerCfg(TrainerCfg):
     max_iterations = 3000
     save_interval = 100
     experiment_name = "fftai_gr1t2_rough"
@@ -43,6 +43,6 @@ class FTAIGR1T2RoughTrainerCfg(TrainerCfg):
 
 
 @dataclass
-class FTAIGR1T2FlatTrainerCfg(FTAIGR1T2RoughTrainerCfg):
+class FFTAIGR1T2FlatTrainerCfg(FFTAIGR1T2RoughTrainerCfg):
     max_iterations = 1500
     experiment_name = "fftai_gr1t2_flat"

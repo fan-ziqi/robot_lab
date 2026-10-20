@@ -7,7 +7,7 @@ Humanoid Motion Data Simple Converter
 This script only converts CSV motion data directly to NPZ format.
 
 USAGE:
-    python data_convert_simple.py
+    python csv2npz.py --file motion.csv --urdf robot.urdf --mesh-dir meshes --output motion.npz
 
 DESCRIPTION:
     1. Read raw CSV motion data
@@ -27,17 +27,10 @@ REQUIREMENTS:
     - pinocchio
 """
 
-CSV_FILE = "/home/ubuntu/workspaces/LAFAN1_Retargeting_Dataset/g1/dance1_subject2.csv"
-URDF_FILE = "/home/ubuntu/workspaces/LAFAN1_Retargeting_Dataset/robot_description/g1/g1_29dof_rev_1_0.urdf"
-MESH_DIR = "/home/ubuntu/workspaces/LAFAN1_Retargeting_Dataset/robot_description/g1"
-NPZ_FILE = (
-    "/home/ubuntu/workspaces/robot_lab_kill-usd/source/robot_lab/robot_lab/tasks/"
-    "direct/g1_amp/motions/g1_dance1_subject2_30.npz"
-)
+import argparse
+from pathlib import Path
 
 import numpy as np
-import pandas as pd
-import pinocchio as pin
 
 
 def quaternion_inverse(q):
@@ -68,11 +61,14 @@ def compute_angular_velocity(q_prev, q_next, dt, eps=1e-8):
       - Return (angle / dt) * axis
     """
     q_inv = quaternion_inverse(q_prev)
-    q_rel = quaternion_multiply(q_inv, q_next)
+    # World angular velocity: the relative rotation is expressed in world axes.
+    q_rel = quaternion_multiply(q_next, q_inv)
     norm_q_rel = np.linalg.norm(q_rel)
     if norm_q_rel < eps:
         return np.zeros(3, dtype=np.float32)
     q_rel /= norm_q_rel
+    if q_rel[0] < 0:
+        q_rel = -q_rel
     w = np.clip(q_rel[0], -1.0, 1.0)
     angle = 2.0 * np.arccos(w)
     sin_half = np.sqrt(1.0 - w * w)
@@ -91,19 +87,35 @@ def build_pin_robot(urdf_path, mesh_dir):
     Returns:
         robot (pin.RobotWrapper)
     """
+    import pinocchio as pin
+
     robot = pin.RobotWrapper.BuildFromURDF(urdf_path, mesh_dir, pin.JointModelFreeFlyer())
     return robot
 
 
 def main():
-    # 1. Read CSV data
-    csv_file = CSV_FILE
+    parser = argparse.ArgumentParser(description="Convert a G1 motion CSV to an AMP archive.")
+    parser.add_argument("--file", required=True, help="Input CSV: root xyz, quaternion xyzw, then 29 joints.")
+    parser.add_argument("--urdf", required=True, help="G1 URDF used by the retargeted motion.")
+    parser.add_argument("--mesh-dir", required=True, help="Directory containing the URDF mesh packages.")
+    parser.add_argument("--output", required=True, help="Output NPZ path.")
+    parser.add_argument("--fps", type=float, default=30.0)
+    parser.add_argument("--start-frame", type=int, default=0)
+    parser.add_argument("--end-frame", type=int, default=None)
+    args = parser.parse_args()
+    if args.fps <= 0 or args.start_frame < 0:
+        parser.error("fps must be positive and start-frame must be nonnegative")
+    import pandas as pd
+    import pinocchio as pin
+
+    csv_file = args.file
     df = pd.read_csv(csv_file, header=None)
-    start_idx = 250
-    end_idx = 250 + 10 * 30  # 10s
-    end_idx += 1
+    start_idx = args.start_frame
+    end_idx = args.end_frame
     data_orig = df.iloc[start_idx:end_idx].to_numpy(dtype=np.float32)
     N = data_orig.shape[0]
+    if N < 2 or data_orig.shape[1] != 36:
+        raise ValueError("Motion CSV must contain at least two selected frames and 36 columns.")
     print(f"Loading CSV: {csv_file}, frame range [{start_idx}:{end_idx}], total {N} frames.")
 
     # Root and joint data
@@ -111,7 +123,7 @@ def main():
     joint_data = data_orig[:, 7:]  # (N, D)
 
     # Original sampling rate
-    fps = 30
+    fps = args.fps
     dt = 1.0 / fps
 
     # Joint names
@@ -181,8 +193,8 @@ def main():
     body_rotations = np.zeros((N, B, 4), dtype=np.float32)
 
     # Pinocchio forward kinematics
-    urdf_path = URDF_FILE
-    mesh_dir = MESH_DIR
+    urdf_path = args.urdf
+    mesh_dir = args.mesh_dir
     robot = build_pin_robot(urdf_path, mesh_dir)
     model = robot.model
     data_pk = robot.data
@@ -240,7 +252,8 @@ def main():
         "body_linear_velocities": body_linear_velocities,
         "body_angular_velocities": body_angular_velocities,
     }
-    out_filename = NPZ_FILE
+    out_filename = Path(args.output)
+    out_filename.parent.mkdir(parents=True, exist_ok=True)
     np.savez(out_filename, **data_dict)
     print(f"Conversion completed, data saved to {out_filename}")
     print("fps:", fps)

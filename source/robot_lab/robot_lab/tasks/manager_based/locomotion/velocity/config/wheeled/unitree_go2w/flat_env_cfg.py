@@ -29,7 +29,3 @@ class UnitreeGo2WFlatEnvCfg(UnitreeGo2WRoughEnvCfg):
             self.disable_zero_weight_rewards()
 
         # Only this independently validated class opts into Newton.
-        if type(self) is UnitreeGo2WFlatEnvCfg:
-            from robot_lab.tasks.manager_based.locomotion.velocity.newton_support import configure_newton_from_profile
-
-            configure_newton_from_profile(self, "unitree_go2w", njmax=256, nconmax=128)

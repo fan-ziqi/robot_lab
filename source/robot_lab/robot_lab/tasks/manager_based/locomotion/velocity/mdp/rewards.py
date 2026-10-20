@@ -456,12 +456,10 @@ def feet_distance_y_exp(
     cur_footsteps_translated = asset.data.body_link_pos_w.torch[
         :, asset_cfg.body_ids, :
     ] - asset.data.root_link_pos_w.torch[:, :].unsqueeze(1)
-    n_feet = len(asset_cfg.body_ids)
-    footsteps_in_body_frame = torch.zeros(env.num_envs, n_feet, 3, device=env.device)
-    for i in range(n_feet):
-        footsteps_in_body_frame[:, i, :] = math_utils.quat_apply(
-            math_utils.quat_conjugate(asset.data.root_link_quat_w.torch), cur_footsteps_translated[:, i, :]
-        )
+    n_feet = cur_footsteps_translated.shape[1]
+    footsteps_in_body_frame = math_utils.quat_apply_inverse(
+        asset.data.root_link_quat_w.torch[:, None, :].expand(-1, n_feet, -1), cur_footsteps_translated
+    )
     side_sign = torch.tensor(
         [1.0 if i % 2 == 0 else -1.0 for i in range(n_feet)],
         device=env.device,
@@ -488,11 +486,11 @@ def feet_distance_xy_exp(
         :, asset_cfg.body_ids, :
     ] - asset.data.root_link_pos_w.torch[:, :].unsqueeze(1)
 
-    footsteps_in_body_frame = torch.zeros(env.num_envs, 4, 3, device=env.device)
-    for i in range(4):
-        footsteps_in_body_frame[:, i, :] = math_utils.quat_apply(
-            math_utils.quat_conjugate(asset.data.root_link_quat_w.torch), cur_footsteps_translated[:, i, :]
-        )
+    if cur_footsteps_translated.shape[1] != 4:
+        raise ValueError("feet_distance_xy_exp requires four ordered feet")
+    footsteps_in_body_frame = math_utils.quat_apply_inverse(
+        asset.data.root_link_quat_w.torch[:, None, :].expand(-1, 4, -1), cur_footsteps_translated
+    )
 
     # Desired x and y positions for each foot
     stance_width_tensor = stance_width * torch.ones([env.num_envs, 1], device=env.device)
@@ -549,18 +547,12 @@ def feet_height_body(
     cur_footpos_translated = asset.data.body_pos_w.torch[:, asset_cfg.body_ids, :] - asset.data.root_pos_w.torch[
         :, :
     ].unsqueeze(1)
-    footpos_in_body_frame = torch.zeros(env.num_envs, len(asset_cfg.body_ids), 3, device=env.device)
-    cur_footvel_translated = asset.data.body_lin_vel_w.torch[
-        :, asset_cfg.body_ids, :
-    ] - asset.data.root_lin_vel_w.torch[:, :].unsqueeze(1)
-    footvel_in_body_frame = torch.zeros(env.num_envs, len(asset_cfg.body_ids), 3, device=env.device)
-    for i in range(len(asset_cfg.body_ids)):
-        footpos_in_body_frame[:, i, :] = math_utils.quat_apply_inverse(
-            asset.data.root_quat_w.torch, cur_footpos_translated[:, i, :]
-        )
-        footvel_in_body_frame[:, i, :] = math_utils.quat_apply_inverse(
-            asset.data.root_quat_w.torch, cur_footvel_translated[:, i, :]
-        )
+    cur_footvel_translated = (
+        asset.data.body_lin_vel_w.torch[:, asset_cfg.body_ids, :] - asset.data.root_lin_vel_w.torch[:, None, :]
+    )
+    root_quat = asset.data.root_quat_w.torch[:, None, :].expand(-1, cur_footpos_translated.shape[1], -1)
+    footpos_in_body_frame = math_utils.quat_apply_inverse(root_quat, cur_footpos_translated)
+    footvel_in_body_frame = math_utils.quat_apply_inverse(root_quat, cur_footvel_translated)
     foot_z_target_error = torch.square(footpos_in_body_frame[:, :, 2] - target_height).view(env.num_envs, -1)
     foot_velocity_tanh = torch.tanh(tanh_mult * torch.norm(footvel_in_body_frame[:, :, :2], dim=2))
     reward = torch.sum(foot_z_target_error * foot_velocity_tanh, dim=1)
@@ -592,15 +584,13 @@ def feet_slide(
     cur_footvel_translated = asset.data.body_lin_vel_w.torch[
         :, asset_cfg.body_ids, :
     ] - asset.data.root_lin_vel_w.torch[:, :].unsqueeze(1)
-    footvel_in_body_frame = torch.zeros(env.num_envs, len(asset_cfg.body_ids), 3, device=env.device)
-    for i in range(len(asset_cfg.body_ids)):
-        footvel_in_body_frame[:, i, :] = math_utils.quat_apply_inverse(
-            asset.data.root_quat_w.torch, cur_footvel_translated[:, i, :]
-        )
-    foot_leteral_vel = torch.sqrt(torch.sum(torch.square(footvel_in_body_frame[:, :, :2]), dim=2)).view(
+    footvel_in_body_frame = math_utils.quat_apply_inverse(
+        asset.data.root_quat_w.torch[:, None, :].expand(-1, cur_footvel_translated.shape[1], -1), cur_footvel_translated
+    )
+    foot_lateral_vel = torch.sqrt(torch.sum(torch.square(footvel_in_body_frame[:, :, :2]), dim=2)).view(
         env.num_envs, -1
     )
-    reward = torch.sum(foot_leteral_vel * contacts, dim=1)
+    reward = torch.sum(foot_lateral_vel * contacts, dim=1)
     reward *= torch.clamp(-env.scene["robot"].data.projected_gravity_b.torch[:, 2], 0, 0.7) / 0.7
     return reward
 

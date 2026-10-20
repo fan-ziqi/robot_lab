@@ -102,7 +102,7 @@ class G1AmpEnv(DirectRLEnv):
             self.amp_observation_buffer[:, i + 1] = self.amp_observation_buffer[:, i]
         # build AMP observation
         self.amp_observation_buffer[:, 0] = obs.clone()
-        self.extras = {"amp_obs": self.amp_observation_buffer.view(-1, self.amp_observation_size)}
+        self.extras["amp_obs"] = self.amp_observation_buffer.view(-1, self.amp_observation_size)
 
         return {"policy": obs}
 
@@ -110,7 +110,7 @@ class G1AmpEnv(DirectRLEnv):
         # ================= imitation reward ==========================
         with torch.no_grad():
             # get reference action at current time
-            current_times = (self.episode_length_buf * self.physics_dt).cpu().numpy()
+            current_times = (self.episode_length_buf * self.step_dt).cpu().numpy()
             # sample reference action data
             (
                 ref_dof_positions,
@@ -202,15 +202,6 @@ class G1AmpEnv(DirectRLEnv):
 
         self.extras["log"] = log_dict
 
-        # directly record to TensorBoard (if agent is available)
-        if hasattr(self, "_skrl_agent") and getattr(self, "_skrl_agent", None) is not None:
-            try:
-                agent = getattr(self, "_skrl_agent")
-                for k, v in log_dict.items():
-                    agent.track_data(f"Reward / {k}", v)
-            except Exception:
-                pass
-
         return total_reward
 
     def _get_dones(self) -> tuple[torch.Tensor, torch.Tensor]:
@@ -238,7 +229,7 @@ class G1AmpEnv(DirectRLEnv):
             raise ValueError(f"Unknown reset strategy: {self.cfg.reset_strategy}")
 
         self.robot.write_root_link_pose_to_sim_index(root_pose=root_state[:, :7], env_ids=env_ids)
-        self.robot.write_root_com_velocity_to_sim_index(root_velocity=root_state[:, 7:], env_ids=env_ids)
+        self.robot.write_root_link_velocity_to_sim_index(root_velocity=root_state[:, 7:], env_ids=env_ids)
         self.robot.write_joint_state_to_sim_index(
             position=joint_pos, velocity=joint_vel, joint_ids=None, env_ids=env_ids
         )
@@ -246,7 +237,10 @@ class G1AmpEnv(DirectRLEnv):
     # reset strategies
 
     def _reset_strategy_default(self, env_ids: torch.Tensor) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
-        root_state = self.robot.data.default_root_state.torch[env_ids].clone()
+        root_state = torch.cat(
+            (self.robot.data.default_root_pose.torch[env_ids], self.robot.data.default_root_vel.torch[env_ids]),
+            dim=-1,
+        )
         root_state[:, :3] += self.scene.env_origins[env_ids]
         joint_pos = self.robot.data.default_joint_pos.torch[env_ids].clone()
         joint_vel = self.robot.data.default_joint_vel.torch[env_ids].clone()
@@ -270,7 +264,10 @@ class G1AmpEnv(DirectRLEnv):
 
         # get root transforms (the humanoid torso)
         motion_torso_index = self._motion_loader.get_body_index([self.cfg.reference_body])[0]
-        root_state = self.robot.data.default_root_state.torch[env_ids].clone()
+        root_state = torch.cat(
+            (self.robot.data.default_root_pose.torch[env_ids], self.robot.data.default_root_vel.torch[env_ids]),
+            dim=-1,
+        )
         root_state[:, 0:3] = body_positions[:, motion_torso_index] + self.scene.env_origins[env_ids]
         root_state[:, 2] += 0.05  # lift the humanoid slightly to avoid collisions with the ground
         root_state[:, 3:7] = body_rotations[:, motion_torso_index]

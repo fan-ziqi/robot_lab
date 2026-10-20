@@ -3,7 +3,7 @@
 
 import os
 
-from isaaclab.utils import configclass
+from isaaclab.utils import configclass, replace
 
 from robot_lab.assets.unitree import UNITREE_G1_29DOF_ACTION_SCALE, UNITREE_G1_29DOF_CFG
 from robot_lab.tasks.manager_based.beyondmimic.tracking_env_cfg import BeyondMimicEnvCfg
@@ -14,7 +14,7 @@ class UnitreeG1BeyondMimicFlatEnvCfg(BeyondMimicEnvCfg):
     def __post_init__(self):
         super().__post_init__()
 
-        self.scene.robot = UNITREE_G1_29DOF_CFG.replace(prim_path="{ENV_REGEX_NS}/Robot")
+        self.scene.robot = replace(UNITREE_G1_29DOF_CFG, prim_path="{ENV_REGEX_NS}/Robot")
         self.actions.joint_pos.scale = UNITREE_G1_29DOF_ACTION_SCALE
         self.commands.motion.motion_file = f"{os.path.dirname(__file__)}/motion/G1_Take_102.bvh_60hz.npz"
         # self.commands.motion.motion_file = f"{os.path.dirname(__file__)}/motion/G1_gangnam_style_V01.bvh_60hz.npz"

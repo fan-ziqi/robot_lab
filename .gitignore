@@ -38,3 +38,10 @@ _build
 
 # LSP
 pyrightconfig.json
+
+# uv environments
+.venv/
+.venv-*/
+# Python package builds
+**/build/
+dist/

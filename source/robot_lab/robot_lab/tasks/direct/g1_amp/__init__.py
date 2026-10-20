@@ -24,6 +24,8 @@ gym.register(
     disable_env_checker=True,
     kwargs={
         "env_cfg_entry_point": f"{__name__}.g1_amp_env_cfg:G1AmpDanceEnvCfg",
+        "default_agent": "skrl",
+        "skrl_cfg_entry_point": f"{agents.__name__}:skrl_dance_amp_cfg.yaml",
         "skrl_amp_cfg_entry_point": f"{agents.__name__}:skrl_dance_amp_cfg.yaml",
     },
 )

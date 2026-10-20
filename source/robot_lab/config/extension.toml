@@ -15,10 +15,8 @@ repository = "https://github.com/fan-ziqi/robot_lab.git"
 keywords = ["extension", "robot_lab", "isaaclab"]
 
 [dependencies]
-"isaaclab" = { version = "3.0.0" }
-"isaaclab_physx" = {}
+"isaaclab" = {}
 "isaaclab_assets" = {}
-"isaaclab_mimic" = {}
 "isaaclab_rl" = {}
 "isaaclab_tasks" = {}
 # NOTE: Add additional dependencies here

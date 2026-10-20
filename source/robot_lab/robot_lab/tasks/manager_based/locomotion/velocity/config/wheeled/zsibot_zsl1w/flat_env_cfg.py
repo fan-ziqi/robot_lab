@@ -29,7 +29,3 @@ class ZsibotZSL1WFlatEnvCfg(ZsibotZSL1WRoughEnvCfg):
             self.disable_zero_weight_rewards()
 
         # Only this independently validated class opts into Newton.
-        if type(self) is ZsibotZSL1WFlatEnvCfg:
-            from robot_lab.tasks.manager_based.locomotion.velocity.newton_support import configure_newton_from_profile
-
-            configure_newton_from_profile(self, "zsibot_zsl1w", njmax=256, nconmax=128)

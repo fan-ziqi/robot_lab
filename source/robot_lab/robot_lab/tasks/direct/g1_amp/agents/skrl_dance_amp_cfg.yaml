@@ -61,7 +61,7 @@ reply_buffer:
   memory_size: 1000000
 
 
-# AMP agent configuration (field names are from AMP_DEFAULT_CONFIG)
+# AMP agent configuration (field names are from AMP_CFG)
 # https://skrl.readthedocs.io/en/latest/api/agents/amp.html
 agent:
   class: AMP
@@ -69,33 +69,31 @@ agent:
   learning_epochs: 6
   mini_batches: 2
   discount_factor: 0.99
-  lambda: 0.95
+  gae_lambda: 0.95
   learning_rate: 5.0e-05
   # learning_rate_scheduler: null
   # learning_rate_scheduler_kwargs: null
   learning_rate_scheduler: KLAdaptiveLR
   learning_rate_scheduler_kwargs:
     kl_threshold: 0.008
-  state_preprocessor: RunningStandardScaler
-  state_preprocessor_kwargs: null
+  observation_preprocessor: RunningStandardScaler
+  observation_preprocessor_kwargs: null
   value_preprocessor: RunningStandardScaler
   value_preprocessor_kwargs: null
-  amp_state_preprocessor: RunningStandardScaler
-  amp_state_preprocessor_kwargs: null
+  amp_observation_preprocessor: RunningStandardScaler
+  amp_observation_preprocessor_kwargs: null
   random_timesteps: 0
   learning_starts: 0
   grad_norm_clip: 0.0
   ratio_clip: 0.2
   value_clip: 0.2
-  clip_predicted_values: True
   entropy_loss_scale: 0.02
   value_loss_scale: 2.5
   discriminator_loss_scale: 5.0
   amp_batch_size: 512
-  task_reward_weight: 1.0
-  style_reward_weight: 1.0
+  task_reward_scale: 1.0
+  style_reward_scale: 2.0
   discriminator_batch_size: 4096
-  discriminator_reward_scale: 2.0
   discriminator_logit_regularization_scale: 0.05
   discriminator_gradient_penalty_scale: 5.0
   discriminator_weight_decay_scale: 1.0e-04

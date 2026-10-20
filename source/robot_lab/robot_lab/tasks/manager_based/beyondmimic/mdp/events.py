@@ -36,11 +36,8 @@ def randomize_joint_default_pos(
     if env_ids is None:
         env_ids = torch.arange(env.scene.num_envs, device=asset.device)
 
-    # resolve joint indices
-    if asset_cfg.joint_ids == slice(None):
-        joint_ids = slice(None)  # for optimization purposes
-    else:
-        joint_ids = torch.tensor(asset_cfg.joint_ids, dtype=torch.int, device=asset.device)
+    # Selections are already resolved to slices or device tensors by the manager.
+    joint_ids = asset_cfg.joint_ids
 
     if pos_distribution_params is not None:
         pos = asset.data.default_joint_pos.torch.to(asset.device).clone()
@@ -48,7 +45,7 @@ def randomize_joint_default_pos(
             pos, pos_distribution_params, env_ids, joint_ids, operation=operation, distribution=distribution
         )[env_ids][:, joint_ids]
 
-        if env_ids != slice(None) and joint_ids != slice(None):
+        if not isinstance(env_ids, slice) and not isinstance(joint_ids, slice):
             env_ids = env_ids[:, None]
         asset.data.default_joint_pos.torch[env_ids, joint_ids] = pos
         # update the offset in action since it is not updated automatically

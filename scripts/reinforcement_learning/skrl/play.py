@@ -11,6 +11,14 @@ import argparse
 import sys
 from contextlib import contextmanager
 
+import warp as wp
+
+wp.config.enable_backward = False
+
+from isaaclab_rl.entrypoints import run_play_cli  # noqa: E402
+
+import robot_lab.tasks  # noqa: F401  # isort: skip
+
 
 def positive_int(value: str) -> int:
     value = int(value)
@@ -59,13 +67,6 @@ def main(argv: list[str] | None = None) -> int:
     wrapper_args, args = parser.parse_known_args(args)
     if "--help" in args or "-h" in args:
         print("robot_lab wrapper option: --max_steps N (positive environment-step limit)")
-
-    import warp as wp
-
-    wp.config.enable_backward = False
-    import robot_lab.tasks  # noqa: F401
-
-    from isaaclab_rl.entrypoints import run_play_cli
 
     # The installed 3.0 launcher uses --viz none; accept the task's headless spelling.
     if "--headless" in args:

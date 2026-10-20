@@ -1,7 +1,7 @@
 # Copyright (c) 2024-2026 Ziqi Fan
 # SPDX-License-Identifier: Apache-2.0
 
-from isaaclab.utils import configclass
+from isaaclab.utils import configclass, replace
 
 import robot_lab.tasks.manager_based.locomotion.velocity.mdp as mdp
 from robot_lab.tasks.manager_based.locomotion.velocity.velocity_env_cfg import LocomotionVelocityRoughEnvCfg
@@ -48,14 +48,16 @@ class UnitreeG1RoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         # post init of parent
         super().__post_init__()
 
-        # ------------------------------Sence------------------------------
-        self.scene.robot = UNITREE_G1_29DOF_CFG.replace(prim_path="{ENV_REGEX_NS}/Robot")
+        # ------------------------------Scene------------------------------
+        self.scene.robot = replace(UNITREE_G1_29DOF_CFG, prim_path="{ENV_REGEX_NS}/Robot")
+        # Merge the fixed sensor frames before mass/COM randomization.
+        self.scene.robot.spawn.merge_fixed_joints = True
         self.scene.height_scanner.prim_path = (
-            "{ENV_REGEX_NS}/Robot/Geometry/base/pelvis/waist_yaw_link/waist_roll_link/torso_link"
+            "{ENV_REGEX_NS}/Robot/Geometry/pelvis/waist_yaw_link/waist_roll_link/torso_link"
         )
         self.scene.height_scanner.spawn = None
         self.scene.height_scanner_base.prim_path = (
-            "{ENV_REGEX_NS}/Robot/Geometry/base/pelvis/waist_yaw_link/waist_roll_link/torso_link"
+            "{ENV_REGEX_NS}/Robot/Geometry/pelvis/waist_yaw_link/waist_roll_link/torso_link"
         )
         self.scene.height_scanner_base.spawn = None
 
@@ -171,8 +173,3 @@ class UnitreeG1RoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         self.commands.base_velocity.ranges.lin_vel_x = (-1.0, 1.0)
         self.commands.base_velocity.ranges.lin_vel_y = (-1.0, 1.0)
         self.commands.base_velocity.ranges.ang_vel_z = (-1.0, 1.0)
-
-        if type(self) is UnitreeG1RoughEnvCfg:
-            from robot_lab.tasks.manager_based.locomotion.velocity.newton_support import configure_newton_from_profile
-
-            configure_newton_from_profile(self, "unitree_g1", njmax=512, nconmax=256)

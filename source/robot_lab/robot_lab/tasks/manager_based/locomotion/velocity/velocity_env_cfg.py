@@ -8,12 +8,6 @@
 
 import math
 from dataclasses import MISSING
-from typing import ClassVar
-
-from isaaclab_newton.physics import MJWarpSolverCfg, NewtonCfg, NewtonCollisionPipelineCfg, NewtonShapeCfg
-from isaaclab_physx.physics import PhysxCfg
-
-from isaaclab_physx.physics import PhysxCfg
 
 import isaaclab.sim as sim_utils
 from isaaclab.assets import ArticulationCfg, AssetBaseCfg
@@ -32,7 +26,7 @@ from isaaclab.utils import configclass
 from isaaclab.utils.assets import ISAAC_NUCLEUS_DIR, ISAACLAB_NUCLEUS_DIR
 from isaaclab.utils.noise import UniformNoiseCfg as Unoise
 
-from isaaclab_tasks.utils import PresetCfg
+from isaaclab_tasks.core.velocity.velocity_env_cfg import RoughPhysicsCfg
 
 import robot_lab.tasks.manager_based.locomotion.velocity.mdp as mdp
 
@@ -40,43 +34,6 @@ import robot_lab.tasks.manager_based.locomotion.velocity.mdp as mdp
 # Pre-defined configs
 ##
 from isaaclab.terrains.config.rough import ROUGH_TERRAINS_CFG  # isort: skip
-
-
-@configclass
-class UrdfNewtonCfg(NewtonCfg):
-    """Newton physics with Kit's URDF importer available at scene construction.
-
-    Local URDF assets require the Kit extension when the standalone importer
-    wheel is absent. This selects a runtime, not PhysX physics or a viewer.
-    """
-
-    launcher_type: ClassVar[str] = "isaaclab_physx.app:KitLauncher"
-
-
-@configclass
-class VelocityPhysicsCfg(PresetCfg):
-    """Opt-in velocity backends; existing tasks retain their plain PhysX config.
-
-    The Newton starting profile follows Isaac Lab 3.0's core velocity task.
-    Each adopting task must validate its asset, sensors and events independently.
-    """
-
-    isaacsim_physx = PhysxCfg(gpu_max_rigid_patch_count=10 * 2**15)
-    default = isaacsim_physx
-    newton_mjwarp = UrdfNewtonCfg(
-        solver_cfg=MJWarpSolverCfg(
-            njmax=1000,
-            nconmax=300,
-            cone="pyramidal",
-            impratio=1.0,
-            integrator="implicitfast",
-            use_mujoco_contacts=False,
-        ),
-        collision_cfg=NewtonCollisionPipelineCfg(max_triangle_pairs=2_500_000),
-        num_substeps=2,
-        debug_mode=False,
-        default_shape_cfg=NewtonShapeCfg(margin=0.0, ke=160000.0, kd=1100.0),
-    )
 
 
 ##
@@ -119,6 +76,7 @@ class MySceneCfg(InteractiveSceneCfg):
         pattern_cfg=patterns.GridPatternCfg(resolution=0.1, size=[1.6, 1.0]),
         debug_vis=False,
         mesh_prim_paths=["/World/ground"],
+        global_world_only=True,
     )
     height_scanner_base = RayCasterCfg(
         prim_path="{ENV_REGEX_NS}/Robot/.*base",
@@ -127,6 +85,7 @@ class MySceneCfg(InteractiveSceneCfg):
         pattern_cfg=patterns.GridPatternCfg(resolution=0.05, size=(0.1, 0.1)),
         debug_vis=False,
         mesh_prim_paths=["/World/ground"],
+        global_world_only=True,
     )
     contact_forces = ContactSensorCfg(prim_path="{ENV_REGEX_NS}/Robot/.*", history_length=3, track_air_time=True)
     # lights
@@ -337,17 +296,6 @@ class EventCfg:
             "recompute_inertia": True,
         },
     )
-
-    # Skip: inertia updated via mass randomization by setting recompute_inertia=True
-    # randomize_rigid_body_inertia = EventTerm(
-    #     func=mdp.randomize_rigid_body_inertia,
-    #     mode="startup",
-    #     params={
-    #         "asset_cfg": SceneEntityCfg("robot", body_names=".*"),
-    #         "inertia_distribution_params": (0.5, 1.5),
-    #         "operation": "scale",
-    #     },
-    # )
 
     randomize_com_positions = EventTerm(
         func=mdp.randomize_rigid_body_com,
@@ -741,8 +689,7 @@ class CurriculumCfg:
 class LocomotionVelocityRoughEnvCfg(ManagerBasedRLEnvCfg):
     """Configuration for the locomotion velocity-tracking environment."""
 
-    # Keep the existing PhysX backend explicit before changing its settings.
-    sim: sim_utils.SimulationCfg = sim_utils.SimulationCfg(physics=PhysxCfg())
+    sim: sim_utils.SimulationCfg = sim_utils.SimulationCfg(physics=RoughPhysicsCfg())
 
     # Scene settings
     scene: MySceneCfg = MySceneCfg(num_envs=4096, env_spacing=2.5)
@@ -765,7 +712,7 @@ class LocomotionVelocityRoughEnvCfg(ManagerBasedRLEnvCfg):
         self.sim.dt = 0.005
         self.sim.render_interval = self.decimation
         self.sim.physics_material = self.scene.terrain.physics_material
-        self.sim.physics.gpu_max_rigid_patch_count = 10 * 2**15
+        self.sim.use_newton_actuators = True
         # update sensor update periods
         # we tick all the sensors based on the smallest update period (physics update period)
         if self.scene.height_scanner is not None:

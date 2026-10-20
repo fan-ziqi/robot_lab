@@ -9,30 +9,27 @@
     python replay_npz.py -f path_to_motion.npz
 """
 
-"""Launch Isaac Sim Simulator first."""
+from __future__ import annotations
 
 import argparse
+from typing import TYPE_CHECKING
 
 import numpy as np
 import torch
 
-from isaaclab.app import AppLauncher
+from isaaclab.app import add_launcher_args, launch_simulation
 
 # add argparse arguments
 parser = argparse.ArgumentParser(description="Replay converted motions.")
 parser.add_argument("--file", "-f", type=str, required=True)
 
-# append AppLauncher cli args
+# append simulation launcher cli args
 parser.add_argument("--headless", action="store_true", help="Run without a visualizer unless --viz is explicit.")
-AppLauncher.add_app_launcher_args(parser)
+add_launcher_args(parser)
 # parse the arguments
 args_cli = parser.parse_args()
 if args_cli.headless and not args_cli.visualizer:
     args_cli.visualizer = ["none"]
-
-# launch omniverse app
-app_launcher = AppLauncher(args_cli)
-simulation_app = app_launcher.app
 
 """Rest everything follows."""
 
@@ -40,15 +37,18 @@ simulation_app = app_launcher.app
 # Pre-defined configs
 ##
 from isaaclab_physx.physics import PhysxCfg
-from robot_lab.assets.unitree import UNITREE_G1_29DOF_CFG
-from robot_lab.tasks.manager_based.beyondmimic.mdp import MotionLoader
 
 import isaaclab.sim as sim_utils
-from isaaclab.assets import Articulation, ArticulationCfg, AssetBaseCfg
-from isaaclab.scene import InteractiveScene, InteractiveSceneCfg
-from isaaclab.sim import SimulationContext
+from isaaclab.assets import ArticulationCfg, AssetBaseCfg
+from isaaclab.scene import InteractiveSceneCfg
 from isaaclab.utils import configclass
 from isaaclab.utils.assets import ISAAC_NUCLEUS_DIR
+
+from robot_lab.assets.unitree import UNITREE_G1_29DOF_CFG
+
+if TYPE_CHECKING:
+    from isaaclab.assets import Articulation
+    from isaaclab.scene import InteractiveScene
 
 
 @configclass
@@ -70,6 +70,8 @@ class ReplayMotionsSceneCfg(InteractiveSceneCfg):
 
 
 def run_simulator(sim: sim_utils.SimulationContext, scene: InteractiveScene):
+    from robot_lab.tasks.manager_based.beyondmimic.mdp import MotionLoader
+
     # Extract scene entities
     robot: Articulation = scene["robot"]
     # Define simulation stepping
@@ -79,23 +81,27 @@ def run_simulator(sim: sim_utils.SimulationContext, scene: InteractiveScene):
         args_cli.file,
         torch.tensor([0], dtype=torch.long, device=sim.device),
         sim.device,
+        body_names=[robot.body_names[0]],
+        joint_names=robot.joint_names,
+        num_robot_bodies=robot.num_bodies,
     )
     time_steps = torch.zeros(scene.num_envs, dtype=torch.long, device=sim.device)
 
     # Simulation loop
-    while simulation_app.is_running():
+    while sim.is_running():
         time_steps += 1
         reset_ids = time_steps >= motion.time_step_total
         time_steps[reset_ids] = 0
 
-        root_states = robot.data.default_root_state.torch.clone()
-        root_states[:, :3] = motion.body_pos_w[time_steps][:, 0] + scene.env_origins[:, None, :]
-        root_states[:, 3:7] = motion.body_quat_w[time_steps][:, 0]
-        root_states[:, 7:10] = motion.body_lin_vel_w[time_steps][:, 0]
-        root_states[:, 10:] = motion.body_ang_vel_w[time_steps][:, 0]
+        root_pose = robot.data.default_root_pose.torch.clone()
+        root_pose[:, :3] = motion.body_pos_w[time_steps][:, 0] + scene.env_origins
+        root_pose[:, 3:7] = motion.body_quat_w[time_steps][:, 0]
+        root_velocity = torch.cat(
+            (motion.body_lin_vel_w[time_steps][:, 0], motion.body_ang_vel_w[time_steps][:, 0]), dim=-1
+        )
 
-        robot.write_root_link_pose_to_sim_index(root_pose=(root_states)[:, :7])
-        robot.write_root_com_velocity_to_sim_index(root_velocity=(root_states)[:, 7:])
+        robot.write_root_link_pose_to_sim_index(root_pose=root_pose)
+        robot.write_root_com_velocity_to_sim_index(root_velocity=root_velocity)
         robot.write_joint_state_to_sim_index(
             position=motion.joint_pos[time_steps], velocity=motion.joint_vel[time_steps]
         )
@@ -103,24 +109,24 @@ def run_simulator(sim: sim_utils.SimulationContext, scene: InteractiveScene):
         sim.render()  # We don't want physic (sim.step())
         scene.update(sim_dt)
 
-        pos_lookat = root_states[0, :3].cpu().numpy()
+        pos_lookat = root_pose[0, :3].cpu().numpy()
         sim.set_camera_view(pos_lookat + np.array([2.0, 2.0, 0.5]), pos_lookat)
 
 
 def main():
     sim_cfg = sim_utils.SimulationCfg(device=args_cli.device, physics=PhysxCfg())
     sim_cfg.dt = 0.02
-    sim = SimulationContext(sim_cfg)
+    with launch_simulation(sim_cfg, args_cli):
+        from isaaclab.scene import InteractiveScene
+        from isaaclab.sim import SimulationContext
 
-    scene_cfg = ReplayMotionsSceneCfg(num_envs=1, env_spacing=2.0)
-    scene = InteractiveScene(scene_cfg)
-    sim.reset()
-    # Run the simulator
-    run_simulator(sim, scene)
+        sim = SimulationContext(sim_cfg)
+        scene_cfg = ReplayMotionsSceneCfg(num_envs=1, env_spacing=2.0)
+        scene = InteractiveScene(scene_cfg)
+        sim.reset()
+        run_simulator(sim, scene)
 
 
 if __name__ == "__main__":
     # run the main function
     main()
-    # close sim app
-    simulation_app.close()

@@ -1,7 +1,7 @@
 # Copyright (c) 2024-2026 Ziqi Fan
 # SPDX-License-Identifier: Apache-2.0
 
-from isaaclab.utils import configclass
+from isaaclab.utils import configclass, replace
 
 from robot_lab.tasks.manager_based.locomotion.velocity.velocity_env_cfg import LocomotionVelocityRoughEnvCfg
 
@@ -28,7 +28,7 @@ class ZsibotZSL1RoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         # post init of parent
         super().__post_init__()
 
-        self.scene.robot = ZSIBOT_ZSL1_CFG.replace(prim_path="{ENV_REGEX_NS}/Robot")
+        self.scene.robot = replace(ZSIBOT_ZSL1_CFG, prim_path="{ENV_REGEX_NS}/Robot")
         self.scene.height_scanner.prim_path = "{ENV_REGEX_NS}/Robot/Geometry/BASE_LINK"
         self.scene.height_scanner.spawn = None
         self.scene.height_scanner_base.prim_path = "{ENV_REGEX_NS}/Robot/Geometry/BASE_LINK"
@@ -160,11 +160,6 @@ class ZsibotZSL1RoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         # self.curriculum.command_levels_ang_vel.params["range_multiplier"] = (0.2, 1.0)
         self.curriculum.command_levels_lin_vel = None
         self.curriculum.command_levels_ang_vel = None
-
-        if type(self) is ZsibotZSL1RoughEnvCfg:
-            from robot_lab.tasks.manager_based.locomotion.velocity.newton_support import configure_newton_from_profile
-
-            configure_newton_from_profile(self, "zsibot_zsl1", njmax=256, nconmax=128)
 
         # ------------------------------Commands------------------------------
         # self.commands.base_velocity.ranges.lin_vel_x = (-1.0, 1.0)

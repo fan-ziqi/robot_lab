@@ -8,15 +8,21 @@
 
 """Script to play a checkpoint if an RL agent from RSL-RL."""
 
-"""Launch Isaac Sim Simulator first."""
-
 import argparse
 import sys
 
-from isaaclab.app import AppLauncher
+import warp as wp
 
-# local imports
-import cli_args  # isort: skip
+wp.config.enable_backward = False
+
+from isaaclab.app import add_launcher_args, launch_simulation
+
+from isaaclab_rl.entrypoints.backends import cli_args_rsl_rl as cli_args
+from isaaclab_rl.entrypoints.common import apply_video_recording, pre_launch_video_config, run_playback
+
+from isaaclab_tasks.utils import resolve_task_config, setup_preset_cli
+
+import robot_lab.tasks  # noqa: F401  # isort: skip
 
 # add argparse arguments
 parser = argparse.ArgumentParser(description="Train an RL agent with RSL-RL.")
@@ -38,14 +44,14 @@ parser.add_argument(
 )
 parser.add_argument("--real-time", action="store_true", default=False, help="Run in real-time, if possible.")
 parser.add_argument("--keyboard", action="store_true", default=False, help="Whether to use keyboard.")
-parser.add_argument("--map", type=str, default=None, help="Dir of the map.")
+parser.add_argument("--map", type=str, required=True, help="USD path of the map.")
 # append RSL-RL cli arguments
 cli_args.add_rsl_rl_args(parser)
-# append AppLauncher cli args
+# append simulation launcher cli args
 parser.add_argument("--headless", action="store_true", help="Run without a viewer (alias for --viz none).")
-AppLauncher.add_app_launcher_args(parser)
+add_launcher_args(parser)
 # parse the arguments
-args_cli, hydra_args = parser.parse_known_args()
+args_cli, hydra_args = setup_preset_cli(parser)
 if args_cli.headless and args_cli.visualizer is None:
     args_cli.visualizer = ["none"]
 # always enable cameras to record video
@@ -57,34 +63,17 @@ if args_cli.video:
 # clear out sys.argv for Hydra
 sys.argv = [sys.argv[0]] + hydra_args
 
-# launch omniverse app
-app_launcher = AppLauncher(args_cli)
-simulation_app = app_launcher.app
-
-"""Check for installed RSL-RL version."""
-
-import importlib.metadata as metadata
-
-from packaging import version
-
-installed_version = metadata.version("rsl-rl-lib")
-
 """Rest everything follows."""
 
 import os
-import time
 
 import gymnasium as gym
 import torch
-from rsl_rl.runners import DistillationRunner, OnPolicyRunner
 
-from isaaclab.devices import Se2Keyboard, Se2KeyboardCfg
 from isaaclab.envs import (
-    DirectMARLEnv,
     DirectMARLEnvCfg,
     DirectRLEnvCfg,
     ManagerBasedRLEnvCfg,
-    VideoRecorderCfg,
     multi_agent_to_single_agent,
 )
 from isaaclab.managers import ObservationTermCfg as ObsTerm
@@ -94,24 +83,26 @@ from isaaclab.utils.assets import retrieve_file_path
 from isaaclab_rl.rsl_rl import (
     RslRlBaseRunnerCfg,
     RslRlVecEnvWrapper,
-    export_policy_as_jit,
-    export_policy_as_onnx,
+    check_rsl_rl_version,
+    create_rsl_rl_runner,
     handle_deprecated_rsl_rl_cfg,
 )
 from isaaclab_rl.utils.pretrained_checkpoint import get_published_pretrained_checkpoint
 
-from isaaclab_tasks.utils import get_checkpoint_path, resolve_task_config
-
-import robot_lab.tasks  # noqa: F401  # isort: skip
+from isaaclab_tasks.utils import get_checkpoint_path
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 from rl_utils import camera_follow
+
+installed_version = check_rsl_rl_version()
 
 # PLACEHOLDER: Extension template (do not remove this comment)
 
 
 def main(env_cfg: ManagerBasedRLEnvCfg | DirectRLEnvCfg | DirectMARLEnvCfg, agent_cfg: RslRlBaseRunnerCfg):
     """Play with RSL-RL agent."""
+    from isaaclab.envs import DirectMARLEnv
+
     # grab task name for checkpoint path
     task_name = args_cli.task.split(":")[-1]
 
@@ -177,11 +168,13 @@ def main(env_cfg: ManagerBasedRLEnvCfg | DirectRLEnvCfg | DirectMARLEnvCfg, agen
     env_cfg.observations.policy.enable_corruption = False
     # remove random pushing
     env_cfg.events.randomize_apply_external_force_torque = None
-    env_cfg.events.push_robot = None
+    env_cfg.events.randomize_push_robot = None
     env_cfg.curriculum.command_levels_lin_vel = None
     env_cfg.curriculum.command_levels_ang_vel = None
 
     if args_cli.keyboard:
+        from isaaclab.devices import Se2Keyboard, Se2KeyboardCfg
+
         env_cfg.scene.num_envs = 1
         env_cfg.terminations.time_out = None
         env_cfg.commands.base_velocity.debug_vis = False
@@ -216,14 +209,7 @@ def main(env_cfg: ManagerBasedRLEnvCfg | DirectRLEnvCfg | DirectMARLEnvCfg, agen
 
     # Configure recording before the environment creates its recorder manager.
     if args_cli.video:
-        env_cfg.video_recorders = [
-            VideoRecorderCfg(
-                source="visualizer:kit",
-                output_dir=os.path.join(log_dir, "videos", "play"),
-                video_length=args_cli.video_length,
-                video_interval=0,
-            )
-        ]
+        apply_video_recording(env_cfg, log_dir, args_cli, subdir="play", checkpoint_path=resume_path)
 
     # create isaac environment
     env = gym.make(args_cli.task, cfg=env_cfg)
@@ -237,12 +223,7 @@ def main(env_cfg: ManagerBasedRLEnvCfg | DirectRLEnvCfg | DirectMARLEnvCfg, agen
 
     print(f"[INFO]: Loading model checkpoint from: {resume_path}")
     # load previously trained model
-    if agent_cfg.class_name == "OnPolicyRunner":
-        runner = OnPolicyRunner(env, agent_cfg.to_dict(), log_dir=None, device=agent_cfg.device)
-    elif agent_cfg.class_name == "DistillationRunner":
-        runner = DistillationRunner(env, agent_cfg.to_dict(), log_dir=None, device=agent_cfg.device)
-    else:
-        raise ValueError(f"Unsupported runner class: {agent_cfg.class_name}")
+    runner = create_rsl_rl_runner(env, agent_cfg)
     runner.load(resume_path)
 
     # obtain the trained policy for inference
@@ -251,68 +232,29 @@ def main(env_cfg: ManagerBasedRLEnvCfg | DirectRLEnvCfg | DirectMARLEnvCfg, agen
     # export the trained policy to JIT and ONNX formats
     export_model_dir = os.path.join(os.path.dirname(resume_path), "exported")
 
-    if version.parse(installed_version) >= version.parse("4.0.0"):
-        # use the new export functions for rsl-rl >= 4.0.0
-        runner.export_policy_to_jit(path=export_model_dir, filename="policy.pt")
-        runner.export_policy_to_onnx(path=export_model_dir, filename="policy.onnx")
-    else:
-        # extract the neural network for rsl-rl < 4.0.0
-        if version.parse(installed_version) >= version.parse("2.3.0"):
-            policy_nn = runner.alg.policy
-        else:
-            policy_nn = runner.alg.actor_critic
-
-        # extract the normalizer
-        if hasattr(policy_nn, "actor_obs_normalizer"):
-            normalizer = policy_nn.actor_obs_normalizer
-        elif hasattr(policy_nn, "student_obs_normalizer"):
-            normalizer = policy_nn.student_obs_normalizer
-        else:
-            normalizer = None
-
-        # export to JIT and ONNX
-        export_policy_as_jit(policy_nn, normalizer=normalizer, path=export_model_dir, filename="policy.pt")
-        export_policy_as_onnx(policy_nn, normalizer=normalizer, path=export_model_dir, filename="policy.onnx")
-
-    dt = env.unwrapped.step_dt
+    runner.export_policy_to_jit(path=export_model_dir, filename="policy.pt")
+    runner.export_policy_to_onnx(path=export_model_dir, filename="policy.onnx")
 
     # reset environment
     obs = env.get_observations()
-    timestep = 0
-    # simulate environment
-    while simulation_app.is_running():
-        start_time = time.time()
-        # run everything in inference mode
-        with torch.inference_mode():
-            # agent stepping
-            actions = policy(obs)
-            # env stepping
-            obs, _, dones, _ = env.step(actions)
-            # reset recurrent states for episodes that have terminated
-            if version.parse(installed_version) >= version.parse("4.0.0"):
-                policy.reset(dones)
-            else:
-                policy_nn.reset(dones)
-        if args_cli.video:
-            timestep += 1
-            # Exit the play loop after recording one video
-            if timestep == args_cli.video_length:
-                break
+
+    def step():
+        nonlocal obs
+        obs, _, dones, _ = env.step(policy(obs))
+        policy.reset(dones)
 
         if args_cli.keyboard:
             camera_follow(env)
 
-        # time delay for real-time evaluation
-        sleep_time = dt - (time.time() - start_time)
-        if args_cli.real_time and sleep_time > 0:
-            time.sleep(sleep_time)
+    run_playback(step, dt=env.unwrapped.step_dt, args_cli=args_cli, env_cfg=env_cfg)
 
     # close the simulator
     env.close()
 
 
 if __name__ == "__main__":
-    # run the main function
-    main(*resolve_task_config(args_cli.task, args_cli.agent, overrides=hydra_args))
-    # close sim app
-    simulation_app.close()
+    env_cfg, agent_cfg = resolve_task_config(args_cli.task, args_cli.agent, overrides=hydra_args, play_mode=True)
+    args_cli.require_kit = args_cli.keyboard
+    pre_launch_video_config(env_cfg, args_cli)
+    with launch_simulation(env_cfg, args_cli):
+        main(env_cfg, agent_cfg)

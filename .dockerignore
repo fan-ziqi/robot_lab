@@ -19,5 +19,10 @@ recordings/
 # ignore __pycache__
 **/__pycache__/
 **/*.egg-info/
+# ignore local environments and package builds
+.venv/
+.venv-*/
+**/build/
+dist/
 # ignore isaac sim symlink
 _isaac_sim?
