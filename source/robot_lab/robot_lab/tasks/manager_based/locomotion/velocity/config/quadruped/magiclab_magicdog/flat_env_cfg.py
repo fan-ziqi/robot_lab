@@ -27,3 +27,8 @@ class MagicDogFlatEnvCfg(MagicDogRoughEnvCfg):
         # If the weight of rewards is 0, set rewards to None
         if self.__class__.__name__ == "MagicDogFlatEnvCfg":
             self.disable_zero_weight_rewards()
+
+        if type(self) is MagicDogFlatEnvCfg:
+            from robot_lab.tasks.manager_based.locomotion.velocity.newton_support import configure_newton_from_profile
+
+            configure_newton_from_profile(self, "magiclab_magicdog", njmax=256, nconmax=128)

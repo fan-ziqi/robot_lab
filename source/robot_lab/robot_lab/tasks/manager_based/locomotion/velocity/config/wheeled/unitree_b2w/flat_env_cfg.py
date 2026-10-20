@@ -27,3 +27,8 @@ class UnitreeB2WFlatEnvCfg(UnitreeB2WRoughEnvCfg):
         # If the weight of rewards is 0, set rewards to None
         if self.__class__.__name__ == "UnitreeB2WFlatEnvCfg":
             self.disable_zero_weight_rewards()
+
+        if type(self) is UnitreeB2WFlatEnvCfg:
+            from robot_lab.tasks.manager_based.locomotion.velocity.newton_support import configure_newton_from_profile
+
+            configure_newton_from_profile(self, "unitree_b2w", njmax=512, nconmax=128)

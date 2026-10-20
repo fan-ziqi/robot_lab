@@ -13,6 +13,8 @@ class UnitreeGo2FlatEnvCfg(UnitreeGo2RoughEnvCfg):
         super().__post_init__()
 
         # Twice the measured 64-constraint peak; contacts also gain headroom.
+        self.sim.physics.newton_mjwarp.solver_cfg.njmax = 128
+        self.sim.physics.newton_mjwarp.solver_cfg.nconmax = 64
 
         # override rewards
         self.rewards.base_height_l2.params["sensor_cfg"] = None

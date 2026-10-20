@@ -52,3 +52,6 @@ from .utils import is_env_assigned_to_terrain, is_robot_on_terrain
 
 from isaaclab.envs.mdp import *
 from isaaclab_tasks.core.velocity.mdp import *
+
+from .events import floor_body_mass as floor_body_mass
+from .terminations import invalid_physics_state as invalid_physics_state

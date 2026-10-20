@@ -5,6 +5,8 @@ from isaaclab.utils import configclass
 
 from robot_lab.tasks.manager_based.locomotion.velocity.velocity_env_cfg import LocomotionVelocityRoughEnvCfg
 
+from .newton_cfg import configure_go2_newton
+
 ##
 # Pre-defined configs
 ##
@@ -169,3 +171,4 @@ class UnitreeGo2RoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         # self.commands.base_velocity.ranges.ang_vel_z = (-1.0, 1.0)
 
         # Opt in only after the legacy task has been completely initialized.
+        configure_go2_newton(self)
