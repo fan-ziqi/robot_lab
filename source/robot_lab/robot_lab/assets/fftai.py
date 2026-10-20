@@ -24,8 +24,7 @@ from robot_lab.assets import ISAACLAB_ASSETS_DATA_DIR
 FFTAI_GR1T1_CFG = ArticulationCfg(
     spawn=sim_utils.UrdfFileCfg(
         fix_base=False,
-        merge_fixed_joints=True,
-        replace_cylinders_with_capsules=False,
+        merge_fixed_joints=False,
         asset_path=f"{ISAACLAB_ASSETS_DATA_DIR}/Robots/fftai/gr1t1_description/urdf/GR1T1.urdf",
         activate_contact_sensors=True,
         rigid_props=sim_utils.RigidBodyPropertiesCfg(

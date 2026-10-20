@@ -1,12 +1,6 @@
 # Copyright (c) 2024-2026 Ziqi Fan
 # SPDX-License-Identifier: Apache-2.0
 
-"""
-Python module serving as a project/extension template.
-"""
+"""Robot Lab task registration without a Kit UI dependency."""
 
-# Register Gym environments.
-from .tasks import *
-
-# Register UI extensions.
-from .ui_extension_example import *
+from . import tasks  # noqa: F401

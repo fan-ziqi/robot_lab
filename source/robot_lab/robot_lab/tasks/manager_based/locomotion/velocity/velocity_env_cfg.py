@@ -9,6 +9,8 @@
 import math
 from dataclasses import MISSING
 
+from isaaclab_physx.physics import PhysxCfg
+
 import isaaclab.sim as sim_utils
 from isaaclab.assets import ArticulationCfg, AssetBaseCfg
 from isaaclab.envs import ManagerBasedRLEnvCfg
@@ -24,7 +26,7 @@ from isaaclab.sensors import ContactSensorCfg, RayCasterCfg, patterns
 from isaaclab.terrains import TerrainImporterCfg
 from isaaclab.utils import configclass
 from isaaclab.utils.assets import ISAAC_NUCLEUS_DIR, ISAACLAB_NUCLEUS_DIR
-from isaaclab.utils.noise import AdditiveUniformNoiseCfg as Unoise
+from isaaclab.utils.noise import UniformNoiseCfg as Unoise
 
 import robot_lab.tasks.manager_based.locomotion.velocity.mdp as mdp
 
@@ -68,7 +70,7 @@ class MySceneCfg(InteractiveSceneCfg):
     robot: ArticulationCfg = MISSING
     # sensors
     height_scanner = RayCasterCfg(
-        prim_path="{ENV_REGEX_NS}/Robot/base",
+        prim_path="{ENV_REGEX_NS}/Robot/.*base",
         offset=RayCasterCfg.OffsetCfg(pos=(0.0, 0.0, 20.0)),
         ray_alignment="yaw",
         pattern_cfg=patterns.GridPatternCfg(resolution=0.1, size=[1.6, 1.0]),
@@ -76,7 +78,7 @@ class MySceneCfg(InteractiveSceneCfg):
         mesh_prim_paths=["/World/ground"],
     )
     height_scanner_base = RayCasterCfg(
-        prim_path="{ENV_REGEX_NS}/Robot/base",
+        prim_path="{ENV_REGEX_NS}/Robot/.*base",
         offset=RayCasterCfg.OffsetCfg(pos=(0.0, 0.0, 20.0)),
         ray_alignment="yaw",
         pattern_cfg=patterns.GridPatternCfg(resolution=0.05, size=(0.1, 0.1)),
@@ -696,6 +698,9 @@ class CurriculumCfg:
 class LocomotionVelocityRoughEnvCfg(ManagerBasedRLEnvCfg):
     """Configuration for the locomotion velocity-tracking environment."""
 
+    # Keep the existing PhysX backend explicit before changing its settings.
+    sim: sim_utils.SimulationCfg = sim_utils.SimulationCfg(physics=PhysxCfg())
+
     # Scene settings
     scene: MySceneCfg = MySceneCfg(num_envs=4096, env_spacing=2.5)
     # Basic settings
@@ -717,7 +722,7 @@ class LocomotionVelocityRoughEnvCfg(ManagerBasedRLEnvCfg):
         self.sim.dt = 0.005
         self.sim.render_interval = self.decimation
         self.sim.physics_material = self.scene.terrain.physics_material
-        self.sim.physx.gpu_max_rigid_patch_count = 10 * 2**15
+        self.sim.physics.gpu_max_rigid_patch_count = 10 * 2**15
         # update sensor update periods
         # we tick all the sensors based on the smallest update period (physics update period)
         if self.scene.height_scanner is not None:

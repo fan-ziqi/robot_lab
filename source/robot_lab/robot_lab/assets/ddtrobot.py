@@ -22,8 +22,7 @@ from robot_lab.assets import ISAACLAB_ASSETS_DATA_DIR
 DDTROBOT_TITA_CFG = ArticulationCfg(
     spawn=sim_utils.UrdfFileCfg(
         fix_base=False,
-        merge_fixed_joints=True,
-        replace_cylinders_with_capsules=False,
+        merge_fixed_joints=False,
         asset_path=f"{ISAACLAB_ASSETS_DATA_DIR}/Robots/ddt/tita_description/urdf/tita.urdf",
         activate_contact_sensors=True,
         rigid_props=sim_utils.RigidBodyPropertiesCfg(
@@ -60,36 +59,40 @@ DDTROBOT_TITA_CFG = ArticulationCfg(
     actuators={
         "hip": DCMotorCfg(
             joint_names_expr=["joint_left_leg_1", "joint_right_leg_1"],
-            effort_limit=60.0,
+            joint_effort_limit=1.0e9,  # Preserve the Isaac Lab 2.x explicit-actuator solver clamp.
+            actuator_effort_limit=60.0,
             saturation_effort=60.0,
-            velocity_limit=25.0,
+            actuator_velocity_limit=25.0,
             stiffness=40.0,
             damping=1.0,
             friction=0.0,
         ),
         "thigh": DCMotorCfg(
             joint_names_expr=["joint_left_leg_2", "joint_right_leg_2"],
-            effort_limit=60.0,
+            joint_effort_limit=1.0e9,  # Preserve the Isaac Lab 2.x explicit-actuator solver clamp.
+            actuator_effort_limit=60.0,
             saturation_effort=60.0,
-            velocity_limit=25.0,
+            actuator_velocity_limit=25.0,
             stiffness=40.0,
             damping=1.0,
             friction=0.0,
         ),
         "calf": DCMotorCfg(
             joint_names_expr=["joint_left_leg_3", "joint_right_leg_3"],
-            effort_limit=60.0,
+            joint_effort_limit=1.0e9,  # Preserve the Isaac Lab 2.x explicit-actuator solver clamp.
+            actuator_effort_limit=60.0,
             saturation_effort=60.0,
-            velocity_limit=25.0,
+            actuator_velocity_limit=25.0,
             stiffness=40.0,
             damping=1.0,
             friction=0.0,
         ),
         "wheel": DCMotorCfg(
             joint_names_expr=["joint_left_leg_4", "joint_right_leg_4"],
-            effort_limit=15.0,
+            joint_effort_limit=1.0e9,  # Preserve the Isaac Lab 2.x explicit-actuator solver clamp.
+            actuator_effort_limit=15.0,
             saturation_effort=15.0,
-            velocity_limit=20.0,
+            actuator_velocity_limit=20.0,
             stiffness=0.0,
             damping=1.0,
             friction=0.0,

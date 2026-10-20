@@ -10,8 +10,7 @@ from robot_lab.assets import ISAACLAB_ASSETS_DATA_DIR
 ROBOTERA_XBOT_CFG = ArticulationCfg(
     spawn=sim_utils.UrdfFileCfg(
         fix_base=False,
-        merge_fixed_joints=True,
-        replace_cylinders_with_capsules=False,
+        merge_fixed_joints=False,
         asset_path=f"{ISAACLAB_ASSETS_DATA_DIR}/Robots/robotera/xbot_description/urdf/robot.urdf",
         activate_contact_sensors=True,
         rigid_props=sim_utils.RigidBodyPropertiesCfg(
@@ -44,13 +43,13 @@ ROBOTERA_XBOT_CFG = ArticulationCfg(
                 ".*_leg_pitch_joint",
                 ".*_knee_joint",
             ],
-            effort_limit_sim={
+            joint_effort_limit={
                 ".*_leg_roll_joint": 100,
                 ".*_leg_yaw_joint": 100,
                 ".*_leg_pitch_joint": 250,
                 ".*_knee_joint": 250,
             },
-            velocity_limit_sim=12,
+            joint_velocity_limit=12,
             stiffness={
                 ".*_leg_roll_joint": 200,
                 ".*_leg_yaw_joint": 200,
@@ -62,16 +61,16 @@ ROBOTERA_XBOT_CFG = ArticulationCfg(
         ),
         "feet": ImplicitActuatorCfg(
             joint_names_expr=[".*_ankle_pitch_joint", ".*_ankle_roll_joint"],
-            effort_limit_sim=100,
-            velocity_limit_sim=12.0,
+            joint_effort_limit=100,
+            joint_velocity_limit=12.0,
             stiffness=15.0,
             damping=10.0,
             armature=0.01,
         ),
         "waist": ImplicitActuatorCfg(
             joint_names_expr=["waist_.*"],
-            effort_limit_sim=100,
-            velocity_limit_sim=12.0,
+            joint_effort_limit=100,
+            joint_velocity_limit=12.0,
             stiffness=200.0,
             damping=10.0,
             armature=0.01,
@@ -86,7 +85,7 @@ ROBOTERA_XBOT_CFG = ArticulationCfg(
                 ".*_wrist_roll_joint",
                 ".*_wrist_yaw_joint",
             ],
-            effort_limit_sim={
+            joint_effort_limit={
                 ".*_shoulder_pitch_joint": 80,
                 ".*_shoulder_roll_joint": 80,
                 ".*_arm_yaw_joint": 50,
@@ -95,7 +94,7 @@ ROBOTERA_XBOT_CFG = ArticulationCfg(
                 ".*_wrist_roll_joint": 50,
                 ".*_wrist_yaw_joint": 50,
             },
-            velocity_limit_sim=7.0,
+            joint_velocity_limit=7.0,
             stiffness=100.0,
             damping=10.0,
             armature=0.01,

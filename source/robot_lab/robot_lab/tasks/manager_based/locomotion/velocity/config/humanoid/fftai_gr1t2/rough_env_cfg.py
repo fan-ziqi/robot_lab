@@ -24,8 +24,10 @@ class FFTAIGR1T2RoughEnvCfg(LocomotionVelocityRoughEnvCfg):
 
         # ------------------------------Sence------------------------------
         self.scene.robot = FFTAI_GR1T2_CFG.replace(prim_path="{ENV_REGEX_NS}/Robot")
-        self.scene.height_scanner.prim_path = "{ENV_REGEX_NS}/Robot/" + self.base_link_name
-        self.scene.height_scanner_base.prim_path = "{ENV_REGEX_NS}/Robot/" + self.base_link_name
+        self.scene.height_scanner.prim_path = "{ENV_REGEX_NS}/Robot/Geometry/base"
+        self.scene.height_scanner.spawn = None
+        self.scene.height_scanner_base.prim_path = "{ENV_REGEX_NS}/Robot/Geometry/base"
+        self.scene.height_scanner_base.spawn = None
 
         # ------------------------------Observations------------------------------
         self.observations.policy.base_lin_vel.scale = 2.0

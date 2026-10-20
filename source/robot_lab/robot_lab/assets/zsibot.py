@@ -14,8 +14,7 @@ from robot_lab.assets import ISAACLAB_ASSETS_DATA_DIR
 ZSIBOT_ZSL1_CFG = ArticulationCfg(
     spawn=sim_utils.UrdfFileCfg(
         fix_base=False,
-        merge_fixed_joints=True,
-        replace_cylinders_with_capsules=False,
+        merge_fixed_joints=False,
         asset_path=f"{ISAACLAB_ASSETS_DATA_DIR}/Robots/zsibot/zsl1_description/urdf/zsl1.urdf",
         activate_contact_sensors=True,
         rigid_props=sim_utils.RigidBodyPropertiesCfg(
@@ -47,9 +46,10 @@ ZSIBOT_ZSL1_CFG = ArticulationCfg(
     actuators={
         "base_legs": DCMotorCfg(
             joint_names_expr=[".*_ABAD_JOINT", ".*_HIP_JOINT", ".*_KNEE_JOINT"],
-            effort_limit=28,
+            joint_effort_limit=1.0e9,  # Preserve the Isaac Lab 2.x explicit-actuator solver clamp.
+            actuator_effort_limit=28,
             saturation_effort=28,
-            velocity_limit=28,
+            actuator_velocity_limit=28,
             stiffness=20.0,
             damping=0.7,
             friction=0.0,
@@ -60,8 +60,7 @@ ZSIBOT_ZSL1_CFG = ArticulationCfg(
 ZSIBOT_ZSL1W_CFG = ArticulationCfg(
     spawn=sim_utils.UrdfFileCfg(
         fix_base=False,
-        merge_fixed_joints=True,
-        replace_cylinders_with_capsules=False,
+        merge_fixed_joints=False,
         asset_path=f"{ISAACLAB_ASSETS_DATA_DIR}/Robots/zsibot/zsl1w_description/urdf/zsl1w.urdf",
         activate_contact_sensors=True,
         rigid_props=sim_utils.RigidBodyPropertiesCfg(
@@ -94,17 +93,18 @@ ZSIBOT_ZSL1W_CFG = ArticulationCfg(
     actuators={
         "legs": DCMotorCfg(
             joint_names_expr=[".*_ABAD_JOINT", ".*_HIP_JOINT", ".*_KNEE_JOINT"],
-            effort_limit=28,
+            joint_effort_limit=1.0e9,  # Preserve the Isaac Lab 2.x explicit-actuator solver clamp.
+            actuator_effort_limit=28,
             saturation_effort=28,
-            velocity_limit=28,
+            actuator_velocity_limit=28,
             stiffness=20.0,
             damping=0.7,
             friction=0.0,
         ),
         "wheels": ImplicitActuatorCfg(
             joint_names_expr=[".*_FOOT_JOINT"],
-            effort_limit_sim=28,
-            velocity_limit_sim=28,
+            joint_effort_limit=28,
+            joint_velocity_limit=28,
             stiffness=0.0,
             damping=0.7,
             friction=0.0,

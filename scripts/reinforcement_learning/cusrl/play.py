@@ -9,10 +9,26 @@ import argparse
 import os
 import sys
 
+import warp as wp
+
+wp.config.enable_backward = False
+
 from isaaclab.app import AppLauncher
 
+
 # add argparse arguments
+def positive_int(value: str) -> int:
+    value = int(value)
+    if value <= 0:
+        raise argparse.ArgumentTypeError("must be a positive integer")
+    return value
+
+
 parser = argparse.ArgumentParser(description="Evaluate an RL agent with CusRL.")
+parser.add_argument(
+    "--max_steps", type=positive_int, default=None, help="Stop playback after this many environment steps."
+)
+parser.add_argument("--disable-export", action="store_true", help="Skip ONNX and JIT policy exports.")
 parser.add_argument("--video", action="store_true", default=False, help="Record videos during training.")
 parser.add_argument("--video_length", type=int, default=200, help="Length of the recorded video (in steps).")
 parser.add_argument(
@@ -34,12 +50,17 @@ parser.add_argument(
 parser.add_argument("--keyboard", action="store_true", default=False, help="Whether to use keyboard.")
 
 # append AppLauncher cli args
+parser.add_argument("--headless", action="store_true", help="Run without a viewer (alias for --viz none).")
 AppLauncher.add_app_launcher_args(parser)
 # parse the arguments
 args_cli, hydra_args = parser.parse_known_args()
+if args_cli.headless and args_cli.visualizer is None:
+    args_cli.visualizer = ["none"]
 # always enable cameras to record video
 if args_cli.video:
     args_cli.enable_cameras = True
+    if args_cli.visualizer is None:
+        args_cli.visualizer = ["kit"]
 
 # clear out sys.argv for Hydra
 sys.argv = [sys.argv[0]] + hydra_args
@@ -61,12 +82,12 @@ from isaaclab.envs import (
     DirectMARLEnvCfg,  # noqa: F401
     DirectRLEnvCfg,  # noqa: F401
     ManagerBasedRLEnvCfg,  # noqa: F401
+    VideoRecorderCfg,
     multi_agent_to_single_agent,
 )
 from isaaclab.managers import ObservationTermCfg as ObsTerm
-from isaaclab.utils.dict import print_dict
 
-from isaaclab_tasks.utils.hydra import hydra_task_config  # noqa: F401
+from isaaclab_tasks.utils import resolve_task_config
 
 import robot_lab.tasks  # noqa: F401  # isort: skip
 
@@ -80,7 +101,16 @@ class CameraFollowPlayerHook(cusrl.Player.Hook):
         camera_follow(self.player.environment)
 
 
-@hydra_task_config(args_cli.task, args_cli.agent)
+class PlaybackStepCounter(cusrl.Player.Hook):
+    """Count callbacks after the environment and agent complete each step."""
+
+    def __init__(self):
+        self.completed_steps = 0
+
+    def step(self, step: int, transition: dict, metrics: dict):
+        self.completed_steps += 1
+
+
 def main(env_cfg: ManagerBasedRLEnvCfg | DirectRLEnvCfg | DirectMARLEnvCfg, agent_cfg: TrainerCfg):
     """Play with CusRL-RL agent."""
     # set the environment seed
@@ -132,24 +162,23 @@ def main(env_cfg: ManagerBasedRLEnvCfg | DirectRLEnvCfg | DirectMARLEnvCfg, agen
         log_dir = os.path.join("logs", "cusrl", agent_cfg.experiment_name)
         log_dir = os.path.abspath(log_dir)
 
+    # Configure recording before the environment creates its recorder manager.
+    if args_cli.video:
+        env_cfg.video_recorders = [
+            VideoRecorderCfg(
+                source="visualizer:kit",
+                output_dir=os.path.join(log_dir, "videos", "play"),
+                video_length=args_cli.video_length,
+                video_interval=0,
+            )
+        ]
+
     # create isaac environment
-    env = gym.make(args_cli.task, cfg=env_cfg, render_mode="rgb_array" if args_cli.video else None)
+    env = gym.make(args_cli.task, cfg=env_cfg)
 
     # convert to single-agent instance if required by the RL algorithm
     if isinstance(env.unwrapped, DirectMARLEnv):
         env = multi_agent_to_single_agent(env)
-
-    # wrap for video recording
-    if args_cli.video:
-        video_kwargs = {
-            "video_folder": os.path.join(log_dir, "videos", "play"),
-            "step_trigger": lambda step: step == 0,
-            "video_length": args_cli.video_length,
-            "disable_logger": True,
-        }
-        print("[INFO] Recording videos during training.")
-        print_dict(video_kwargs, nesting=4)
-        env = gym.wrappers.RecordVideo(env, **video_kwargs)
 
     # create player from cusrl
     player = cusrl.Player(
@@ -157,17 +186,25 @@ def main(env_cfg: ManagerBasedRLEnvCfg | DirectRLEnvCfg | DirectMARLEnvCfg, agen
         agent=agent_cfg.agent_factory.override(device=args_cli.device),
         checkpoint_path=trial,
         deterministic=not args_cli.stochastic,
+        num_steps=args_cli.max_steps,
     )
 
-    export_model_dir = os.path.join(log_dir, "exported")
-    player.agent.export(output_dir=export_model_dir, target_format="onnx", verbose=args_cli.verbose)
-    player.agent.export(output_dir=export_model_dir, target_format="jit", verbose=args_cli.verbose)
+    if not args_cli.disable_export:
+        export_model_dir = os.path.join(log_dir, "exported")
+        player.agent.export(output_dir=export_model_dir, target_format="onnx", verbose=args_cli.verbose)
+        player.agent.export(output_dir=export_model_dir, target_format="jit", verbose=args_cli.verbose)
 
     if args_cli.keyboard:
         player.register_hook(CameraFollowPlayerHook())
 
+    step_counter = PlaybackStepCounter()
+    player.register_hook(step_counter)
+
     # run playing loop
     player.run_playing_loop()
+    print(f"[robot_lab] playback_steps={step_counter.completed_steps} requested_max_steps={args_cli.max_steps}")
+    if args_cli.max_steps is not None and step_counter.completed_steps != args_cli.max_steps:
+        raise RuntimeError(f"Playback completed {step_counter.completed_steps} steps; expected {args_cli.max_steps}")
 
     # close the simulator
     env.close()
@@ -175,6 +212,6 @@ def main(env_cfg: ManagerBasedRLEnvCfg | DirectRLEnvCfg | DirectMARLEnvCfg, agen
 
 if __name__ == "__main__":
     # run the main function
-    main()
+    main(*resolve_task_config(args_cli.task, args_cli.agent, overrides=hydra_args))
     # close sim app
     simulation_app.close()

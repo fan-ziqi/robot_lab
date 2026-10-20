@@ -10,8 +10,7 @@ from robot_lab.assets import ISAACLAB_ASSETS_DATA_DIR
 BOOSTER_T1_CFG = ArticulationCfg(
     spawn=sim_utils.UrdfFileCfg(
         fix_base=False,
-        merge_fixed_joints=True,
-        replace_cylinders_with_capsules=False,
+        merge_fixed_joints=False,
         asset_path=f"{ISAACLAB_ASSETS_DATA_DIR}/Robots/booster/t1_description/urdf/robot.urdf",
         activate_contact_sensors=True,
         rigid_props=sim_utils.RigidBodyPropertiesCfg(
@@ -65,14 +64,14 @@ BOOSTER_T1_CFG = ArticulationCfg(
                 ".*_Knee_Pitch",
                 "Waist",
             ],
-            effort_limit_sim={
+            joint_effort_limit={
                 ".*_Hip_Pitch": 45.0,
                 ".*_Hip_Roll": 30.0,
                 ".*_Hip_Yaw": 30.0,
                 ".*_Knee_Pitch": 60.0,
                 "Waist": 30.0,
             },
-            velocity_limit_sim={
+            joint_velocity_limit={
                 ".*_Hip_Pitch": 12.5,
                 ".*_Hip_Roll": 10.9,
                 ".*_Hip_Yaw": 10.9,
@@ -85,8 +84,8 @@ BOOSTER_T1_CFG = ArticulationCfg(
         ),
         "feet": ImplicitActuatorCfg(
             joint_names_expr=[".*_Ankle_Pitch", ".*_Ankle_Roll"],
-            effort_limit_sim={".*_Ankle_Pitch": 24, ".*_Ankle_Roll": 15},
-            velocity_limit_sim={".*_Ankle_Pitch": 18.8, ".*_Ankle_Roll": 12.4},
+            joint_effort_limit={".*_Ankle_Pitch": 24, ".*_Ankle_Roll": 15},
+            joint_velocity_limit={".*_Ankle_Pitch": 18.8, ".*_Ankle_Roll": 12.4},
             stiffness=50.0,
             damping=1.0,
             armature=0.01,
@@ -98,8 +97,8 @@ BOOSTER_T1_CFG = ArticulationCfg(
                 ".*_Elbow_Pitch",
                 ".*_Elbow_Yaw",
             ],
-            effort_limit_sim=18.0,
-            velocity_limit_sim=18.8,
+            joint_effort_limit=18.0,
+            joint_velocity_limit=18.8,
             stiffness=40.0,
             damping=10.0,
             armature=0.01,

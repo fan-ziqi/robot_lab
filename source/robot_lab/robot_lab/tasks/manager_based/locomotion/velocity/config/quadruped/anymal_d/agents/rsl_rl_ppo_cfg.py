@@ -11,7 +11,7 @@ from isaaclab_rl.rsl_rl import (
     RslRlSymmetryCfg,
 )
 
-from isaaclab_tasks.manager_based.locomotion.velocity.mdp.symmetry import anymal
+from isaaclab_tasks.core.velocity.mdp.symmetry import anymal
 
 
 @configclass

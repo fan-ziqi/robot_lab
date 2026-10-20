@@ -18,6 +18,7 @@ Guidelines for modifications:
 * [Chengrui Zhu](https://github.com/chengruiz)
 * [DDT Robot](https://directdrive.com)
 * [Deep Robotics](https://www.deeprobotics.cn/en)
+* [Kuankuan Sima](https://github.com/SimonKennethRobo)
 * [Magiclab](https://www.magiclab.top/)
 * [RoboParty](https://roboparty.cn/)
 * [Yankai Xiang](https://github.com/cmjang)

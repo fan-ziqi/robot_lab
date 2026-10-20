@@ -17,7 +17,6 @@ MAGICLAB_BOT_GEN1_CFG = ArticulationCfg(
     spawn=sim_utils.UrdfFileCfg(
         fix_base=False,
         merge_fixed_joints=False,
-        replace_cylinders_with_capsules=False,
         asset_path=f"{ISAACLAB_ASSETS_DATA_DIR}/Robots/magiclab/magicbot-Gen1/urdf/MAGICBOT.urdf",
         activate_contact_sensors=True,
         rigid_props=sim_utils.RigidBodyPropertiesCfg(
@@ -58,8 +57,8 @@ MAGICLAB_BOT_GEN1_CFG = ArticulationCfg(
                 "JOINT_HIP_PITCH_.*",
                 "JOINT_KNEE_PITCH_.*",
             ],
-            effort_limit_sim=300,
-            velocity_limit_sim=100.0,
+            joint_effort_limit=300,
+            joint_velocity_limit=100.0,
             stiffness={
                 "JOINT_HIP_PITCH_.*": 200.0,
                 "JOINT_HIP_ROLL_.*": 150.0,
@@ -78,7 +77,7 @@ MAGICLAB_BOT_GEN1_CFG = ArticulationCfg(
             },
         ),
         "feet": ImplicitActuatorCfg(
-            effort_limit_sim=20,
+            joint_effort_limit=20,
             joint_names_expr=["JOINT_ANKLE_PITCH_.*", "JOINT_ANKLE_ROLL_.*"],
             stiffness=20.0,
             damping=2.0,
@@ -88,8 +87,8 @@ MAGICLAB_BOT_GEN1_CFG = ArticulationCfg(
             joint_names_expr=[
                 "joint_.*a1",
             ],
-            effort_limit_sim=300,
-            velocity_limit_sim=100.0,
+            joint_effort_limit=300,
+            joint_velocity_limit=100.0,
             stiffness=40.0,
             damping=10.0,
             armature={
@@ -104,7 +103,6 @@ MAGICLAB_BOT_Z1_CFG = ArticulationCfg(
     spawn=sim_utils.UrdfFileCfg(
         fix_base=False,
         merge_fixed_joints=False,
-        replace_cylinders_with_capsules=False,
         asset_path=f"{ISAACLAB_ASSETS_DATA_DIR}/Robots/magiclab/magicbot-Z1/urdf/MagicBotZ1.urdf",
         activate_contact_sensors=True,
         rigid_props=sim_utils.RigidBodyPropertiesCfg(
@@ -145,8 +143,8 @@ MAGICLAB_BOT_Z1_CFG = ArticulationCfg(
                 "JOINT_HIP_PITCH_.*",
                 "JOINT_KNEE_PITCH_.*",
             ],
-            effort_limit_sim=300,
-            velocity_limit_sim=100.0,
+            joint_effort_limit=300,
+            joint_velocity_limit=100.0,
             stiffness={
                 "JOINT_HIP_PITCH_.*": 200.0,
                 "JOINT_HIP_ROLL_.*": 150.0,
@@ -165,7 +163,7 @@ MAGICLAB_BOT_Z1_CFG = ArticulationCfg(
             },
         ),
         "feet": ImplicitActuatorCfg(
-            effort_limit_sim=20,
+            joint_effort_limit=20,
             joint_names_expr=["JOINT_ANKLE_PITCH_.*", "JOINT_ANKLE_ROLL_.*"],
             stiffness=20.0,
             damping=2.0,
@@ -175,8 +173,8 @@ MAGICLAB_BOT_Z1_CFG = ArticulationCfg(
             joint_names_expr=[
                 "joint_.*a1",
             ],
-            effort_limit_sim=300,
-            velocity_limit_sim=100.0,
+            joint_effort_limit=300,
+            joint_velocity_limit=100.0,
             stiffness=40.0,
             damping=10.0,
             armature={
@@ -191,7 +189,6 @@ MAGICDOG_CFG = ArticulationCfg(
     spawn=sim_utils.UrdfFileCfg(
         fix_base=False,
         merge_fixed_joints=False,
-        replace_cylinders_with_capsules=False,
         asset_path=f"{ISAACLAB_ASSETS_DATA_DIR}/Robots/magiclab/magicdog/urdf/magicdog.urdf",
         activate_contact_sensors=True,
         rigid_props=sim_utils.RigidBodyPropertiesCfg(
@@ -225,9 +222,10 @@ MAGICDOG_CFG = ArticulationCfg(
     actuators={
         "legs": DCMotorCfg(
             joint_names_expr=[".*"],
-            effort_limit=25.0,
+            joint_effort_limit=1.0e9,  # Preserve the Isaac Lab 2.x explicit-actuator solver clamp.
+            actuator_effort_limit=25.0,
             saturation_effort=25.0,
-            velocity_limit=22.0,
+            actuator_velocity_limit=22.0,
             stiffness=30.0,
             damping=1.0,
             friction=0.0,
@@ -239,8 +237,7 @@ MAGICDOG_CFG = ArticulationCfg(
 MAGICDOG_W_CFG = ArticulationCfg(
     spawn=sim_utils.UrdfFileCfg(
         fix_base=False,
-        merge_fixed_joints=True,
-        replace_cylinders_with_capsules=False,
+        merge_fixed_joints=False,
         asset_path=f"{ISAACLAB_ASSETS_DATA_DIR}/Robots/magiclab/magicdog_w/urdf/magicdog_w.urdf",
         activate_contact_sensors=True,
         rigid_props=sim_utils.RigidBodyPropertiesCfg(
@@ -274,18 +271,19 @@ MAGICDOG_W_CFG = ArticulationCfg(
     soft_joint_pos_limit_factor=1.0,
     actuators={
         "legs": DCMotorCfg(
-            joint_names_expr=["^(?!.*_foot_joint).*"],
-            effort_limit=37.5,
+            joint_names_expr=["^(?!.*_wheel_joint).*"],
+            joint_effort_limit=1.0e9,  # Preserve the Isaac Lab 2.x explicit-actuator solver clamp.
+            actuator_effort_limit=37.5,
             saturation_effort=37.5,
-            velocity_limit=15.0,
+            actuator_velocity_limit=15.0,
             stiffness=30.0,
             damping=1.0,
             friction=0.0,
         ),
         "wheels": ImplicitActuatorCfg(
             joint_names_expr=[".*_wheel_joint"],
-            effort_limit_sim=15.0,
-            velocity_limit_sim=35.0,
+            joint_effort_limit=15.0,
+            joint_velocity_limit=35.0,
             stiffness=0.0,
             damping=0.2,
             friction=0.0,

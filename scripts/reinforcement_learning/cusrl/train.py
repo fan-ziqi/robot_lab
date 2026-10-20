@@ -9,12 +9,24 @@ import argparse
 import os
 import sys
 
+import warp as wp
+
+wp.config.enable_backward = False
+
 from isaaclab.app import AppLauncher
 
 # local imports
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
+
 # add argparse arguments
+def positive_int(value: str) -> int:
+    value = int(value)
+    if value <= 0:
+        raise argparse.ArgumentTypeError("must be a positive integer")
+    return value
+
+
 parser = argparse.ArgumentParser(description="Train an RL agent with CusRL.")
 parser.add_argument("--video", action="store_true", default=False, help="Record videos during training.")
 parser.add_argument("--video_length", type=int, default=200, help="Length of the recorded video (in steps).")
@@ -29,16 +41,24 @@ parser.add_argument("--run_name", type=str, default=None, help="Name of the run 
 parser.add_argument("--checkpoint", type=str, default=None, help="Checkpoint to load for resuming training.")
 parser.add_argument("--logger", type=str, default="tensorboard", help="Logger to use for training.")
 parser.add_argument("--max_iterations", type=int, default=None, help="RL Policy training iterations.")
+parser.add_argument(
+    "--save_interval", type=positive_int, default=None, help="Checkpoint interval in training iterations."
+)
 parser.add_argument("--autocast", nargs="?", const=True, help="Datatype for automatic mixed precision.")
 parser.add_argument("--compile", action="store_true", help="Whether to use `torch.compile` for optimization.")
 
 # append AppLauncher cli args
+parser.add_argument("--headless", action="store_true", help="Run without a viewer (alias for --viz none).")
 AppLauncher.add_app_launcher_args(parser)
 args_cli, hydra_args = parser.parse_known_args()
+if args_cli.headless and args_cli.visualizer is None:
+    args_cli.visualizer = ["none"]
 
 # always enable cameras to record video
 if args_cli.video:
     args_cli.enable_cameras = True
+    if args_cli.visualizer is None:
+        args_cli.visualizer = ["kit"]
 
 # clear out sys.argv for Hydra
 sys.argv = [sys.argv[0]] + hydra_args
@@ -66,11 +86,11 @@ from isaaclab.envs import (
     DirectMARLEnvCfg,  # noqa: F401
     DirectRLEnvCfg,  # noqa: F401
     ManagerBasedRLEnvCfg,  # noqa: F401
+    VideoRecorderCfg,
     multi_agent_to_single_agent,
 )
-from isaaclab.utils.dict import print_dict
 
-from isaaclab_tasks.utils.hydra import hydra_task_config  # noqa: F401
+from isaaclab_tasks.utils import resolve_task_config
 
 import robot_lab.tasks  # noqa: F401  # isort: skip
 
@@ -80,13 +100,14 @@ torch.backends.cudnn.deterministic = False
 torch.backends.cudnn.benchmark = False
 
 
-@hydra_task_config(args_cli.task, args_cli.agent)
 def main(env_cfg: ManagerBasedRLEnvCfg | DirectRLEnvCfg | DirectMARLEnvCfg, agent_cfg: TrainerCfg):
     """Train with CusRL agent."""
     env_cfg.scene.num_envs = args_cli.num_envs if args_cli.num_envs is not None else env_cfg.scene.num_envs
     agent_cfg.max_iterations = (
         args_cli.max_iterations if args_cli.max_iterations is not None else agent_cfg.max_iterations
     )
+    if args_cli.save_interval is not None:
+        agent_cfg.save_interval = args_cli.save_interval
 
     # set the environment seed
     # note: certain randomizations occur in the environment initialization so we set the seed here
@@ -104,24 +125,23 @@ def main(env_cfg: ManagerBasedRLEnvCfg | DirectRLEnvCfg | DirectMARLEnvCfg, agen
         log_dir = f"{log_dir}_{args_cli.run_name}"
     log_dir = os.path.join(log_root_path, log_dir)
 
+    # Configure recording before the environment creates its recorder manager.
+    if args_cli.video and cusrl.utils.is_main_process():
+        env_cfg.video_recorders = [
+            VideoRecorderCfg(
+                source="visualizer:kit",
+                output_dir=os.path.join(log_dir, "videos", "train"),
+                video_length=args_cli.video_length,
+                video_interval=args_cli.video_interval,
+            )
+        ]
+
     # create isaac environment
-    env = gym.make(args_cli.task, cfg=env_cfg, render_mode="rgb_array" if args_cli.video else None)
+    env = gym.make(args_cli.task, cfg=env_cfg)
 
     # convert to single-agent instance if required by the RL algorithm
     if isinstance(env.unwrapped, DirectMARLEnv):
         env = multi_agent_to_single_agent(env)
-
-    # wrap for video recording
-    if args_cli.video and cusrl.utils.is_main_process():
-        video_kwargs = {
-            "video_folder": os.path.join(log_dir, "videos", "train"),
-            "step_trigger": lambda step: step % args_cli.video_interval == 0,
-            "video_length": args_cli.video_length,
-            "disable_logger": True,
-        }
-        print("[INFO] Recording videos during training.")
-        print_dict(video_kwargs, nesting=4)
-        env = gym.wrappers.RecordVideo(env, **video_kwargs)
 
     # create trainer from cusrl
     trainer = cusrl.Trainer(
@@ -144,6 +164,6 @@ def main(env_cfg: ManagerBasedRLEnvCfg | DirectRLEnvCfg | DirectMARLEnvCfg, agen
 
 if __name__ == "__main__":
     # run the main function
-    main()
+    main(*resolve_task_config(args_cli.task, args_cli.agent, overrides=hydra_args))
     # close sim app
     simulation_app.close()

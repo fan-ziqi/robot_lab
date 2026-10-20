@@ -100,7 +100,7 @@ def is_robot_on_terrain(env: ManagerBasedEnv, terrain_name: str, asset_name: str
 
     # Get robot positions in world frame
     asset = env.scene[asset_name]
-    robot_pos_w = asset.data.root_pos_w[:, :2]  # [num_envs, 2] (x, y)
+    robot_pos_w = asset.data.root_pos_w.torch[:, :2]  # [num_envs, 2] (x, y)
 
     # Get terrain grid information
     terrain_origins = terrain.terrain_origins  # [num_rows, num_cols, 3]

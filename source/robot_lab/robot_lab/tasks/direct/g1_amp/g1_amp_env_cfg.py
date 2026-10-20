@@ -13,15 +13,39 @@ from __future__ import annotations
 
 import os
 
-from isaaclab.assets import ArticulationCfg
+from isaaclab_physx.physics import PhysxCfg
+
+import isaaclab.sim as sim_utils
+from isaaclab.assets import ArticulationCfg, AssetBaseCfg
 from isaaclab.envs import DirectRLEnvCfg
 from isaaclab.scene import InteractiveSceneCfg
-from isaaclab.sim import PhysxCfg, SimulationCfg
+from isaaclab.sim import SimulationCfg
 from isaaclab.utils import configclass
 
 from robot_lab.assets.unitree import UNITREE_G1_29DOF_CFG
 
 MOTIONS_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "motions")
+
+
+@configclass
+class G1AmpSceneCfg(InteractiveSceneCfg):
+    """Declarative robot, ground and lighting for the G1 AMP scene."""
+
+    robot: ArticulationCfg = UNITREE_G1_29DOF_CFG.replace(prim_path="{ENV_REGEX_NS}/Robot")
+    ground = AssetBaseCfg(
+        prim_path="/World/ground",
+        collision_group=-1,
+        spawn=sim_utils.GroundPlaneCfg(
+            physics_material=sim_utils.RigidBodyMaterialCfg(
+                static_friction=1.0,
+                dynamic_friction=1.0,
+                restitution=0.0,
+            )
+        ),
+    )
+    light = AssetBaseCfg(
+        prim_path="/World/Light", spawn=sim_utils.DomeLightCfg(intensity=2000.0, color=(0.75, 0.75, 0.75))
+    )
 
 
 @configclass
@@ -73,14 +97,11 @@ class G1AmpDanceEnvCfg(DirectRLEnvCfg):
     sim: SimulationCfg = SimulationCfg(
         dt=dt,
         render_interval=decimation,
-        physx=PhysxCfg(
+        physics=PhysxCfg(
             gpu_found_lost_pairs_capacity=2**23,
             gpu_total_aggregate_pairs_capacity=2**23,
         ),
     )
 
     # scene
-    scene: InteractiveSceneCfg = InteractiveSceneCfg(num_envs=4096, env_spacing=4.0, replicate_physics=True)
-
-    # robot
-    robot: ArticulationCfg = UNITREE_G1_29DOF_CFG.replace(prim_path="/World/envs/env_.*/Robot")
+    scene: G1AmpSceneCfg = G1AmpSceneCfg(num_envs=4096, env_spacing=4.0, replicate_physics=True)

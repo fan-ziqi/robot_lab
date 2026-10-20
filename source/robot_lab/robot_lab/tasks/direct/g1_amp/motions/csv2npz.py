@@ -235,7 +235,8 @@ def main():
         "dof_positions": dof_positions,
         "dof_velocities": dof_velocities,
         "body_positions": body_positions,
-        "body_rotations": body_rotations,
+        "body_rotations": body_rotations[..., [1, 2, 3, 0]],
+        "quaternion_order": "xyzw",
         "body_linear_velocities": body_linear_velocities,
         "body_angular_velocities": body_angular_velocities,
     }

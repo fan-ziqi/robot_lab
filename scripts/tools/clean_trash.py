@@ -55,8 +55,10 @@ def clean_trash(folder_path):
         print("No folders meet the conditions, no need to delete.")
 
 
-# Example call
 if __name__ == "__main__":
-    # folder = input("Please enter the target folder path: ").strip()
-    folder = "logs"
-    clean_trash(folder)
+    import argparse
+
+    parser = argparse.ArgumentParser(description="Interactively remove incomplete training runs.")
+    parser.add_argument("folder", nargs="?", default="logs", help="Directory to inspect (default: logs).")
+    args = parser.parse_args()
+    clean_trash(args.folder)

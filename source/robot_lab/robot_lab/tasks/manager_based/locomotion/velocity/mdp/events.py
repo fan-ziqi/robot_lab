@@ -6,14 +6,15 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Literal
 
 import torch
+import warp as wp
 
 import isaaclab.utils.math as math_utils
-from isaaclab.assets import Articulation, RigidObject
 from isaaclab.managers import SceneEntityCfg
 
 from .utils import is_env_assigned_to_terrain
 
 if TYPE_CHECKING:
+    from isaaclab.assets import Articulation, RigidObject
     from isaaclab.envs import ManagerBasedEnv
 
 
@@ -39,8 +40,8 @@ def randomize_rigid_body_inertia(
     asset: RigidObject | Articulation = env.scene[asset_cfg.name]
 
     # resolve environment ids
-    if env_ids is None:
-        env_ids = torch.arange(env.scene.num_envs, device="cpu")
+    if env_ids is None or isinstance(env_ids, slice):
+        env_ids = torch.arange(env.scene.num_envs, device="cpu")[env_ids or slice(None)]
     else:
         env_ids = env_ids.cpu()
 
@@ -50,11 +51,13 @@ def randomize_rigid_body_inertia(
     else:
         body_ids = torch.tensor(asset_cfg.body_ids, dtype=torch.int, device="cpu")
 
-    # get the current inertia tensors of the bodies (num_assets, num_bodies, 9 for articulations or 9 for rigid objects)
-    inertias = asset.root_physx_view.get_inertias()
+    # Native PhysX model properties use CPU Warp arrays; expose Torch views for randomization.
+    inertias = wp.to_torch(asset.root_view.get_inertias())
 
     # apply randomization on default values
-    inertias[env_ids[:, None], body_ids, :] = asset.data.default_inertia[env_ids[:, None], body_ids, :].clone()
+    inertias[env_ids[:, None], body_ids, :] = asset.data.default_inertia.torch.cpu()[
+        env_ids[:, None], body_ids, :
+    ].clone()
 
     # randomize each diagonal element (xx, yy, zz -> indices 0, 4, 8)
     for idx in [0, 4, 8]:
@@ -68,10 +71,10 @@ def randomize_rigid_body_inertia(
             distribution,
         )
         # Assign the randomized values back to the inertia tensor
-        inertias[env_ids[:, None], body_ids, idx] = randomized_inertias
+        inertias[env_ids[:, None], body_ids, idx] = randomized_inertias[env_ids[:, None], body_ids]
 
     # set the inertia tensors into the physics simulation
-    asset.root_physx_view.set_inertias(inertias, env_ids)
+    asset.root_view.set_inertias(wp.from_torch(inertias), indices=wp.from_torch(env_ids.to(torch.int32)))
 
 
 def randomize_com_positions(
@@ -103,8 +106,8 @@ def randomize_com_positions(
     asset: RigidObject | Articulation = env.scene[asset_cfg.name]
 
     # Resolve environment indices
-    if env_ids is None:
-        env_ids = torch.arange(env.scene.num_envs, device="cpu")
+    if env_ids is None or isinstance(env_ids, slice):
+        env_ids = torch.arange(env.scene.num_envs, device="cpu")[env_ids or slice(None)]
     else:
         env_ids = env_ids.cpu()
 
@@ -114,8 +117,8 @@ def randomize_com_positions(
     else:
         body_ids = torch.tensor(asset_cfg.body_ids, dtype=torch.int, device="cpu")
 
-    # Get the current COM offsets (num_assets, num_bodies, 3)
-    com_offsets = asset.root_physx_view.get_coms()
+    # Native articulation COM poses have shape (num_assets, num_bodies, 7); only xyz is randomized.
+    com_offsets = wp.to_torch(asset.root_view.get_coms())
 
     for dim_idx in range(3):  # Randomize x, y, z independently
         randomized_offset = _randomize_prop_by_op(
@@ -129,7 +132,7 @@ def randomize_com_positions(
         com_offsets[env_ids[:, None], body_ids, dim_idx] = randomized_offset[env_ids[:, None], body_ids]
 
     # Set the randomized COM offsets into the simulation
-    asset.root_physx_view.set_coms(com_offsets, env_ids)
+    asset.root_view.set_coms(wp.from_torch(com_offsets), indices=wp.from_torch(env_ids.to(torch.int32)))
 
 
 """
@@ -228,6 +231,9 @@ def reset_root_state_uniform(
     # extract the used quantities (to enable type-hinting)
     asset: RigidObject | Articulation = env.scene[asset_cfg.name]
 
+    if env_ids is None or isinstance(env_ids, slice):
+        env_ids = torch.arange(env.num_envs, device=env.device)[env_ids or slice(None)]
+
     # Separate pit and non-pit environments
     # Check which environments are assigned to pit terrain (not random reset)
     assigned_to_pits = is_env_assigned_to_terrain(env, "pits")
@@ -236,16 +242,16 @@ def reset_root_state_uniform(
 
     # Reset pit environments to default state (no random perturbations)
     if len(pit_env_ids) > 0:
-        root_states = asset.data.default_root_state[pit_env_ids].clone()
+        root_states = asset.data.default_root_state.torch[pit_env_ids].clone()
         positions = root_states[:, 0:3] + env.scene.env_origins[pit_env_ids]
         orientations = root_states[:, 3:7]
         velocities = torch.zeros_like(root_states[:, 7:13])
-        asset.write_root_pose_to_sim(torch.cat([positions, orientations], dim=-1), env_ids=pit_env_ids)
-        asset.write_root_velocity_to_sim(velocities, env_ids=pit_env_ids)
+        asset.write_root_pose_to_sim_index(root_pose=torch.cat([positions, orientations], dim=-1), env_ids=pit_env_ids)
+        asset.write_root_velocity_to_sim_index(root_velocity=velocities, env_ids=pit_env_ids)
 
     # Reset non-pit environments with random perturbations
     if len(non_pit_env_ids) > 0:
-        root_states = asset.data.default_root_state[non_pit_env_ids].clone()
+        root_states = asset.data.default_root_state.torch[non_pit_env_ids].clone()
 
         # poses
         range_list = [pose_range.get(key, (0.0, 0.0)) for key in ["x", "y", "z", "roll", "pitch", "yaw"]]
@@ -267,5 +273,7 @@ def reset_root_state_uniform(
         velocities = root_states[:, 7:13] + rand_samples
 
         # set into the physics simulation
-        asset.write_root_pose_to_sim(torch.cat([positions, orientations], dim=-1), env_ids=non_pit_env_ids)
-        asset.write_root_velocity_to_sim(velocities, env_ids=non_pit_env_ids)
+        asset.write_root_pose_to_sim_index(
+            root_pose=torch.cat([positions, orientations], dim=-1), env_ids=non_pit_env_ids
+        )
+        asset.write_root_velocity_to_sim_index(root_velocity=velocities, env_ids=non_pit_env_ids)

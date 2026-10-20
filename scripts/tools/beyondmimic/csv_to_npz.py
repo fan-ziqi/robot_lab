@@ -33,11 +33,17 @@ parser.add_argument(
 )
 parser.add_argument("--output_name", type=str, help="The name of the motion npz file.")
 parser.add_argument("--output_fps", type=int, default=50, help="The fps of the output motion.")
+parser.add_argument(
+    "--exit_after_save", action="store_true", help="Exit after writing the first complete motion cycle."
+)
 
 # append AppLauncher cli args
+parser.add_argument("--headless", action="store_true", help="Run without a visualizer unless --viz is explicit.")
 AppLauncher.add_app_launcher_args(parser)
 # parse the arguments
 args_cli = parser.parse_args()
+if args_cli.headless and not args_cli.visualizer:
+    args_cli.visualizer = ["none"]
 if not args_cli.output_name:
     # generate at the same location as input file
     args_cli.output_name = (
@@ -52,6 +58,7 @@ simulation_app = app_launcher.app
 """Rest everything follows."""
 
 import torch
+from isaaclab_physx.physics import PhysxCfg
 
 ##
 # Pre-defined configs
@@ -124,7 +131,6 @@ class MotionLoader:
         motion = motion.to(torch.float32).to(self.device)
         self.motion_base_poss_input = motion[:, :3]
         self.motion_base_rots_input = motion[:, 3:7]
-        self.motion_base_rots_input = self.motion_base_rots_input[:, [3, 0, 1, 2]]  # convert to wxyz
         self.motion_dof_poss_input = motion[:, 7:]
 
         self.input_frames = motion.shape[0]
@@ -273,6 +279,7 @@ def run_simulator(sim: sim_utils.SimulationContext, scene: InteractiveScene):
     # ------- data logger -------------------------------------------------------
     log = {
         "fps": [args_cli.output_fps],
+        "quaternion_order": "xyzw",
         "joint_pos": [],
         "joint_vel": [],
         "body_pos_w": [],
@@ -298,20 +305,21 @@ def run_simulator(sim: sim_utils.SimulationContext, scene: InteractiveScene):
         ) = motion.get_next_state()
 
         # set root state
-        root_states = robot.data.default_root_state.clone()
+        root_states = robot.data.default_root_state.torch.clone()
         root_states[:, :3] = motion_base_pos
         root_states[:, :2] += scene.env_origins[:, :2]
         root_states[:, 3:7] = motion_base_rot
         root_states[:, 7:10] = motion_base_lin_vel
         root_states[:, 10:] = motion_base_ang_vel
-        robot.write_root_state_to_sim(root_states)
+        robot.write_root_link_pose_to_sim_index(root_pose=(root_states)[:, :7])
+        robot.write_root_com_velocity_to_sim_index(root_velocity=(root_states)[:, 7:])
 
         # set joint state
-        joint_pos = robot.data.default_joint_pos.clone()
-        joint_vel = robot.data.default_joint_vel.clone()
+        joint_pos = robot.data.default_joint_pos.torch.clone()
+        joint_vel = robot.data.default_joint_vel.torch.clone()
         joint_pos[:, robot_joint_indexes] = motion_dof_pos
         joint_vel[:, robot_joint_indexes] = motion_dof_vel
-        robot.write_joint_state_to_sim(joint_pos, joint_vel)
+        robot.write_joint_state_to_sim_index(position=joint_pos, velocity=joint_vel)
         sim.render()  # We don't want physic (sim.step())
         scene.update(sim.get_physics_dt())
 
@@ -319,12 +327,12 @@ def run_simulator(sim: sim_utils.SimulationContext, scene: InteractiveScene):
         sim.set_camera_view(pos_lookat + np.array([2.0, 2.0, 0.5]), pos_lookat)
 
         if not file_saved:
-            log["joint_pos"].append(robot.data.joint_pos[0, :].cpu().numpy().copy())
-            log["joint_vel"].append(robot.data.joint_vel[0, :].cpu().numpy().copy())
-            log["body_pos_w"].append(robot.data.body_pos_w[0, :].cpu().numpy().copy())
-            log["body_quat_w"].append(robot.data.body_quat_w[0, :].cpu().numpy().copy())
-            log["body_lin_vel_w"].append(robot.data.body_lin_vel_w[0, :].cpu().numpy().copy())
-            log["body_ang_vel_w"].append(robot.data.body_ang_vel_w[0, :].cpu().numpy().copy())
+            log["joint_pos"].append(robot.data.joint_pos.torch[0, :].cpu().numpy().copy())
+            log["joint_vel"].append(robot.data.joint_vel.torch[0, :].cpu().numpy().copy())
+            log["body_pos_w"].append(robot.data.body_pos_w.torch[0, :].cpu().numpy().copy())
+            log["body_quat_w"].append(robot.data.body_quat_w.torch[0, :].cpu().numpy().copy())
+            log["body_lin_vel_w"].append(robot.data.body_lin_vel_w.torch[0, :].cpu().numpy().copy())
+            log["body_ang_vel_w"].append(robot.data.body_ang_vel_w.torch[0, :].cpu().numpy().copy())
 
         if reset_flag and not file_saved:
             file_saved = True
@@ -340,12 +348,14 @@ def run_simulator(sim: sim_utils.SimulationContext, scene: InteractiveScene):
 
             np.savez(args_cli.output_name, **log)
             print("[INFO]: Motion npz file saved to", args_cli.output_name)
+            if args_cli.exit_after_save:
+                break
 
 
 def main():
     """Main function."""
     # Load kit helper
-    sim_cfg = sim_utils.SimulationCfg(device=args_cli.device)
+    sim_cfg = sim_utils.SimulationCfg(device=args_cli.device, physics=PhysxCfg())
     sim_cfg.dt = 1.0 / args_cli.output_fps
     sim = SimulationContext(sim_cfg)
     # Design scene

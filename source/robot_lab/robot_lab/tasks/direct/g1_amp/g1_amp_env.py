@@ -15,10 +15,7 @@ import gymnasium as gym
 import numpy as np
 import torch
 
-import isaaclab.sim as sim_utils
-from isaaclab.assets import Articulation
 from isaaclab.envs import DirectRLEnv
-from isaaclab.sim.spawners.from_files import GroundPlaneCfg, spawn_ground_plane
 from isaaclab.utils.math import quat_apply
 
 from .g1_amp_env_cfg import G1AmpDanceEnvCfg
@@ -30,10 +27,11 @@ class G1AmpEnv(DirectRLEnv):
 
     def __init__(self, cfg: G1AmpDanceEnvCfg, render_mode: str | None = None, **kwargs):
         super().__init__(cfg, render_mode, **kwargs)
+        self.robot = self.scene["robot"]
 
         # action offset and scale
-        dof_lower_limits = self.robot.data.soft_joint_pos_limits[0, :, 0]
-        dof_upper_limits = self.robot.data.soft_joint_pos_limits[0, :, 1]
+        dof_lower_limits = self.robot.data.soft_joint_pos_limits.torch[0, :, 0]
+        dof_upper_limits = self.robot.data.soft_joint_pos_limits.torch[0, :, 1]
         self.action_offset = 0.5 * (dof_upper_limits + dof_lower_limits)
         self.action_scale = dof_upper_limits - dof_lower_limits
 
@@ -71,37 +69,12 @@ class G1AmpEnv(DirectRLEnv):
             (self.num_envs, self.cfg.num_amp_observations, self.cfg.amp_observation_space), device=self.device
         )
 
-    def _setup_scene(self):
-        self.robot = Articulation(self.cfg.robot)
-        # add ground plane
-        spawn_ground_plane(
-            prim_path="/World/ground",
-            cfg=GroundPlaneCfg(
-                physics_material=sim_utils.RigidBodyMaterialCfg(
-                    static_friction=1.0,
-                    dynamic_friction=1.0,
-                    restitution=0.0,
-                ),
-            ),
-        )
-        # clone and replicate
-        self.scene.clone_environments(copy_from_source=False)
-        # we need to explicitly filter collisions for CPU simulation
-        if self.device == "cpu":
-            self.scene.filter_collisions(global_prim_paths=["/World/ground"])
-
-        # add articulation to scene
-        self.scene.articulations["robot"] = self.robot
-        # add lights
-        light_cfg = sim_utils.DomeLightCfg(intensity=2000.0, color=(0.75, 0.75, 0.75))
-        light_cfg.func("/World/Light", light_cfg)
-
     def _pre_physics_step(self, actions: torch.Tensor):
         self.actions = actions.clone()
 
     def _apply_action(self):
         target = self.action_offset + self.action_scale * self.actions
-        self.robot.set_joint_position_target(target)
+        self.robot.actuators.target_command.set_position_index(value=target)
 
     def _get_observations(self) -> dict:
         # build task observation
@@ -109,17 +82,17 @@ class G1AmpEnv(DirectRLEnv):
         # calculate progress: current episode step / max step, shape [num_envs, 1]
         progress = (self.episode_length_buf.squeeze(-1).float() / (self.max_episode_length - 1)).unsqueeze(-1)
         # convert to relative coordinates, keep consistent with reference action observation
-        root_pos_relative = self.robot.data.body_pos_w[:, self.ref_body_index] - self.scene.env_origins
-        key_body_pos_relative = self.robot.data.body_pos_w[:, self.key_body_indexes] - self.scene.env_origins.unsqueeze(
-            1
-        )
+        root_pos_relative = self.robot.data.body_pos_w.torch[:, self.ref_body_index] - self.scene.env_origins
+        key_body_pos_relative = self.robot.data.body_pos_w.torch[
+            :, self.key_body_indexes
+        ] - self.scene.env_origins.unsqueeze(1)
         obs = compute_obs(
-            self.robot.data.joint_pos,
-            self.robot.data.joint_vel,
+            self.robot.data.joint_pos.torch,
+            self.robot.data.joint_vel.torch,
             root_pos_relative,
-            self.robot.data.body_quat_w[:, self.ref_body_index],
-            # self.robot.data.body_lin_vel_w[:, self.ref_body_index],
-            # self.robot.data.body_ang_vel_w[:, self.ref_body_index],
+            self.robot.data.body_quat_w.torch[:, self.ref_body_index],
+            # self.robot.data.body_lin_vel_w.torch[:, self.ref_body_index],
+            # self.robot.data.body_ang_vel_w.torch[:, self.ref_body_index],
             key_body_pos_relative,
             progress,
         )
@@ -157,14 +130,14 @@ class G1AmpEnv(DirectRLEnv):
             ref_root_quat = ref_body_rotations[:, self.motion_ref_body_index]
 
         # 1. joint angle imitation reward
-        joint_pos_error = torch.square(self.robot.data.joint_pos - ref_joint_pos).sum(dim=-1)
+        joint_pos_error = torch.square(self.robot.data.joint_pos.torch - ref_joint_pos).sum(dim=-1)
         rew_joint_pos = exp_reward_with_floor(
             joint_pos_error, self.cfg.rew_imitation_joint_pos, self.cfg.imitation_sigma_joint_pos, floor=4.0
         )
         rew_joint_pos = torch.clamp(rew_joint_pos, min=-1.0)  # avoid joint position over-penalty
 
         # 2. joint velocity imitation reward
-        joint_vel_error = torch.square(self.robot.data.joint_vel - ref_joint_vel).sum(dim=-1)
+        joint_vel_error = torch.square(self.robot.data.joint_vel.torch - ref_joint_vel).sum(dim=-1)
         rew_joint_vel = exp_reward_with_floor(
             joint_vel_error, self.cfg.rew_imitation_joint_vel, self.cfg.imitation_sigma_joint_vel, floor=6.0
         )
@@ -172,13 +145,15 @@ class G1AmpEnv(DirectRLEnv):
 
         # 3. root position imitation reward
         # convert robot current position to relative position to environment origin, compare with reference position
-        current_relative_pos = self.robot.data.body_pos_w[:, self.ref_body_index] - self.scene.env_origins
+        current_relative_pos = self.robot.data.body_pos_w.torch[:, self.ref_body_index] - self.scene.env_origins
         pos_err = torch.square(current_relative_pos - ref_root_pos).sum(dim=-1)
         rew_pos = exp_reward_with_floor(pos_err, self.cfg.rew_imitation_pos, self.cfg.imitation_sigma_pos, floor=4.0)
         rew_pos = torch.clamp(rew_pos, min=-1.0)  # avoid position error over-penalty
 
         # 4. root orientation imitation reward
-        quat_dot = torch.abs(torch.sum(self.robot.data.body_quat_w[:, self.ref_body_index] * ref_root_quat, dim=-1))
+        quat_dot = torch.abs(
+            torch.sum(self.robot.data.body_quat_w.torch[:, self.ref_body_index] * ref_root_quat, dim=-1)
+        )
         ang_err = 2 * torch.arccos(torch.clamp(quat_dot, -1.0, 1.0))
         rew_rot = self.cfg.rew_imitation_rot * torch.exp(-torch.square(ang_err) / (self.cfg.imitation_sigma_rot**2))
 
@@ -194,10 +169,10 @@ class G1AmpEnv(DirectRLEnv):
             self.cfg.rew_joint_vel_l2,
             self.reset_terminated,
             self.actions,
-            self.robot.data.joint_pos,
-            self.robot.data.soft_joint_pos_limits,
-            self.robot.data.joint_acc,
-            self.robot.data.joint_vel,
+            self.robot.data.joint_pos.torch,
+            self.robot.data.soft_joint_pos_limits.torch,
+            self.robot.data.joint_acc.torch,
+            self.robot.data.joint_vel.torch,
         )
 
         # ================= total reward ==========================
@@ -241,14 +216,16 @@ class G1AmpEnv(DirectRLEnv):
     def _get_dones(self) -> tuple[torch.Tensor, torch.Tensor]:
         time_out = self.episode_length_buf >= self.max_episode_length - 1
         if self.cfg.early_termination:
-            died = self.robot.data.body_pos_w[:, self.ref_body_index, 2] < self.cfg.termination_height
+            died = self.robot.data.body_pos_w.torch[:, self.ref_body_index, 2] < self.cfg.termination_height
         else:
             died = torch.zeros_like(time_out)
         return died, time_out
 
     def _reset_idx(self, env_ids: torch.Tensor | None):
-        if env_ids is None or len(env_ids) == self.num_envs:
-            env_ids = self.robot._ALL_INDICES
+        if env_ids is None or isinstance(env_ids, slice):
+            env_ids = torch.arange(self.num_envs, device=self.device)[env_ids or slice(None)]
+        if len(env_ids) == self.num_envs:
+            env_ids = torch.arange(self.num_envs, device=self.device)
         self.robot.reset(env_ids)
         super()._reset_idx(env_ids)
 
@@ -260,17 +237,19 @@ class G1AmpEnv(DirectRLEnv):
         else:
             raise ValueError(f"Unknown reset strategy: {self.cfg.reset_strategy}")
 
-        self.robot.write_root_link_pose_to_sim(root_state[:, :7], env_ids)
-        self.robot.write_root_com_velocity_to_sim(root_state[:, 7:], env_ids)
-        self.robot.write_joint_state_to_sim(joint_pos, joint_vel, None, env_ids)
+        self.robot.write_root_link_pose_to_sim_index(root_pose=root_state[:, :7], env_ids=env_ids)
+        self.robot.write_root_com_velocity_to_sim_index(root_velocity=root_state[:, 7:], env_ids=env_ids)
+        self.robot.write_joint_state_to_sim_index(
+            position=joint_pos, velocity=joint_vel, joint_ids=None, env_ids=env_ids
+        )
 
     # reset strategies
 
     def _reset_strategy_default(self, env_ids: torch.Tensor) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
-        root_state = self.robot.data.default_root_state[env_ids].clone()
+        root_state = self.robot.data.default_root_state.torch[env_ids].clone()
         root_state[:, :3] += self.scene.env_origins[env_ids]
-        joint_pos = self.robot.data.default_joint_pos[env_ids].clone()
-        joint_vel = self.robot.data.default_joint_vel[env_ids].clone()
+        joint_pos = self.robot.data.default_joint_pos.torch[env_ids].clone()
+        joint_vel = self.robot.data.default_joint_vel.torch[env_ids].clone()
         return root_state, joint_pos, joint_vel
 
     def _reset_strategy_random(
@@ -291,7 +270,7 @@ class G1AmpEnv(DirectRLEnv):
 
         # get root transforms (the humanoid torso)
         motion_torso_index = self._motion_loader.get_body_index([self.cfg.reference_body])[0]
-        root_state = self.robot.data.default_root_state[env_ids].clone()
+        root_state = self.robot.data.default_root_state.torch[env_ids].clone()
         root_state[:, 0:3] = body_positions[:, motion_torso_index] + self.scene.env_origins[env_ids]
         root_state[:, 2] += 0.05  # lift the humanoid slightly to avoid collisions with the ground
         root_state[:, 3:7] = body_rotations[:, motion_torso_index]

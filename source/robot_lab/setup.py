@@ -6,7 +6,7 @@
 import os
 
 import toml
-from setuptools import setup
+from setuptools import find_packages, setup
 
 # Obtain the extension data from the extension.toml file
 EXTENSION_PATH = os.path.dirname(os.path.realpath(__file__))
@@ -18,19 +18,16 @@ INSTALL_REQUIRES = [
     # base
     "psutil",
     "colorama",
-    "xacrodoc",
     # amp
     "numpy",
     "pandas",
-    "pinocchio",
     # rl
-    "cusrl[all]",
 ]
 
 # Installation operation
 setup(
     name="robot_lab",
-    packages=["robot_lab"],
+    packages=find_packages(),
     author=EXTENSION_TOML_DATA["package"]["author"],
     maintainer=EXTENSION_TOML_DATA["package"]["maintainer"],
     url=EXTENSION_TOML_DATA["package"]["repository"],
@@ -38,16 +35,13 @@ setup(
     description=EXTENSION_TOML_DATA["package"]["description"],
     keywords=EXTENSION_TOML_DATA["package"]["keywords"],
     install_requires=INSTALL_REQUIRES,
+    extras_require={"cusrl": ["cusrl[all]"], "skrl": ["skrl"], "motion": ["pin", "xacrodoc"]},
     license="Apache License 2.0",
     include_package_data=True,
-    python_requires=">=3.10",
+    python_requires=">=3.12",
     classifiers=[
         "Natural Language :: English",
-        "Programming Language :: Python :: 3.10",
-        "Programming Language :: Python :: 3.11",
-        "Isaac Sim :: 4.5.0",
-        "Isaac Sim :: 5.0.0",
-        "Isaac Sim :: 5.1.0",
+        "Programming Language :: Python :: 3.12",
     ],
     zip_safe=False,
 )
