@@ -8,6 +8,10 @@
 
 import math
 from dataclasses import MISSING
+from typing import ClassVar
+
+from isaaclab_newton.physics import MJWarpSolverCfg, NewtonCfg, NewtonCollisionPipelineCfg, NewtonShapeCfg
+from isaaclab_physx.physics import PhysxCfg
 
 from isaaclab_physx.physics import PhysxCfg
 
@@ -28,12 +32,51 @@ from isaaclab.utils import configclass
 from isaaclab.utils.assets import ISAAC_NUCLEUS_DIR, ISAACLAB_NUCLEUS_DIR
 from isaaclab.utils.noise import UniformNoiseCfg as Unoise
 
+from isaaclab_tasks.utils import PresetCfg
+
 import robot_lab.tasks.manager_based.locomotion.velocity.mdp as mdp
 
 ##
 # Pre-defined configs
 ##
 from isaaclab.terrains.config.rough import ROUGH_TERRAINS_CFG  # isort: skip
+
+
+@configclass
+class UrdfNewtonCfg(NewtonCfg):
+    """Newton physics with Kit's URDF importer available at scene construction.
+
+    Local URDF assets require the Kit extension when the standalone importer
+    wheel is absent. This selects a runtime, not PhysX physics or a viewer.
+    """
+
+    launcher_type: ClassVar[str] = "isaaclab_physx.app:KitLauncher"
+
+
+@configclass
+class VelocityPhysicsCfg(PresetCfg):
+    """Opt-in velocity backends; existing tasks retain their plain PhysX config.
+
+    The Newton starting profile follows Isaac Lab 3.0's core velocity task.
+    Each adopting task must validate its asset, sensors and events independently.
+    """
+
+    isaacsim_physx = PhysxCfg(gpu_max_rigid_patch_count=10 * 2**15)
+    default = isaacsim_physx
+    newton_mjwarp = UrdfNewtonCfg(
+        solver_cfg=MJWarpSolverCfg(
+            njmax=1000,
+            nconmax=300,
+            cone="pyramidal",
+            impratio=1.0,
+            integrator="implicitfast",
+            use_mujoco_contacts=False,
+        ),
+        collision_cfg=NewtonCollisionPipelineCfg(max_triangle_pairs=2_500_000),
+        num_substeps=2,
+        debug_mode=False,
+        default_shape_cfg=NewtonShapeCfg(margin=0.0, ke=160000.0, kd=1100.0),
+    )
 
 
 ##

@@ -232,6 +232,11 @@ class UnitreeB2WRoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         self.curriculum.command_levels_lin_vel = None
         self.curriculum.command_levels_ang_vel = None
 
+        if type(self) is UnitreeB2WRoughEnvCfg:
+            from robot_lab.tasks.manager_based.locomotion.velocity.newton_support import configure_newton_from_profile
+
+            configure_newton_from_profile(self, "unitree_b2w", njmax=1024, nconmax=256)
+
         # ------------------------------Commands------------------------------
         # self.commands.base_velocity.ranges.lin_vel_x = (-2.0, 2.0)
         # self.commands.base_velocity.ranges.lin_vel_y = (-2.0, 2.0)

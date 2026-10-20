@@ -158,3 +158,9 @@ class AgibotD1RoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         self.curriculum.command_levels_ang_vel = None
 
         # ------------------------------Commands------------------------------
+
+        # Only this independently validated class opts into Newton.
+        if type(self) is AgibotD1RoughEnvCfg:
+            from robot_lab.tasks.manager_based.locomotion.velocity.newton_support import configure_newton_from_profile
+
+            configure_newton_from_profile(self, "agibot_d1", njmax=256, nconmax=128)

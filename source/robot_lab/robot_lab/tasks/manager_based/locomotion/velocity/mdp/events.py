@@ -9,13 +9,61 @@ import torch
 import warp as wp
 
 import isaaclab.utils.math as math_utils
-from isaaclab.managers import SceneEntityCfg
+from isaaclab.managers import ManagerTermBase, SceneEntityCfg
 
 from .utils import is_env_assigned_to_terrain
 
 if TYPE_CHECKING:
     from isaaclab.assets import Articulation, RigidObject
     from isaaclab.envs import ManagerBasedEnv
+
+
+class floor_body_mass(ManagerTermBase):
+    """Newton startup mass regularization selected from unrandomized defaults."""
+
+    def __init__(self, cfg, env):
+        super().__init__(cfg, env)
+        self.default_mass = env.scene[cfg.params["asset_cfg"].name].data.body_mass.torch.clone()
+
+    def __call__(
+        self,
+        env: ManagerBasedEnv,
+        env_ids: torch.Tensor | slice | None,
+        asset_cfg: SceneEntityCfg,
+        min_mass: float = 0.05,
+        min_inertia: float = 8e-6,
+    ):
+        """Regularize near-massless Newton bodies at startup, preserving their COM.
+
+        Only bodies below 1e-3 kg are selected. Replace their inertia tensor with
+        an isotropic diagonal tensor, rather than scaling almost-zero inertias.
+        This term is installed exclusively in the Newton event preset.
+        """
+        asset = env.scene[asset_cfg.name]
+        masses = asset.data.body_mass.torch
+        selected = torch.as_tensor(
+            asset_cfg.body_ids
+            if not isinstance(asset_cfg.body_ids, slice)
+            else list(range(asset.num_bodies))[asset_cfg.body_ids],
+            device=asset.device,
+        )
+        body_ids = selected[(self.default_mass[0, selected] < 1e-3)]
+        names = [asset.body_names[i] for i in body_ids.tolist()]
+        if body_ids.numel():
+            rows = slice(None) if env_ids is None else env_ids
+            count = masses[rows].shape[0]
+            new_masses = torch.full((count, len(names)), min_mass, device=asset.device, dtype=masses.dtype)
+            inertias = torch.zeros((count, len(names), 9), device=asset.device, dtype=masses.dtype)
+            inertias[..., [0, 4, 8]] = min_inertia
+            asset.set_masses_index(masses=new_masses, body_ids=body_ids, env_ids=rows)
+            asset.set_inertias_index(inertias=inertias, body_ids=body_ids, env_ids=rows)
+            actual = asset.data.body_mass.torch[0, body_ids].tolist()
+        else:
+            actual = []
+        print(
+            f"[Newton mass floor] asset={asset_cfg.name} count={len(names)} bodies={names} masses_kg={actual}",
+            flush=True,
+        )
 
 
 def randomize_rigid_body_inertia(

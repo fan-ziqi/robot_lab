@@ -27,3 +27,9 @@ class AgibotD1FlatEnvCfg(AgibotD1RoughEnvCfg):
         # If the weight of rewards is 0, set rewards to None
         if self.__class__.__name__ == "AgibotD1FlatEnvCfg":
             self.disable_zero_weight_rewards()
+
+        # Only this independently validated class opts into Newton.
+        if type(self) is AgibotD1FlatEnvCfg:
+            from robot_lab.tasks.manager_based.locomotion.velocity.newton_support import configure_newton_from_profile
+
+            configure_newton_from_profile(self, "agibot_d1", njmax=256, nconmax=128)

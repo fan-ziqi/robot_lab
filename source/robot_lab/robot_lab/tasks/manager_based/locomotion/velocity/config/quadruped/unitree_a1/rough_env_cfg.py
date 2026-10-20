@@ -160,4 +160,9 @@ class UnitreeA1RoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         self.curriculum.command_levels_lin_vel = None
         self.curriculum.command_levels_ang_vel = None
 
+        if type(self) is UnitreeA1RoughEnvCfg:
+            from robot_lab.tasks.manager_based.locomotion.velocity.newton_support import configure_newton_from_profile
+
+            configure_newton_from_profile(self, "unitree_a1", njmax=256, nconmax=128)
+
         # ------------------------------Commands------------------------------

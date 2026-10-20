@@ -161,3 +161,9 @@ class DeeproboticsLite3RoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         # self.commands.base_velocity.ranges.lin_vel_x = (-1.5, 1.5)
         # self.commands.base_velocity.ranges.lin_vel_y = (-0.8, 0.8)
         # self.commands.base_velocity.ranges.ang_vel_z = (-1.5, 1.5)
+
+        # Only this independently validated class opts into Newton.
+        if type(self) is DeeproboticsLite3RoughEnvCfg:
+            from robot_lab.tasks.manager_based.locomotion.velocity.newton_support import configure_newton_from_profile
+
+            configure_newton_from_profile(self, "deeprobotics_lite3", njmax=256, nconmax=128)
