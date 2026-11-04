@@ -45,3 +45,8 @@ pyrightconfig.json
 # Python package builds
 **/build/
 dist/
+
+# Local viewer state and launch logs
+/imgui.ini
+/robotlab-gui.log
+/robotlab-gui-error.log

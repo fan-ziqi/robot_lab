@@ -25,6 +25,7 @@ dependencies = [
 robot_lab = "robot_lab.tasks"
 
 [project.optional-dependencies]
+legacy-policy = ["onnxruntime>=1.20,<2"]
 importers = ["isaaclab-dev[importers]"]
 isaacsim = ["isaaclab-dev[isaacsim]"]
 ov = ["isaaclab-dev[ov]"]

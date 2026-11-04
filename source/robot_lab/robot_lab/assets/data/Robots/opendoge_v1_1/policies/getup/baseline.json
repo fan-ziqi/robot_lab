@@ -1,0 +1,11 @@
+{
+  "robot": "opendoge",
+  "terrain": "getup",
+  "task_id": "LainLab-OpenDoge-Getup",
+  "method": "PPO flat getup",
+  "iterations": 4999,
+  "checkpoint": "model.pt",
+  "onnx": "policy.onnx",
+  "source_checkpoint": "logs/opendoge_getup_flat/lainlab_opendoge_getup/2026-09-20_16-15-03/model_4999.pt",
+  "selection": "Flat-ground random-fall getup; 100% upright and 100% relative-height success at 3cm/5cm in 128-env evaluation."
+}

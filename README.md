@@ -10,6 +10,10 @@
 
 ## Overview
 
+Original OpenDoge model and exported HIM policy replay: [usage and compatibility](docs/opendoge-legacy.md).
+
+OpenDog V1.1 model and LainLab flat/getup/rough/multi-skill policies: [usage and validation](docs/opendoge-v1.1.md).
+
 **robot_lab** is a RL extension library for robots, based on IsaacLab. It allows you to develop in an isolated environment, outside of the core Isaac Lab repository.
 
 The table below lists representative environments. Use `isaaclab list_envs` for all task IDs and agent configurations:

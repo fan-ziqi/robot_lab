@@ -2,6 +2,10 @@
 * text=auto
 *.sh text eol=LF
 
+# Preserve vendored OpenDoge bytes and upstream formatting for provenance hashes.
+source/robot_lab/robot_lab/assets/data/Robots/opendoge/** -text -whitespace
+source/robot_lab/robot_lab/assets/data/Robots/opendoge_v1_1/** -text -whitespace
+
 # # copied from https://github.com/isaac-sim/IsaacLab/blob/main/.gitattributes
 # *.usd filter=lfs diff=lfs merge=lfs -text
 # *.dae filter=lfs diff=lfs merge=lfs -text

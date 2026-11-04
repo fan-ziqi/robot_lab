@@ -1,0 +1,11 @@
+{
+  "robot": "opendoge",
+  "terrain": "flat",
+  "task_id": "LainLab-OpenDoge-Flat",
+  "method": "PPO",
+  "iterations": 4999,
+  "checkpoint": "model.pt",
+  "onnx": "policy.onnx",
+  "source_checkpoint": "logs/opendoge_4096/lainlab_opendoge_flat_velocity/2026-09-18_03-54-57/model_4999.pt",
+  "selection": "Longer flat run; playback metrics match the 999-step policy on the current play command ranges."
+}

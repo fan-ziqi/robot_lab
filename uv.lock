@@ -4130,6 +4130,9 @@ importers = [
 isaacsim = [
     { name = "isaaclab-dev", extra = ["isaacsim"] },
 ]
+legacy-policy = [
+    { name = "onnxruntime" },
+]
 motion = [
     { name = "pandas" },
     { name = "pin", version = "3.4.0", source = { registry = "https://pypi.org/simple" }, marker = "sys_platform == 'win32'" },
@@ -4187,11 +4190,12 @@ requires-dist = [
     { name = "isaaclab-dev", extras = ["video"], marker = "extra == 'video'", editable = "../IsaacLab" },
     { name = "isaaclab-dev", extras = ["viser"], marker = "extra == 'viser'", editable = "../IsaacLab" },
     { name = "isaaclab-dev", extras = ["wandb"], marker = "extra == 'wandb'", editable = "../IsaacLab" },
+    { name = "onnxruntime", marker = "extra == 'legacy-policy'", specifier = ">=1.20,<2" },
     { name = "pandas", marker = "extra == 'motion'" },
     { name = "pin", marker = "extra == 'motion'" },
     { name = "xacrodoc", marker = "extra == 'motion'" },
 ]
-provides-extras = ["importers", "isaacsim", "ov", "ovphysx", "ovrtx", "rerun", "rsl-rl", "skrl", "video", "viser", "wandb", "cusrl", "motion"]
+provides-extras = ["legacy-policy", "importers", "isaacsim", "ov", "ovphysx", "ovrtx", "rerun", "rsl-rl", "skrl", "video", "viser", "wandb", "cusrl", "motion"]
 
 [package.metadata.requires-dev]
 dev = [

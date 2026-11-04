@@ -1,0 +1,11 @@
+{
+  "robot": "opendoge",
+  "terrain": "rough",
+  "task_id": "LainLab-OpenDoge-Rough",
+  "method": "PPO (2x rough curriculum)",
+  "iterations": 9999,
+  "checkpoint": "model.pt",
+  "onnx": "policy.onnx",
+  "source_checkpoint": "logs/opendoge_rough_10000_hard2x/lainlab_opendoge_rough_velocity/2026-09-19_23-20-43/model_9999.pt",
+  "selection": "Trained against the current 2x rough terrain configuration; more robust than the earlier 1x checkpoint on level-9 slope playback."
+}

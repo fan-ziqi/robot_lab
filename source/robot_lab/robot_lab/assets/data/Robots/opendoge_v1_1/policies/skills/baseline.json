@@ -1,0 +1,96 @@
+{
+  "robot": "opendoge",
+  "terrain": "skills",
+  "task_id": "LainLab-OpenDoge-Skills-Flat",
+  "status": "sota",
+  "method": "Behaviour cloning from four single-skill experts",
+  "iterations": null,
+  "checkpoint": "model.pt",
+  "onnx": "policy.onnx",
+  "sha256": {
+    "model.pt": "18aaf997da4f568678a7fc9dc889654e09fbe718dcba26556de7934bd426f506",
+    "policy.onnx": "00ee08a21c173622b1d1af185e0c38d79575237fd95daa9abb866ee48a733e8d"
+  },
+  "source_checkpoint": "logs/skills_data_v57/student_v57.pt",
+  "observation": {
+    "actor_dim": 57,
+    "critic_dim": 81,
+    "layout": "[shared 48 proprioception+command][jump twist 3][skill 6 = one_hot(4) + phase sin/cos]",
+    "single_source": "src/tasks/multiskill/layout.py",
+    "invariant": "each expert's native observation is a prefix of this layout, so experts are driven by slicing and no adapter can drift; pinned by tests/test_opendoge_skills.py",
+    "expert_prefix_widths": {"walk": 48, "getup": 48, "handstand": 48, "jump": 51}
+  },
+  "architecture": {
+    "actor": "rsl_rl MLPModel, 512-256-128 ELU, empirical observation normalization, Gaussian with scalar std",
+    "why_flat": "Per-skill output heads and a zero-initialised per-skill residual were both implemented and measured; both are worse on handover (see rejected), so the flat shared output layer ships.",
+    "implemented_but_not_shipped": [
+      "src/tasks/multiskill/rl.py: SkillHeadedActor (one independent head per skill)",
+      "src/tasks/multiskill/rl.py: SharedResidualActor (shared head + zero-init per-skill residual)"
+    ]
+  },
+  "expert_selection": {
+    "walk": "src/baseline/opendoge/flat/model.pt",
+    "getup": "src/baseline/opendoge/getup/model.pt",
+    "handstand": "logs/opendoge_handstand/lainlab_opendoge_handstand/2026-09-26_02-18-22/model_1100.pt",
+    "jump": "logs/opendoge_jump_together/lainlab_opendoge_jump/2026-09-26_17-45-18/model_4999.pt",
+    "criterion": "Kept the pair that measured best on handover. The jump expert is the retrained moving jump (5000 iterations, full budget: one target-height flight per cycle 1.00, four-feet contact agreement 0.98, takeoff stagger median 1 control step, velocity error 0.067 m/s), which is why this baseline differs from the previous in-place-jump one."
+  },
+  "reference_protocol": {
+    "note": "GPU rollouts are not bit-reproducible: repeated runs at a fixed seed differ (measured: transition aggregate sd ~0.002, handstand->walk range 0.66-0.74). On CPU repeated runs were bit-identical, so the source is the Warp/GPU solver. Compare challengers on means of repeated runs at seeds 0/1/2 with these exact commands, never on a single run.",
+    "per_skill": "uv run opendoge-eval LainLab-OpenDoge-Skills-Flat --checkpoint <ckpt> --num-envs 64 --steps 1000 --seed {0,1,2}",
+    "transitions": "uv run opendoge-eval LainLab-OpenDoge-Skills-Flat --checkpoint <ckpt> --num-envs 64 --seed {0,1,2} --transitions --hold-steps 250 --settle-steps 250 --measure-steps 200",
+    "observation_noise": "same commands with --corruption (the actor's training-time observation noise)",
+    "train_config": "same transition command with --train-config (interval pushes and episode resets)",
+    "condition": "play-config (clean observations) unless stated"
+  },
+  "reference_metrics": {
+    "per_skill_seed_means": {
+      "walk_standing_and_stepping": 1.0,
+      "walk_velocity_error": 0.0589,
+      "handstand_hold": 0.972,
+      "getup_standing": 0.973,
+      "jump_peak_rise_m": 0.0828,
+      "jump_recovery": 0.980,
+      "jump_substantial_flights_per_cycle": 1.001,
+      "jump_four_feet_together_in_window": 0.981,
+      "jump_takeoff_stagger_median_steps": 1.0
+    },
+    "per_skill_per_seed": {
+      "walk_velocity_error": [0.063, 0.0578, 0.056],
+      "handstand_hold": [0.971, 0.972, 0.972],
+      "getup_standing": [0.974, 0.974, 0.972],
+      "jump_peak_rise_m": [0.0811, 0.0832, 0.0841],
+      "jump_recovery": [1.0, 1.0, 0.941]
+    },
+    "transitions": {
+      "mean_off_diagonal": 0.9355,
+      "handstand_to_walk": 0.663,
+      "per_seed_aggregate": {"0": 0.9383, "1": 0.9364, "2": 0.9318},
+      "per_seed_handstand_to_walk": {"0": 0.655, "1": 0.661, "2": 0.673}
+    },
+    "robustness": {
+      "observation_noise_per_skill_seed0": "walk 1.000 / 0.074, handstand 0.972, getup 0.978, jump peak 0.086 m / recovery 1.000",
+      "observation_noise_transitions": "0.9314 +/- 0.0065 over seeds 0/1/2",
+      "train_config_transitions_seed0": 0.9452,
+      "note": "the baseline holds its transitions both under observation noise and under the full training condition (pushes + resets)."
+    },
+    "jump_criteria_note": "The old 0.070-0.080 m peak band belonged to the in-place jump task and was re-derived for the moving jump: the unified environment has no push event, so the shipped number is the push-free peak (0.0828 m over 3 seeds). The standalone task's higher 0.146 m peak is inflated by the push_robot event it retains in its play config."
+  },
+  "sota_adoption_rule": [
+    "Run the reference protocol at seeds 0, 1 and 2 and repeat each run (GPU rollouts vary at a fixed seed); compare means, never single runs.",
+    "Reject if any per-skill metric is worse than the reference by more than the measured run-to-run plus seed spread: walk velocity error > 0.068 (reference mean 0.0589 plus ~2 sd; the previous 0.06 cap sat below the walk expert's own 0.059 fidelity inside the unified environment and was unsatisfiable by construction), handstand < 0.95, getup < 0.93, jump substantial flights per cycle outside 0.9-1.1, jump four-feet contact agreement < 0.95, jump recovery < 0.96, jump peak outside 0.075-0.090 m.",
+    "Replace only if the transition aggregate improves beyond the measured run-to-run spread (>= 0.945 against the 0.9355 reference), or the weakest cell handstand->walk rises above 0.70 while the aggregate holds above 0.93.",
+    "A better single-seed or single-run aggregate is not sufficient: run-to-run spread alone reached 0.002 on the aggregate and 0.08 on handstand->walk."
+  ],
+  "rejected": {
+    "per-skill output heads (SkillHeadedActor)": "3 seeds: transition aggregate 0.9255 and handstand->walk 0.491 against the flat head's 0.9389 / 0.678, with identical per-skill metrics. Root cause: the cloning data contains no handover frames, so independent heads have nothing from which to learn the handover, while a flat head interpolates one continuous function across skills.",
+    "per-skill heads + handover data": "collecting real skill switches (opendoge-collect --handovers, ~1.1M frames labelled by the target expert) recovered only part of the gap: aggregate 0.9301, handstand->walk 0.552. Still below the flat head.",
+    "shared head + zero-init per-skill residual + handover data": "0.9288 / 0.555. Zero initialisation fixes the starting point, not the end point: the residuals grew over 30 epochs and landed where the independent heads did. Penalising residual magnitude, rather than re-initialising, is what would be needed.",
+    "PPO fine-tune LR 3e-4": "1900 iterations; transitions 0.916, walk stability 1.000 -> 0.931",
+    "PPO fine-tune LR 5e-5": "900 iterations; transitions 0.865, walk velocity error 0.054 -> 0.296, handstand -11 points",
+    "full-budget experts for handstand and jump (previous task version)": "transitions 0.873, jump->handstand collapsed to 0.359",
+    "recover-to-walk expert (withdrawn)": "transitions 0.846, handstand->walk 0.760 -> 0.327, jump->handstand 0.969 -> 0.370",
+    "single-seed walk-interference claim": "retracted: the 0.008 m/s gap attributed to the jump data is smaller than the same policy's seed spread (0.0141)."
+  },
+  "selection": "Single policy covering walk / handstand / get-up / jump with a 57-field observation. Re-registered after two changes that made the previous artifact unable to run at all: the observation gained the jump's 3-field twist block (54 -> 57), and the jump task was redesigned from an in-place jump into a moving one with one target-height flight per cycle (expert retrained at full budget). All four datasets were re-collected in the new layout and the student was re-cloned. Reference metrics, the observation-noise condition, the full-training condition and the run-to-run spread were all measured before registration (docs/opendoge_multiskill.md sections 5.5, 5.7 and 5.8)."
+}
